@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -File \".specify/scripts/powershell/setup-plan.ps1\" -Json)",
+      "Bash(powershell -File \".specify/scripts/powershell/update-agent-context.ps1\" -AgentType claude)",
+      "Bash(powershell -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json)",
+      "Bash(powershell -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)",
+      "Bash(composer require:*)",
+      "Bash(php -r \"echo 'php ok';\")"
+    ]
+  }
+}
