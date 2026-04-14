@@ -4,9 +4,10 @@ import { router, usePage } from '@inertiajs/vue3';
 import { Bell, Search, Plus, ChevronDown, LogOut, User, Settings } from 'lucide-vue-next';
 import type { Auth } from '@/types';
 
-const page = usePage<{ auth: Auth; name?: string }>();
+const page = usePage<{ auth: Auth; name?: string; low_stock_count?: number }>();
 const user = computed(() => page.props.auth?.user);
 const appName = computed(() => page.props.name ?? 'مستشفى النور');
+const lowStockCount = computed(() => page.props.low_stock_count ?? 0);
 
 const searchQuery = ref('');
 const userMenuOpen = ref(false);
@@ -53,16 +54,20 @@ function closeUserMenu() {
                 <span>حجز جديد</span>
             </button>
 
-            <!-- Notifications -->
-            <button
-                type="button"
+            <!-- Notifications (low-stock badge) -->
+            <a
+                href="/inventory?low_stock=1"
                 class="relative rounded-lg p-2 text-hospital-text-2 hover:bg-hospital-bg hover:text-hospital-primary transition-colors"
-                title="الإشعارات"
+                :title="lowStockCount > 0 ? `${lowStockCount} أصناف منخفضة في المخزن` : 'لا توجد تنبيهات'"
             >
                 <Bell class="h-5 w-5" />
-                <!-- badge placeholder — wired up in Phase 12 -->
-                <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-hospital-danger" />
-            </button>
+                <span
+                    v-if="lowStockCount > 0"
+                    class="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-hospital-danger text-[10px] font-bold text-white"
+                >
+                    {{ lowStockCount > 9 ? '9+' : lowStockCount }}
+                </span>
+            </a>
 
             <!-- User Menu -->
             <div class="relative">

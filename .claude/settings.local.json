@@ -6,7 +6,13 @@
       "Bash(powershell -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json)",
       "Bash(powershell -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)",
       "Bash(composer require:*)",
-      "Bash(php -r \"echo 'php ok';\")"
+      "Bash(php -r \"echo 'php ok';\")",
+      "Bash(vendor/bin/pint --dirty --format agent)",
+      "Bash(grep -r \"use Modules\\\\\\\\\" \"D:\\\\Projects\\\\neil hospital\\\\v3\\\\Modules\" --include=\"*.php\" -h)",
+      "Bash(grep -v \"^$\")",
+      "Bash(powershell.exe -NonInteractive -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)",
+      "Bash(node -e ':*)",
+      "Bash(grep -v \"manual\\\\|php artisan\\\\|composer test\\\\|npm run\\\\|golden-path\\\\|Run \\\\`php\\\\|T019\\\\|T024\\\\|T071\\\\|T091\\\\|T123\\\\|T187\\\\|T230\\\\|T231\\\\|T232\")"
     ]
   }
 }

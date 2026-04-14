@@ -137,27 +137,27 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 
 ### Implementation — Surgery, Lasik, Laser Modules
 
-- [ ] T068 [P] [US3] Create migration `database/migrations/xxxx_create_or_rooms_table.php` (int PK, name, status enum, total_beds)
-- [ ] T069 [P] [US3] Create migration `database/migrations/xxxx_create_or_beds_table.php` (int PK, room_id FK, bed_number, status enum)
-- [ ] T070 [P] [US3] Create migration `database/migrations/xxxx_create_surgeries_table.php` (all columns from data-model.md §Surgery including dept enum to distinguish Surgery/Lasik/Laser, supplies_used JSON, supply_total)
+- [x] T068 [P] [US3] Create migration `database/migrations/xxxx_create_or_rooms_table.php` (int PK, name, status enum, total_beds)
+- [x] T069 [P] [US3] Create migration `database/migrations/xxxx_create_or_beds_table.php` (int PK, room_id FK, bed_number, status enum)
+- [x] T070 [P] [US3] Create migration `database/migrations/xxxx_create_surgeries_table.php` (all columns from data-model.md §Surgery including dept enum to distinguish Surgery/Lasik/Laser, supplies_used JSON, supply_total)
 - [ ] T071 [P] [US3] Run `php artisan migrate` for or_rooms, or_beds, surgeries tables
-- [ ] T072 [P] [US3] Create `Modules/Surgery/Models/Surgery.php` (HasUlids, fillable, casts for JSON + enums, relationships: booking(), surgeon(), orBed())
-- [ ] T073 [P] [US3] Create `Modules/Surgery/Models/OrRoom.php` + `Modules/Surgery/Models/OrBed.php`
-- [ ] T074 [P] [US3] Create `Modules/Surgery/DTOs/SurgeryData.php` + `Modules/Surgery/DTOs/SuppliesUsedData.php`
-- [ ] T075 [P] [US3] Create `Modules/Surgery/Repositories/Contracts/SurgeryRepositoryInterface.php`
-- [ ] T076 [P] [US3] Create `Modules/Surgery/Repositories/SurgeryRepository.php`
-- [ ] T077 [US3] Create `Modules/Surgery/Services/SurgeryService.php` (schedule surgery, update status, compute supply_total from supplies_used JSON array, check OR bed availability)
-- [ ] T078 [US3] Create `Modules/Surgery/Actions/ScheduleSurgeryAction.php` (validates OR bed available for time slot, calls SurgeryService, logs activity)
-- [ ] T079 [US3] Create `Modules/Surgery/Actions/RecordSurgeryReportAction.php` (saves op_report, post_op_notes, complications, marks surgery completed)
-- [ ] T080 [US3] Create `Modules/Surgery/Actions/RecordSuppliesUsedAction.php` (updates supplies_used JSON + supply_total on Surgery, deducts from inventory_items.quantity via InventoryService)
-- [ ] T081 [US3] Create `Modules/Surgery/Http/Requests/StoreSurgeryRequest.php` + `RecordSuppliesRequest.php`
-- [ ] T082 [US3] Create `Modules/Surgery/Controllers/SurgeryController.php` + `OrRoomController.php`
-- [ ] T083 [US3] Register bindings + routes in `Modules/Surgery/Providers/SurgeryServiceProvider.php` and `Modules/Surgery/Routes/web.php` (GET /surgery, POST /surgery, PATCH /surgery/{id}/report, PATCH /surgery/{id}/supplies, GET /surgery/or-rooms)
-- [ ] T084 [P] [US3] Create Lasik module mirror: `Modules/Lasik/` — same structure as Surgery, routes prefixed `/lasik`, dept=lasik filter
-- [ ] T085 [P] [US3] Create Laser module mirror: `Modules/Laser/` — same structure, routes `/laser`, dept=laser, no OR bed (laser procedures use service-share fee formula, not supply deduction)
-- [ ] T086 [US3] Create Vue page `resources/js/Pages/Surgery/Index.vue` (procedure list with status pipeline, OR room availability grid, schedule form in Modal, supplies recorder panel)
-- [ ] T087 [P] [US3] Create Vue page `resources/js/Pages/Lasik/Index.vue` (same structure as Surgery, labeled for LASIK procedures)
-- [ ] T088 [P] [US3] Create Vue page `resources/js/Pages/Laser/Index.vue` (same structure, no OR bed selector)
+- [x] T072 [P] [US3] Create `Modules/Surgery/Models/Surgery.php` (HasUlids, fillable, casts for JSON + enums, relationships: booking(), surgeon(), orBed())
+- [x] T073 [P] [US3] Create `Modules/Surgery/Models/OrRoom.php` + `Modules/Surgery/Models/OrBed.php`
+- [x] T074 [P] [US3] Create `Modules/Surgery/DTOs/SurgeryData.php` + `Modules/Surgery/DTOs/SuppliesUsedData.php`
+- [x] T075 [P] [US3] Create `Modules/Surgery/Repositories/Contracts/SurgeryRepositoryInterface.php`
+- [x] T076 [P] [US3] Create `Modules/Surgery/Repositories/SurgeryRepository.php`
+- [x] T077 [US3] Create `Modules/Surgery/Services/SurgeryService.php` (schedule surgery, update status, compute supply_total from supplies_used JSON array, check OR bed availability)
+- [x] T078 [US3] Create `Modules/Surgery/Actions/ScheduleSurgeryAction.php` (validates OR bed available for time slot, calls SurgeryService, logs activity)
+- [x] T079 [US3] Create `Modules/Surgery/Actions/RecordSurgeryReportAction.php` (saves op_report, post_op_notes, complications, marks surgery completed)
+- [x] T080 [US3] Create `Modules/Surgery/Actions/RecordSuppliesUsedAction.php` (updates supplies_used JSON + supply_total on Surgery, deducts from inventory_items.quantity via InventoryService)
+- [x] T081 [US3] Create `Modules/Surgery/Http/Requests/StoreSurgeryRequest.php` + `RecordSuppliesRequest.php`
+- [x] T082 [US3] Create `Modules/Surgery/Controllers/SurgeryController.php` + `OrRoomController.php`
+- [x] T083 [US3] Register bindings + routes in `Modules/Surgery/Providers/SurgeryServiceProvider.php` and `Modules/Surgery/Routes/web.php` (GET /surgery, POST /surgery, PATCH /surgery/{id}/report, PATCH /surgery/{id}/supplies, GET /surgery/or-rooms)
+- [x] T084 [P] [US3] Create Lasik module mirror: `Modules/Lasik/` — same structure as Surgery, routes prefixed `/lasik`, dept=lasik filter
+- [x] T085 [P] [US3] Create Laser module mirror: `Modules/Laser/` — same structure, routes `/laser`, dept=laser, no OR bed (laser procedures use service-share fee formula, not supply deduction)
+- [x] T086 [US3] Create Vue page `resources/js/Pages/Surgery/Index.vue` (procedure list with status pipeline, OR room availability grid, schedule form in Modal, supplies recorder panel)
+- [x] T087 [P] [US3] Create Vue page `resources/js/Pages/Lasik/Index.vue` (same structure as Surgery, labeled for LASIK procedures)
+- [x] T088 [P] [US3] Create Vue page `resources/js/Pages/Laser/Index.vue` (same structure, no OR bed selector)
 
 **Checkpoint**: All three procedure departments (Surgery, LASIK, Laser) can schedule and complete procedures. Supply deduction updates inventory.
 
@@ -170,36 +170,36 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 
 ### Implementation — Accounting Module
 
-- [ ] T089 [P] [US4] Create migration `database/migrations/xxxx_create_journal_entries_table.php` (ULID PK, date, description, debit_account_id FK, credit_account_id FK, amount, reference, source enum, booking_id FK nullable, created_by FK)
-- [ ] T090 [P] [US4] Create migration `database/migrations/xxxx_create_treasury_entries_table.php` (ULID PK, type enum, description, amount, date, reference_no, beneficiary, account_id FK nullable, source enum, booking_id FK nullable, created_by FK)
+- [x] T089 [P] [US4] Create migration `database/migrations/xxxx_create_journal_entries_table.php` (ULID PK, date, description, debit_account_id FK, credit_account_id FK, amount, reference, source enum, booking_id FK nullable, created_by FK)
+- [x] T090 [P] [US4] Create migration `database/migrations/xxxx_create_treasury_entries_table.php` (ULID PK, type enum, description, amount, date, reference_no, beneficiary, account_id FK nullable, source enum, booking_id FK nullable, created_by FK)
 - [ ] T091 [US4] Run `php artisan migrate` for journal_entries, treasury_entries
-- [ ] T092 [P] [US4] Create `Modules/Accounting/Models/Account.php` (HasUlids, fillable, parent() and children() self-relationships)
-- [ ] T093 [P] [US4] Create `Modules/Accounting/Models/JournalEntry.php` (HasUlids, debitAccount(), creditAccount(), booking() relationships)
-- [ ] T094 [P] [US4] Create `Modules/Accounting/Models/TreasuryEntry.php` (HasUlids, account(), booking() relationships)
-- [ ] T095 [P] [US4] Create `Modules/Accounting/Repositories/Contracts/AccountRepositoryInterface.php` + `JournalRepositoryInterface.php` + `TreasuryRepositoryInterface.php`
-- [ ] T096 [P] [US4] Create `Modules/Accounting/Repositories/AccountRepository.php` + `JournalRepository.php` + `TreasuryRepository.php`
-- [ ] T097 [US4] Create `Modules/Accounting/Services/AccountingService.php` (getBalance(accountId, from, to), getTrialBalanceData, post journal entry with debit≠credit guard)
-- [ ] T098 [US4] Create `Modules/Accounting/Services/TrialBalanceService.php` (computes debit/credit totals per account for date range, asserts totals balance)
+- [x] T092 [P] [US4] Create `Modules/Accounting/Models/Account.php` (HasUlids, fillable, parent() and children() self-relationships)
+- [x] T093 [P] [US4] Create `Modules/Accounting/Models/JournalEntry.php` (HasUlids, debitAccount(), creditAccount(), booking() relationships)
+- [x] T094 [P] [US4] Create `Modules/Accounting/Models/TreasuryEntry.php` (HasUlids, account(), booking() relationships)
+- [x] T095 [P] [US4] Create `Modules/Accounting/Repositories/Contracts/AccountRepositoryInterface.php` + `JournalRepositoryInterface.php` + `TreasuryRepositoryInterface.php`
+- [x] T096 [P] [US4] Create `Modules/Accounting/Repositories/AccountRepository.php` + `JournalRepository.php` + `TreasuryRepository.php`
+- [x] T097 [US4] Create `Modules/Accounting/Services/AccountingService.php` (getBalance(accountId, from, to), getTrialBalanceData, post journal entry with debit≠credit guard)
+- [x] T098 [US4] Create `Modules/Accounting/Services/TrialBalanceService.php` (computes debit/credit totals per account for date range, asserts totals balance)
 - [ ] T099 [US4] Create `Modules/Accounting/Services/IncomeStatementService.php` (groups revenues and expenses, computes net income for period)
-- [ ] T100 [US4] Create `Modules/Accounting/Actions/PostJournalEntryAction.php` (validates debit≠credit, calls JournalRepository, updates running account balances)
-- [ ] T101 [US4] Create `Modules/Accounting/Actions/RecordTreasuryEntryAction.php` (calls TreasuryRepository, optionally links to booking)
-- [ ] T102 [US4] Create `Modules/Accounting/Actions/AutoPostBookingPaymentAction.php` (triggered when booking pay_status → paid: creates treasury_entry + 2 journal_entries per spec §auto-posting rules)
-- [ ] T103 [US4] Hook `AutoPostBookingPaymentAction` into `UpdateBookingAction` via Booking model event or explicit call in BookingService when pay_status changes to `paid`
-- [ ] T104 [US4] Create `Modules/Accounting/Http/Requests/StoreJournalEntryRequest.php` (includes `different:debit_account_id` rule on credit_account_id)
-- [ ] T105 [US4] Create `Modules/Accounting/Http/Requests/StoreTreasuryEntryRequest.php`
-- [ ] T106 [US4] Create `Modules/Accounting/Controllers/TreasuryController.php` (index with daily summary, store)
-- [ ] T107 [US4] Create `Modules/Accounting/Controllers/JournalController.php` (index with all accounts in props, store)
-- [ ] T108 [US4] Create `Modules/Accounting/Controllers/ChartOfAccountsController.php` (index as tree, store, update)
+- [x] T100 [US4] Create `Modules/Accounting/Actions/PostJournalEntryAction.php` (validates debit≠credit, calls JournalRepository, updates running account balances)
+- [x] T101 [US4] Create `Modules/Accounting/Actions/RecordTreasuryEntryAction.php` (calls TreasuryRepository, optionally links to booking)
+- [x] T102 [US4] Create `Modules/Accounting/Actions/AutoPostBookingPaymentAction.php` (triggered when booking pay_status → paid: creates treasury_entry + 2 journal_entries per spec §auto-posting rules)
+- [x] T103 [US4] Hook `AutoPostBookingPaymentAction` into `UpdateBookingAction` via Booking model event or explicit call in BookingService when pay_status changes to `paid`
+- [x] T104 [US4] Create `Modules/Accounting/Http/Requests/StoreJournalEntryRequest.php` (includes `different:debit_account_id` rule on credit_account_id)
+- [x] T105 [US4] Create `Modules/Accounting/Http/Requests/StoreTreasuryEntryRequest.php`
+- [x] T106 [US4] Create `Modules/Accounting/Controllers/TreasuryController.php` (index with daily summary, store)
+- [x] T107 [US4] Create `Modules/Accounting/Controllers/JournalController.php` (index with all accounts in props, store)
+- [x] T108 [US4] Create `Modules/Accounting/Controllers/ChartOfAccountsController.php` (index as tree, store, update)
 - [ ] T109 [US4] Create `Modules/Accounting/Controllers/TrialBalanceController.php` (index with date range filter, returns balanced data)
 - [ ] T110 [US4] Create `Modules/Accounting/Controllers/IncomeStatementController.php` (index with date range)
 - [ ] T111 [US4] Create `Modules/Accounting/Controllers/AccountStatementController.php` (index — consolidated statement per account)
-- [ ] T112 [US4] Register all bindings + routes in `Modules/Accounting/Providers/AccountingServiceProvider.php` and `Modules/Accounting/Routes/web.php`
-- [ ] T113 [US4] Create Vue page `resources/js/Pages/Accounting/Treasury.vue` (daily in/out entries, running balance, summary cards, add entry modal)
-- [ ] T114 [US4] Create Vue page `resources/js/Pages/Accounting/Journal.vue` (journal entry list, add entry form with account selectors)
-- [ ] T115 [US4] Create Vue page `resources/js/Pages/Accounting/ChartOfAccounts.vue` (tree view grouped by group type, add/edit account modal)
-- [ ] T116 [US4] Create Vue page `resources/js/Pages/Accounting/TrialBalance.vue` (two-column debit/credit table, grand totals row, date range filter, export bar)
+- [x] T112 [US4] Register all bindings + routes in `Modules/Accounting/Providers/AccountingServiceProvider.php` and `Modules/Accounting/Routes/web.php`
+- [x] T113 [US4] Create Vue page `resources/js/Pages/Accounting/Treasury.vue` (daily in/out entries, running balance, summary cards, add entry modal)
+- [x] T114 [US4] Create Vue page `resources/js/Pages/Accounting/Journal.vue` (journal entry list, add entry form with account selectors)
+- [x] T115 [US4] Create Vue page `resources/js/Pages/Accounting/ChartOfAccounts.vue` (tree view grouped by group type, add/edit account modal)
+- [x] T116 [US4] Create Vue page `resources/js/Pages/Accounting/TrialBalance.vue` (two-column debit/credit table, grand totals row, date range filter, export bar)
 - [ ] T117 [US4] Create Vue page `resources/js/Pages/Accounting/IncomeStatement.vue` (revenues section, expenses section, net income row — from HTML prototype `.is-section` styles)
-- [ ] T118 [US4] Create Vue page `resources/js/Pages/Accounting/AccountStatement.vue` (account selector, chronological transaction list with running balance)
+- [x] T118 [US4] Create Vue page `resources/js/Pages/Accounting/AccountStatement.vue` (account selector, chronological transaction list with running balance)
 
 **Checkpoint**: Full double-entry accounting functional. Payments auto-post journal entries. Trial balance is always balanced.
 
@@ -212,33 +212,33 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 
 ### Implementation — Inventory Module
 
-- [ ] T119 [P] [US5] Create migration `database/migrations/xxxx_create_suppliers_table.php`
-- [ ] T120 [P] [US5] Create migration `database/migrations/xxxx_create_inventory_items_table.php` (all columns from data-model.md including min_quantity, unit_cost, sell_price, expiry_date, supplier_id FK)
-- [ ] T121 [P] [US5] Create migration `database/migrations/xxxx_create_purchase_invoices_table.php` + `xxxx_create_purchase_invoice_items_table.php`
+- [x] T119 [P] [US5] Create migration `database/migrations/xxxx_create_suppliers_table.php`
+- [x] T120 [P] [US5] Create migration `database/migrations/xxxx_create_inventory_items_table.php` (all columns from data-model.md including min_quantity, unit_cost, sell_price, expiry_date, supplier_id FK)
+- [x] T121 [P] [US5] Create migration `database/migrations/xxxx_create_purchase_invoices_table.php` + `xxxx_create_purchase_invoice_items_table.php`
 - [ ] T122 [P] [US5] Create migration `database/migrations/xxxx_create_stock_permits_table.php` + `xxxx_create_stock_permit_items_table.php`
 - [ ] T123 [US5] Run `php artisan migrate` for inventory tables
-- [ ] T124 [P] [US5] Create `Modules/Inventory/Models/InventoryItem.php` (HasUlids, fillable, isLowStock() accessor: quantity <= min_quantity, supplier() relationship)
-- [ ] T125 [P] [US5] Create `Modules/Inventory/Models/Supplier.php` + `PurchaseInvoice.php` + `PurchaseInvoiceItem.php` + `StockPermit.php` + `StockPermitItem.php`
-- [ ] T126 [P] [US5] Create `Modules/Inventory/Models/Service.php` (the services table model — placed in Inventory module as per plan)
+- [x] T124 [P] [US5] Create `Modules/Inventory/Models/InventoryItem.php` (HasUlids, fillable, isLowStock() accessor: quantity <= min_quantity, supplier() relationship)
+- [x] T125 [P] [US5] Create `Modules/Inventory/Models/Supplier.php` + `PurchaseInvoice.php` + `PurchaseInvoiceItem.php` + `StockPermit.php` + `StockPermitItem.php`
+- [x] T126 [P] [US5] Create `Modules/Inventory/Models/Service.php` (the services table model — placed in Inventory module as per plan)
 - [ ] T127 [P] [US5] Create `Modules/Inventory/Repositories/Contracts/InventoryRepositoryInterface.php` + `SupplierRepositoryInterface.php`
 - [ ] T128 [P] [US5] Create `Modules/Inventory/Repositories/InventoryRepository.php` + `SupplierRepository.php`
-- [ ] T129 [US5] Create `Modules/Inventory/Services/InventoryService.php` (adjustQuantity() — adds or deducts stock qty with zero-floor guard, getLowStockItems())
+- [x] T129 [US5] Create `Modules/Inventory/Services/InventoryService.php` (adjustQuantity() — adds or deducts stock qty with zero-floor guard, getLowStockItems())
 - [ ] T130 [US5] Create `Modules/Inventory/Services/StockAlertService.php` (getLowStockCount() — used by HandleInertiaRequests to populate notification badge)
-- [ ] T131 [US5] Create `Modules/Inventory/Services/PurchaseInvoiceService.php` (creates invoice + line items, calls InventoryService::adjustQuantity for each item, posts accounting entry)
+- [x] T131 [US5] Create `Modules/Inventory/Services/PurchaseInvoiceService.php` (creates invoice + line items, calls InventoryService::adjustQuantity for each item, posts accounting entry)
 - [ ] T132 [US5] Create `Modules/Inventory/Actions/ReceivePurchaseInvoiceAction.php`
 - [ ] T133 [US5] Create `Modules/Inventory/Actions/IssueStockPermitAction.php` (type=out: validates sufficient qty, calls InventoryService::adjustQuantity, logs activity)
 - [ ] T134 [US5] Create `Modules/Inventory/Actions/AddStockPermitAction.php` (type=in: calls InventoryService::adjustQuantity with positive delta)
 - [ ] T135 [US5] Create `Modules/Inventory/Actions/StockTakeAdjustmentAction.php` (computes variance between physical count and system qty, posts adjustment)
 - [ ] T136 [US5] Create all Inventory HTTP Requests in `Modules/Inventory/Http/Requests/`
-- [ ] T137 [US5] Create `Modules/Inventory/Controllers/InventoryController.php` + `SupplierController.php` + `PurchaseInvoiceController.php` + `StockPermitController.php` + `StockTakeController.php` + `PurchaseReturnController.php`
+- [x] T137 [US5] Create `Modules/Inventory/Controllers/InventoryController.php` + `SupplierController.php` + `PurchaseInvoiceController.php` + `StockPermitController.php` + `StockTakeController.php` + `PurchaseReturnController.php`
 - [ ] T138 [US5] Create `Modules/Inventory/Controllers/ServiceController.php` (CRUD for services table + Excel import via maatwebsite/laravel-excel `ServicesImport` class)
 - [ ] T139 [US5] Create `Modules/Inventory/Imports/ServicesImport.php` (implements `ToModel`, `WithHeadings`, `WithUpserts` — adds new, updates existing by name match)
 - [ ] T140 [US5] Create `Modules/Inventory/Imports/InventoryImport.php` (same pattern for inventory items)
-- [ ] T141 [US5] Register all bindings + routes in `Modules/Inventory/Providers/InventoryServiceProvider.php` and `Modules/Inventory/Routes/web.php`
-- [ ] T142 [US5] Update `app/Http/Middleware/HandleInertiaRequests.php` to include `low_stock_count` from `StockAlertService::getLowStockCount()` in shared Inertia data
-- [ ] T143 [US5] Create Vue page `resources/js/Pages/Inventory/Index.vue` (item list with low-stock row highlighting, add item modal, Excel import button)
-- [ ] T144 [P] [US5] Create Vue page `resources/js/Pages/Inventory/Suppliers.vue`
-- [ ] T145 [P] [US5] Create Vue page `resources/js/Pages/Inventory/PurchaseInvoices.vue` (invoice list, create invoice with line items)
+- [x] T141 [US5] Register all bindings + routes in `Modules/Inventory/Providers/InventoryServiceProvider.php` and `Modules/Inventory/Routes/web.php`
+- [x] T142 [US5] Update `app/Http/Middleware/HandleInertiaRequests.php` to include `low_stock_count` from `StockAlertService::getLowStockCount()` in shared Inertia data
+- [x] T143 [US5] Create Vue page `resources/js/Pages/Inventory/Index.vue` (item list with low-stock row highlighting, add item modal, Excel import button)
+- [x] T144 [P] [US5] Create Vue page `resources/js/Pages/Inventory/Suppliers.vue`
+- [x] T145 [P] [US5] Create Vue page `resources/js/Pages/Inventory/PurchaseInvoices.vue` (invoice list, create invoice with line items)
 - [ ] T146 [P] [US5] Create Vue page `resources/js/Pages/Inventory/StockPermit.vue` (dispensing/addition permit form with item multi-select + qty)
 - [ ] T147 [P] [US5] Create Vue page `resources/js/Pages/Inventory/Services.vue` (services CRUD table with Excel import)
 
@@ -255,7 +255,7 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 
 - [ ] T148 [US6] Create `Modules/Accounting/Controllers/LedgerController.php` (دفتر الأستاذ — account ledger with all transactions for selected account + running balance)
 - [ ] T149 [US6] Add route GET /ledger to `Modules/Accounting/Routes/web.php`
-- [ ] T150 [US6] Create Vue page `resources/js/Pages/Accounting/Ledger.vue` (account selector dropdown, transaction table, running balance column, date filter)
+- [x] T150 [US6] Create Vue page `resources/js/Pages/Accounting/Ledger.vue` (account selector dropdown, transaction table, running balance column, date filter)
 
 **Checkpoint**: All financial accounting screens functional — Chart of Accounts, Journal, Trial Balance, Income Statement, Account Statement, Ledger.
 
@@ -268,13 +268,13 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 
 ### Implementation — Doctor Module
 
-- [ ] T151 [P] [US7] Create migration `database/migrations/xxxx_create_doctor_shifts_table.php` + `xxxx_create_doctor_payments_table.php`
-- [ ] T152 [US7] Run `php artisan migrate` for doctor tables
-- [ ] T153 [P] [US7] Create `Modules/Doctor/Models/DoctorShift.php` + `Modules/Doctor/Models/DoctorPayment.php`
+- [x] T151 [P] [US7] Create migration `database/migrations/xxxx_create_doctor_shifts_table.php` + `xxxx_create_doctor_payments_table.php`
+- [x] T152 [US7] Run `php artisan migrate` for doctor tables
+- [x] T153 [P] [US7] Create `Modules/Doctor/Models/DoctorShift.php` + `Modules/Doctor/Models/DoctorPayment.php`
 - [ ] T154 [P] [US7] Create `Modules/Doctor/Repositories/Contracts/DoctorRepositoryInterface.php`
 - [ ] T155 [P] [US7] Create `Modules/Doctor/Repositories/DoctorRepository.php`
 - [ ] T156 [US7] Create `Modules/Doctor/Services/DoctorService.php` (CRUD, getActiveForDept, linkUserAccount)
-- [ ] T157 [US7] Create `Modules/Doctor/Services/DoctorClaimsService.php` — implement all 5 fee calculation strategies:
+- [x] T157 [US7] Create `Modules/Doctor/Services/DoctorClaimsService.php` — implement all 5 fee calculation strategies:
   - `ClinicFeeStrategy`: dr_share = paid - service.center_share
   - `LabsFeeStrategy`: same as clinic
   - `LaserFeeStrategy`: same as clinic (service-defined share)
@@ -284,11 +284,11 @@ description: "Task list for Al-Nour Eye Hospital Management System"
   - Dispatch to correct strategy based on booking.dept + booking.pay_method + doctor.fee_type
 - [ ] T158 [US7] Create `Modules/Doctor/Actions/CreateDoctorAction.php` + `RecordDoctorPaymentAction.php` + `OpenDoctorShiftAction.php`
 - [ ] T159 [US7] Create all Doctor HTTP Requests in `Modules/Doctor/Http/Requests/`
-- [ ] T160 [US7] Create `Modules/Doctor/Controllers/DoctorController.php` + `DoctorClaimsController.php` + `DoctorPaymentController.php` + `DoctorShiftController.php`
+- [x] T160 [US7] Create `Modules/Doctor/Controllers/DoctorController.php` + `DoctorClaimsController.php` + `DoctorPaymentController.php` + `DoctorShiftController.php`
 - [ ] T161 [US7] Create `Modules/Doctor/Controllers/ShiftHandoverController.php` (records shift handover summary, changes shift status to handed_over)
-- [ ] T162 [US7] Register all bindings + routes in `Modules/Doctor/Providers/DoctorServiceProvider.php` and `Modules/Doctor/Routes/web.php`
-- [ ] T163 [US7] Create Vue page `resources/js/Pages/Doctor/Index.vue` (doctor list with fee type badges, add/edit modal)
-- [ ] T164 [US7] Create Vue page `resources/js/Pages/Doctor/Claims.vue` (date range filter, per-doctor accordion with case breakdown table + totals, export bar — from HTML prototype `.dc-section .dc-doctor-hd .dc-table` styles)
+- [x] T162 [US7] Register all bindings + routes in `Modules/Doctor/Providers/DoctorServiceProvider.php` and `Modules/Doctor/Routes/web.php`
+- [x] T163 [US7] Create Vue page `resources/js/Pages/Doctor/Index.vue` (doctor list with fee type badges, add/edit modal)
+- [x] T164 [US7] Create Vue page `resources/js/Pages/Doctor/Claims.vue` (date range filter, per-doctor accordion with case breakdown table + totals, export bar — from HTML prototype `.dc-section .dc-doctor-hd .dc-table` styles)
 - [ ] T165 [US7] Create Vue page `resources/js/Pages/Doctor/Payments.vue` (payment history per doctor, record payment modal)
 - [ ] T166 [US7] Create Vue page `resources/js/Pages/Doctor/Shifts.vue` (shift schedule per doctor, open/close shift, handover button)
 
@@ -311,16 +311,16 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [ ] T172 [US8] Create `Modules/Admin/Services/ActivityLogService.php` (log() method: inserts activity_log row, captures old/new values, IP address — called by all Actions)
 - [ ] T173 [US8] Create `Modules/Admin/Actions/CreateUserAction.php` + `AssignRoleAction.php`
 - [ ] T174 [US8] Create `Modules/Admin/Http/Requests/StoreUserRequest.php` + `UpdateSettingsRequest.php`
-- [ ] T175 [US8] Create `Modules/Admin/Controllers/UserController.php` (index, store, update, destroy — manage user accounts + role assignment)
+- [x] T175 [US8] Create `Modules/Admin/Controllers/UserController.php` (index, store, update, destroy — manage user accounts + role assignment)
 - [ ] T176 [US8] Create `Modules/Admin/Controllers/RoleController.php` (index — display roles and their permissions in grid, update permissions per role)
-- [ ] T177 [US8] Create `Modules/Admin/Controllers/SettingsController.php` (index shows all setting groups, update saves key-value pairs)
-- [ ] T178 [US8] Create `Modules/Admin/Controllers/SystemLogController.php` (index with user/module/action filters + date range)
+- [x] T177 [US8] Create `Modules/Admin/Controllers/SettingsController.php` (index shows all setting groups, update saves key-value pairs)
+- [x] T178 [US8] Create `Modules/Admin/Controllers/SystemLogController.php` (index with user/module/action filters + date range)
 - [ ] T179 [US8] Create `Modules/Admin/Controllers/ArchiveController.php` (list archived bookings and records)
-- [ ] T180 [US8] Register all bindings + routes in `Modules/Admin/Providers/AdminServiceProvider.php` and `Modules/Admin/Routes/web.php` (all routes guarded by `users.manage` or `settings.manage`)
-- [ ] T181 [US8] Create Vue page `resources/js/Pages/Admin/Users.vue` (user cards with role pills from HTML prototype `.user-card .role-pill`, add user modal with role selector)
+- [x] T180 [US8] Register all bindings + routes in `Modules/Admin/Providers/AdminServiceProvider.php` and `Modules/Admin/Routes/web.php` (all routes guarded by `users.manage` or `settings.manage`)
+- [x] T181 [US8] Create Vue page `resources/js/Pages/Admin/Users.vue` (user cards with role pills from HTML prototype `.user-card .role-pill`, add user modal with role selector)
 - [ ] T182 [US8] Create Vue page `resources/js/Pages/Admin/Roles.vue` (role cards with permission checkbox grid from HTML prototype `.role-card .perm-grid`)
-- [ ] T183 [US8] Create Vue page `resources/js/Pages/Admin/Settings.vue` (grouped settings sections from HTML prototype `.settings-section .settings-title`)
-- [ ] T184 [US8] Create Vue page `resources/js/Pages/Admin/SystemLog.vue` (activity log table with filters)
+- [x] T183 [US8] Create Vue page `resources/js/Pages/Admin/Settings.vue` (grouped settings sections from HTML prototype `.settings-section .settings-title`)
+- [x] T184 [US8] Create Vue page `resources/js/Pages/Admin/SystemLog.vue` (activity log table with filters)
 - [ ] T185 [US8] Create Vue page `resources/js/Pages/Admin/Archive.vue`
 
 **Checkpoint**: RBAC fully enforced. All 6 roles have correct access. System log records all mutations.
@@ -348,7 +348,7 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [ ] T197 [US9] Create `Modules/Reporting/Services/ReportingService.php` (all 10 report data queries: dept revenue, cases, doctor claims, doctor payments, insurance claims, inventory movement, purchase prices, profit/loss, expense analysis, system log)
 - [ ] T198 [US9] Create `Modules/Reporting/Services/ExcelExportService.php` (dispatch to correct `maatwebsite/laravel-excel` Export class based on report type)
 - [ ] T199 [P] [US9] Create Excel Export classes in `Modules/Reporting/Exports/` (one per report type: DeptRevenueExport, CasesExport, DoctorClaimsExport, DoctorPaymentsExport, InsuranceClaimsExport, InventoryMovementExport, ProfitLossExport — each implements `FromQuery + WithHeadings`)
-- [ ] T200 [US9] Create `Modules/Reporting/Controllers/DashboardController.php` (stats, recent bookings, dept revenue today, low stock count — from contracts/reporting.md)
+- [x] T200 [US9] Create `Modules/Reporting/Controllers/DashboardController.php` (stats, recent bookings, dept revenue today, low stock count — from contracts/reporting.md)
 - [ ] T201 [US9] Create `Modules/Reporting/Controllers/DeptRevenueReportController.php`
 - [ ] T202 [US9] Create `Modules/Reporting/Controllers/CasesReportController.php`
 - [ ] T203 [US9] Create `Modules/Reporting/Controllers/DoctorClaimsReportController.php` (delegates to DoctorClaimsService for fee calculations)
@@ -379,14 +379,14 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 **Purpose**: Auth login page, Labs module, sales invoice, purchase returns, stocktake, final integration.
 
 - [ ] T221 [P] Create Vue page `resources/js/Pages/Auth/Login.vue` (Arabic login form matching HTML prototype login-screen: hospital logo, eye SVG, username/password fields — role selector removed; role is server-assigned)
-- [ ] T222 [P] Implement Labs module `Modules/Labs/` (migration for diagnostic_results, Model, Repository interface, Repository, Service, Action, Controller, Routes, Vue page `resources/js/Pages/Labs/Index.vue`)
+- [x] T222 [P] Implement Labs module `Modules/Labs/` (migration for diagnostic_results, Model, Repository interface, Repository, Service, Action, Controller, Routes, Vue page `resources/js/Pages/Labs/Index.vue`)
 - [ ] T223 [P] Create `Modules/Accounting/Controllers/SalesInvoiceController.php` (فاتورة البيع — generates invoice from booking, applies insurance coverage, triggers AutoPostBookingPaymentAction) + Vue page `resources/js/Pages/Accounting/SalesInvoice.vue`
 - [ ] T224 [P] Create `Modules/Inventory/Controllers/PurchaseReturnController.php` (مردودات المشتريات — returns items to supplier, adjusts inventory quantity upward, posts accounting reversal) + Vue page `resources/js/Pages/Inventory/PurchaseReturns.vue`
 - [ ] T225 [P] Create `Modules/Inventory/Controllers/StockTakeController.php` (تسوية الجرد — physical count entry, variance calculation, adjustment posting) + Vue page `resources/js/Pages/Inventory/StockTake.vue`
-- [ ] T226 Create `resources/js/Pages/Booking/PatientFile.vue` (ملف المريض الطبي — cross-module patient history: all bookings, clinic sheets, diagnostics, surgeries displayed chronologically by file_no)
+- [x] T226 Create `resources/js/Pages/Booking/PatientFile.vue` (ملف المريض الطبي — cross-module patient history: all bookings, clinic sheets, diagnostics, surgeries displayed chronologically by file_no)
 - [ ] T227 Create `resources/js/Pages/Doctor/ShiftHandover.vue` (تسليم الورديات — shift summary: patient count, revenue, pending cases, hand-over signature/notes)
-- [ ] T228 Create `resources/js/Pages/Accounting/DailyJournal.vue` (قيود اليومية — alias to Journal.vue with date defaulted to today; ensure this route exists at GET /daily-journal)
-- [ ] T229 [P] Add `@media print` CSS rules to Tailwind output or in `resources/css/app.css` (hide sidebar, topbar, action buttons; show full report content; format for A4 RTL paper)
+- [x] T228 Create `resources/js/Pages/Accounting/DailyJournal.vue` (قيود اليومية — alias to Journal.vue with date defaulted to today; ensure this route exists at GET /daily-journal)
+- [x] T229 [P] Add `@media print` CSS rules to Tailwind output or in `resources/css/app.css` (hide sidebar, topbar, action buttons; show full report content; format for A4 RTL paper)
 - [ ] T230 Run `composer test` (pint + phpunit) and fix any failures
 - [ ] T231 Run `npm run types:check` and `npm run lint:check` and fix any TypeScript / ESLint errors
 - [ ] T232 Perform golden-path validation per `specs/001-eye-hospital-hms/quickstart.md` checklist (all 6 flows manually verified)

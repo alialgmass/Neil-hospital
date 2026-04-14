@@ -74,4 +74,26 @@ class BookingController extends Controller
             'booking' => $booking->load(['doctor:id,name', 'service:id,name']),
         ]);
     }
+
+    public function patientFile(string $fileNo): Response
+    {
+        $bookings = \Modules\Booking\Models\Booking::query()
+            ->where('file_no', $fileNo)
+            ->with(['doctor:id,name', 'clinicSheet', 'diagnosticResults', 'surgery'])
+            ->orderByDesc('visit_date')
+            ->get();
+
+        $patient = $bookings->first();
+
+        return Inertia::render('booking/PatientFile', [
+            'file_no'  => $fileNo,
+            'patient'  => $patient ? [
+                'name'    => $patient->patient_name,
+                'phone'   => $patient->patient_phone,
+                'age'     => $patient->patient_age,
+                'file_no' => $patient->file_no,
+            ] : null,
+            'bookings' => $bookings,
+        ]);
+    }
 }

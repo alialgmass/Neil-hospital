@@ -39,6 +39,7 @@
     --color-hospital-text:             #0D1F3C;
     --color-hospital-text-2:           #4A5878;
     --color-hospital-text-3:           #8A96AE;
+    --color-hospital-muted:            #8A96AE;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -196,4 +197,86 @@
     body {
         @apply bg-background text-foreground;
     }
+}
+
+/* ============================================================
+   Print styles — A4 RTL, hide chrome, show content
+   ============================================================ */
+@media print {
+    /* Hide navigation chrome */
+    aside,
+    nav,
+    [data-sidebar],
+    .topbar,
+    [class*="topbar"],
+    [data-topbar],
+    header {
+        display: none !important;
+    }
+
+    /* Reset layout to single column */
+    body,
+    #app,
+    main,
+    [data-page] {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
+    /* Hide action buttons when printing */
+    button:not([data-print-show]),
+    [data-print-hide],
+    .no-print {
+        display: none !important;
+    }
+
+    /* Page setup for RTL A4 */
+    @page {
+        size: A4 portrait;
+        margin: 15mm 20mm;
+        direction: rtl;
+    }
+
+    /* Improve table legibility */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th,
+    td {
+        border: 1px solid #dde4ef;
+        padding: 6px 8px;
+        font-size: 11pt;
+    }
+
+    /* Avoid page breaks inside rows */
+    tr,
+    .print-no-break {
+        page-break-inside: avoid;
+    }
+
+    /* Receipt specific */
+    .receipt-print,
+    [data-print-receipt] {
+        display: block !important;
+    }
+
+    /* Force white background on cards */
+    .rounded-xl,
+    .rounded-lg,
+    [class*="shadow"] {
+        box-shadow: none !important;
+        border: 1px solid #dde4ef !important;
+    }
+
+    /* Color adjustments for print */
+    .text-hospital-primary  { color: #0A4FA6 !important; }
+    .text-hospital-success  { color: #1A8C5B !important; }
+    .text-hospital-danger   { color: #D63B3B !important; }
+    .bg-hospital-primary    { background: #0A4FA6 !important; -webkit-print-color-adjust: exact; }
 }

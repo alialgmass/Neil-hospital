@@ -5,6 +5,8 @@ namespace Modules\Booking\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Booking extends Model
 {
@@ -52,12 +54,27 @@ class Booking extends Model
 
     public function service(): BelongsTo
     {
-        return $this->belongsTo(\Modules\Inventory\Models\Service::class);
+        return $this->belongsTo(Service::class);
     }
 
     public function insuranceCompany(): BelongsTo
     {
-        return $this->belongsTo(\Modules\Insurance\Models\InsuranceCompany::class, 'ins_company_id');
+        return $this->belongsTo(InsuranceCompany::class, 'ins_company_id');
+    }
+
+    public function clinicSheet(): HasOne
+    {
+        return $this->hasOne(\Modules\Clinic\Models\ClinicSheet::class);
+    }
+
+    public function diagnosticResults(): HasMany
+    {
+        return $this->hasMany(\Modules\Labs\Models\DiagnosticResult::class);
+    }
+
+    public function surgery(): HasOne
+    {
+        return $this->hasOne(\Modules\Surgery\Models\Surgery::class);
     }
 
     public function createdBy(): BelongsTo

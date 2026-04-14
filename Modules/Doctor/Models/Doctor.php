@@ -36,4 +36,14 @@ class Doctor extends Model
     {
         return $this->hasMany(\Modules\Booking\Models\Booking::class);
     }
+
+    public function shifts(): HasMany
+    {
+        return $this->hasMany(DoctorShift::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(DoctorPayment::class);
+    }
 }
