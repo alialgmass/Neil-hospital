@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { FlaskConical, PlusCircle } from 'lucide-vue-next';
+import { ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
@@ -71,7 +71,9 @@ function openResult(bookingId: string) {
 
 function submitResult() {
     form.post(`/labs/${resultBooking.value}/results`, {
-        onSuccess: () => { showResult.value = false; },
+        onSuccess: () => {
+ showResult.value = false; 
+},
     });
 }
 

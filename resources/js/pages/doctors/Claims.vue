@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { Calculator, CreditCard } from 'lucide-vue-next';
+import { ref, computed } from 'vue';
 import Modal from '@/components/shared/Modal.vue';
 
 interface Doctor { id: string; name: string; fee_type: string }
@@ -36,7 +36,10 @@ const fromFilter   = ref(props.filters.from      ?? '');
 const toFilter     = ref(props.filters.to         ?? '');
 
 function calculate() {
-    if (!doctorFilter.value || !fromFilter.value || !toFilter.value) { return; }
+    if (!doctorFilter.value || !fromFilter.value || !toFilter.value) {
+ return; 
+}
+
     router.get('/dr-claims/calculate', {
         doctor_id: doctorFilter.value,
         from:      fromFilter.value,
@@ -63,17 +66,22 @@ function openPay() {
         payForm.period_from = props.claims.period_from;
         payForm.period_to   = props.claims.period_to;
     }
+
     showPay.value = true;
 }
 
 function submitPay() {
-    payForm.post('/dr-claims/pay', { onSuccess: () => { showPay.value = false; } });
+    payForm.post('/dr-claims/pay', { onSuccess: () => {
+ showPay.value = false; 
+} });
 }
 
 const deptLabels: Record<string, string> = {
     clinic: 'عيادة', labs: 'فحوصات', surgery: 'عمليات', lasik: 'ليزك', laser: 'ليزر',
 };
-function fmt(n: number) { return Number(n).toLocaleString('ar-EG', { minimumFractionDigits: 2 }) + ' ج.م'; }
+function fmt(n: number) {
+ return Number(n).toLocaleString('ar-EG', { minimumFractionDigits: 2 }) + ' ج.م'; 
+}
 </script>
 
 <template>

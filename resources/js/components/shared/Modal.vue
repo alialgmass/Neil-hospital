@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
 import { X } from 'lucide-vue-next';
+import { onMounted, onUnmounted } from 'vue';
 
 interface Props {
     modelValue: boolean;
@@ -21,13 +21,18 @@ const emit = defineEmits<{
 }>();
 
 function close() {
-    if (!props.closeable) return;
+    if (!props.closeable) {
+return;
+}
+
     emit('update:modelValue', false);
     emit('close');
 }
 
 function onKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape') close();
+    if (e.key === 'Escape') {
+close();
+}
 }
 
 onMounted(() => document.addEventListener('keydown', onKeydown));

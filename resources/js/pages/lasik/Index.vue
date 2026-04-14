@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { CalendarPlus, ClipboardList, Package } from 'lucide-vue-next';
+import { ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
@@ -71,7 +71,9 @@ const scheduleForm = useForm({
 });
 function submitSchedule() {
     scheduleForm.post('/lasik', {
-        onSuccess: () => { showSchedule.value = false; scheduleForm.reset(); },
+        onSuccess: () => {
+ showSchedule.value = false; scheduleForm.reset(); 
+},
     });
 }
 
@@ -79,9 +81,13 @@ function submitSchedule() {
 const showReport   = ref(false);
 const reportTarget = ref('');
 const reportForm   = useForm({ op_report: '', post_op_notes: '', complications: '' });
-function openReport(id: string) { reportTarget.value = id; reportForm.reset(); showReport.value = true; }
+function openReport(id: string) {
+ reportTarget.value = id; reportForm.reset(); showReport.value = true; 
+}
 function submitReport() {
-    reportForm.post(`/lasik/${reportTarget.value}/report`, { onSuccess: () => { showReport.value = false; } });
+    reportForm.post(`/lasik/${reportTarget.value}/report`, { onSuccess: () => {
+ showReport.value = false; 
+} });
 }
 
 /* ── Supplies ── */
@@ -89,11 +95,19 @@ const showSupplies   = ref(false);
 const suppliesTarget = ref('');
 interface SupplyItem { name: string; qty: number; unit_cost: number }
 const supplyItems = ref<SupplyItem[]>([{ name: '', qty: 1, unit_cost: 0 }]);
-function addSupplyRow() { supplyItems.value.push({ name: '', qty: 1, unit_cost: 0 }); }
-function removeSupplyRow(idx: number) { supplyItems.value.splice(idx, 1); }
-function openSupplies(id: string) { suppliesTarget.value = id; supplyItems.value = [{ name: '', qty: 1, unit_cost: 0 }]; showSupplies.value = true; }
+function addSupplyRow() {
+ supplyItems.value.push({ name: '', qty: 1, unit_cost: 0 }); 
+}
+function removeSupplyRow(idx: number) {
+ supplyItems.value.splice(idx, 1); 
+}
+function openSupplies(id: string) {
+ suppliesTarget.value = id; supplyItems.value = [{ name: '', qty: 1, unit_cost: 0 }]; showSupplies.value = true; 
+}
 function submitSupplies() {
-    router.post(`/lasik/${suppliesTarget.value}/supplies`, { surgery_id: suppliesTarget.value, items: supplyItems.value }, { onSuccess: () => { showSupplies.value = false; } });
+    router.post(`/lasik/${suppliesTarget.value}/supplies`, { surgery_id: suppliesTarget.value, items: supplyItems.value }, { onSuccess: () => {
+ showSupplies.value = false; 
+} });
 }
 
 const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'];

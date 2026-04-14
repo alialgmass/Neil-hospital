@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { Printer } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 interface TrialRow {
     code: string;
@@ -35,6 +35,9 @@ const groupLabels: Record<string, string> = {
 function fmt(n: number) {
     return n.toLocaleString('ar-EG', { minimumFractionDigits: 2 });
 }
+function printPage() {
+ window.print(); 
+}
 </script>
 
 <template>
@@ -45,7 +48,7 @@ function fmt(n: number) {
         <div class="flex items-center gap-2">
             <input v-model="fromFilter" type="date" class="rounded-lg border border-hospital-border bg-hospital-bg px-3 py-2 text-sm focus:border-hospital-primary focus:outline-none" @change="applyFilters" />
             <input v-model="toFilter"   type="date" class="rounded-lg border border-hospital-border bg-hospital-bg px-3 py-2 text-sm focus:border-hospital-primary focus:outline-none" @change="applyFilters" />
-            <button class="flex items-center gap-1.5 rounded-lg border border-hospital-border px-3 py-2 text-sm hover:bg-hospital-bg" @click="window.print()">
+            <button class="flex items-center gap-1.5 rounded-lg border border-hospital-border px-3 py-2 text-sm hover:bg-hospital-bg" @click="printPage">
                 <Printer class="h-4 w-4" /> طباعة
             </button>
         </div>

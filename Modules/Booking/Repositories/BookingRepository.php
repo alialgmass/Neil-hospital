@@ -15,7 +15,7 @@ class BookingRepository extends BaseRepository implements BookingRepositoryInter
         parent::__construct(new Booking);
     }
 
-    public function paginate(BookingFilterData $filter): LengthAwarePaginator
+    public function filterAndPaginate(BookingFilterData $filter): LengthAwarePaginator
     {
         $query = Booking::query()
             ->with(['doctor:id,name', 'insuranceCompany:id,name'])
@@ -51,8 +51,8 @@ class BookingRepository extends BaseRepository implements BookingRepositoryInter
         if ($filter->search) {
             $query->where(function ($q) use ($filter) {
                 $q->where('patient_name', 'like', "%{$filter->search}%")
-                  ->orWhere('file_no', 'like', "%{$filter->search}%")
-                  ->orWhere('patient_phone', 'like', "%{$filter->search}%");
+                    ->orWhere('file_no', 'like', "%{$filter->search}%")
+                    ->orWhere('patient_phone', 'like', "%{$filter->search}%");
             });
         }
 
@@ -115,7 +115,7 @@ class BookingRepository extends BaseRepository implements BookingRepositoryInter
         $prefix = "MRN-{$year}-";
 
         $max = Booking::where('file_no', 'like', "{$prefix}%")
-            ->selectRaw("MAX(CAST(SUBSTRING(file_no, ?) AS UNSIGNED)) as seq", [strlen($prefix) + 1])
+            ->selectRaw('MAX(CAST(SUBSTRING(file_no, ?) AS UNSIGNED)) as seq', [strlen($prefix) + 1])
             ->value('seq');
 
         return (int) $max;

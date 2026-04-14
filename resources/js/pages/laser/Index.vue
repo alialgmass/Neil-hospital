@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { CalendarPlus, ClipboardList } from 'lucide-vue-next';
+import { ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
@@ -61,7 +61,9 @@ const scheduleForm = useForm({
 });
 function submitSchedule() {
     scheduleForm.post('/laser', {
-        onSuccess: () => { showSchedule.value = false; scheduleForm.reset(); },
+        onSuccess: () => {
+ showSchedule.value = false; scheduleForm.reset(); 
+},
     });
 }
 
@@ -69,9 +71,13 @@ function submitSchedule() {
 const showReport   = ref(false);
 const reportTarget = ref('');
 const reportForm   = useForm({ op_report: '', post_op_notes: '', complications: '' });
-function openReport(id: string) { reportTarget.value = id; reportForm.reset(); showReport.value = true; }
+function openReport(id: string) {
+ reportTarget.value = id; reportForm.reset(); showReport.value = true; 
+}
 function submitReport() {
-    reportForm.post(`/laser/${reportTarget.value}/report`, { onSuccess: () => { showReport.value = false; } });
+    reportForm.post(`/laser/${reportTarget.value}/report`, { onSuccess: () => {
+ showReport.value = false; 
+} });
 }
 
 const laserProcedures = ['YAG Laser', 'ليزر شبكية', 'ليزر جلوكوما (SLT)', 'ليزر جلوكوما (ALT)', 'ليزر ملتحمة'];

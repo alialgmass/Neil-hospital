@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import {
     CalendarPlus,
@@ -9,6 +8,7 @@ import {
     Printer,
     ChevronDown,
 } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import DateFilter from '@/components/shared/DateFilter.vue';
@@ -71,40 +71,68 @@ const deptLabels: Record<string, string> = {
 };
 
 const columns = [
-    { key: 'file_no',       label: 'رقم الملف',   sortable: true },
-    { key: 'patient_name',  label: 'المريض',       sortable: true },
-    { key: 'dept',          label: 'القسم' },
-    { key: 'visit_date',    label: 'التاريخ',      sortable: true },
-    { key: 'doctor',        label: 'الطبيب' },
-    { key: 'price',         label: 'السعر' },
-    { key: 'pay_status',    label: 'السداد' },
-    { key: 'status',        label: 'الحالة' },
+    { key: 'file_no', label: 'رقم الملف', sortable: true },
+    { key: 'patient_name', label: 'المريض', sortable: true },
+    { key: 'dept', label: 'القسم' },
+    { key: 'visit_date', label: 'التاريخ', sortable: true },
+    { key: 'doctor', label: 'الطبيب' },
+    { key: 'price', label: 'السعر' },
+    { key: 'pay_status', label: 'السداد' },
+    { key: 'status', label: 'الحالة' },
 ];
 
 const statCards = computed(() => [
-    { label: 'العيادة',    value: props.todayStats.clinic   ?? 0, color: 'primary'  as const },
-    { label: 'الفحوصات',  value: props.todayStats.labs     ?? 0, color: 'accent'   as const },
-    { label: 'العمليات',  value: props.todayStats.surgery  ?? 0, color: 'warning'  as const },
-    { label: 'الليزك',    value: props.todayStats.lasik    ?? 0, color: 'success'  as const },
-    { label: 'الليزر',    value: props.todayStats.laser    ?? 0, color: 'danger'   as const },
+    {
+        label: 'العيادة',
+        value: props.todayStats.clinic ?? 0,
+        color: 'primary' as const,
+    },
+    {
+        label: 'الفحوصات',
+        value: props.todayStats.labs ?? 0,
+        color: 'accent' as const,
+    },
+    {
+        label: 'العمليات',
+        value: props.todayStats.surgery ?? 0,
+        color: 'warning' as const,
+    },
+    {
+        label: 'الليزك',
+        value: props.todayStats.lasik ?? 0,
+        color: 'success' as const,
+    },
+    {
+        label: 'الليزر',
+        value: props.todayStats.laser ?? 0,
+        color: 'danger' as const,
+    },
 ]);
 
 function applyFilter(from: string, to: string) {
-    router.get('/booking', {
-        date_from: from,
-        date_to:   to,
-        dept:      selectedDept.value,
-        status:    selectedStatus.value,
-        search:    search.value,
-    }, { preserveState: true, replace: true });
+    router.get(
+        '/booking',
+        {
+            date_from: from,
+            date_to: to,
+            dept: selectedDept.value,
+            status: selectedStatus.value,
+            search: search.value,
+        },
+        { preserveState: true, replace: true },
+    );
 }
 
 function applySearch() {
-    router.get('/booking', {
-        dept:   selectedDept.value,
-        status: selectedStatus.value,
-        search: search.value,
-    }, { preserveState: true, replace: true });
+    router.get(
+        '/booking',
+        {
+            dept: selectedDept.value,
+            status: selectedStatus.value,
+            search: search.value,
+        },
+        { preserveState: true, replace: true },
+    );
 }
 
 function goToPage(page: number) {
@@ -117,16 +145,37 @@ function confirmCancel(booking: Booking) {
 }
 
 function doCancel() {
-    if (!cancelTarget.value) return;
+    if (!cancelTarget.value) {
+return;
+}
+
     router.delete(`/booking/${cancelTarget.value.id}`, {
-        data:        { cancel_reason: cancelReason.value },
-        onSuccess:   () => { cancelTarget.value = null; },
+        data: { cancel_reason: cancelReason.value },
+        onSuccess: () => {
+            cancelTarget.value = null;
+        },
     });
 }
 
 function printReceipt(id: string) {
     window.open(`/booking/${id}/receipt`, '_blank');
 }
+const isEditModalOpen = computed({
+    get: () => !!editBooking.value,
+    set: (val) => {
+        if (!val) {
+            editBooking.value = null;
+        }
+    },
+});
+const isCloseModalOpen = computed({
+    get: () => !!cancelTarget.value,
+    set: (val) => {
+        if (!val) {
+            cancelTarget.value = null;
+        }
+    },
+});
 </script>
 
 <template>
@@ -145,7 +194,12 @@ function printReceipt(id: string) {
 
     <!-- Toolbar -->
     <div class="mb-4 flex flex-wrap items-end gap-3">
-        <SearchBar v-model="search" placeholder="بحث باسم المريض أو رقم الملف..." class="flex-1 min-w-[220px]" @keyup.enter="applySearch" />
+        <SearchBar
+            v-model="search"
+            placeholder="بحث باسم المريض أو رقم الملف..."
+            class="min-w-[220px] flex-1"
+            @keyup.enter="applySearch"
+        />
 
         <select
             v-model="selectedDept"
@@ -153,7 +207,9 @@ function printReceipt(id: string) {
             @change="applySearch"
         >
             <option value="">كل الأقسام</option>
-            <option v-for="(label, key) in deptLabels" :key="key" :value="key">{{ label }}</option>
+            <option v-for="(label, key) in deptLabels" :key="key" :value="key">
+                {{ label }}
+            </option>
         </select>
 
         <select
@@ -169,11 +225,14 @@ function printReceipt(id: string) {
             <option value="cancelled">ملغي</option>
         </select>
 
-        <DateFilter @apply="applyFilter" @clear="() => router.get('/booking')" />
+        <DateFilter
+            @apply="applyFilter"
+            @clear="() => router.get('/booking')"
+        />
 
         <button
             type="button"
-            class="flex items-center gap-2 rounded-lg bg-hospital-primary px-4 py-2 text-sm font-semibold text-white hover:bg-hospital-primary-light transition-colors"
+            class="flex items-center gap-2 rounded-lg bg-hospital-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-hospital-primary-light"
             @click="showCreateModal = true"
         >
             <CalendarPlus class="h-4 w-4" />
@@ -203,14 +262,23 @@ function printReceipt(id: string) {
             <Badge :variant="value as 'paid' | 'partial' | 'unpaid'" />
         </template>
         <template #cell-status="{ value }">
-            <Badge :variant="value as 'waiting' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled'" />
+            <Badge
+                :variant="
+                    value as
+                        | 'waiting'
+                        | 'confirmed'
+                        | 'in_progress'
+                        | 'completed'
+                        | 'cancelled'
+                "
+            />
         </template>
         <template #actions="{ row }">
             <div class="flex items-center justify-end gap-2">
                 <button
                     type="button"
                     title="طباعة إيصال"
-                    class="rounded p-1.5 text-hospital-text-3 hover:bg-hospital-primary-pale hover:text-hospital-primary transition-colors"
+                    class="rounded p-1.5 text-hospital-text-3 transition-colors hover:bg-hospital-primary-pale hover:text-hospital-primary"
                     @click="printReceipt((row as Booking).id)"
                 >
                     <Printer class="h-4 w-4" />
@@ -218,7 +286,7 @@ function printReceipt(id: string) {
                 <button
                     type="button"
                     title="تعديل"
-                    class="rounded p-1.5 text-hospital-text-3 hover:bg-hospital-warning-pale hover:text-hospital-warning transition-colors"
+                    class="rounded p-1.5 text-hospital-text-3 transition-colors hover:bg-hospital-warning-pale hover:text-hospital-warning"
                     @click="editBooking = row as Booking"
                 >
                     <Edit3 class="h-4 w-4" />
@@ -226,7 +294,7 @@ function printReceipt(id: string) {
                 <button
                     type="button"
                     title="إلغاء"
-                    class="rounded p-1.5 text-hospital-text-3 hover:bg-hospital-danger-pale hover:text-hospital-danger transition-colors"
+                    class="rounded p-1.5 text-hospital-text-3 transition-colors hover:bg-hospital-danger-pale hover:text-hospital-danger"
                     @click="confirmCancel(row as Booking)"
                 >
                     <Trash2 class="h-4 w-4" />
@@ -249,7 +317,12 @@ function printReceipt(id: string) {
     </Modal>
 
     <!-- Edit Modal -->
-    <Modal v-model="!!editBooking" title="تعديل الحجز" size="xl" @close="editBooking = null">
+    <Modal
+        v-model="isEditModalOpen"
+        size="xl"
+        title="تعديل الحجز"
+        @close="editBooking = null"
+    >
         <BookingForm
             v-if="editBooking"
             :services="(services as any) ?? []"
@@ -264,16 +337,25 @@ function printReceipt(id: string) {
     </Modal>
 
     <!-- Cancel Confirm Modal -->
-    <Modal v-model="!!cancelTarget" title="تأكيد الإلغاء" size="sm" @close="cancelTarget = null">
+    <Modal
+        v-model="isCloseModalOpen"
+        title="تأكيد الإلغاء"
+        size="sm"
+        @close="cancelTarget = null"
+    >
         <p class="text-sm text-hospital-text">
-            هل تريد إلغاء حجز <strong>{{ cancelTarget?.patient_name }}</strong> — {{ cancelTarget?.file_no }}؟
+            هل تريد إلغاء حجز
+            <strong>{{ cancelTarget?.patient_name }}</strong> —
+            {{ cancelTarget?.file_no }}؟
         </p>
         <div class="mt-4">
-            <label class="mb-1 block text-xs font-medium text-hospital-text-2">سبب الإلغاء *</label>
+            <label class="mb-1 block text-xs font-medium text-hospital-text-2"
+                >سبب الإلغاء *</label
+            >
             <textarea
                 v-model="cancelReason"
                 rows="2"
-                class="w-full rounded-lg border border-hospital-border bg-hospital-bg px-3 py-2 text-sm focus:border-hospital-primary focus:outline-none resize-none"
+                class="w-full resize-none rounded-lg border border-hospital-border bg-hospital-bg px-3 py-2 text-sm focus:border-hospital-primary focus:outline-none"
                 placeholder="اذكر سبب الإلغاء..."
             />
         </div>
@@ -288,7 +370,7 @@ function printReceipt(id: string) {
             <button
                 type="button"
                 :disabled="!cancelReason.trim()"
-                class="rounded-lg bg-hospital-danger px-5 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                class="rounded-lg bg-hospital-danger px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
                 @click="doCancel"
             >
                 تأكيد الإلغاء

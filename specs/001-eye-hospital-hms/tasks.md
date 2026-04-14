@@ -180,7 +180,7 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [x] T096 [P] [US4] Create `Modules/Accounting/Repositories/AccountRepository.php` + `JournalRepository.php` + `TreasuryRepository.php`
 - [x] T097 [US4] Create `Modules/Accounting/Services/AccountingService.php` (getBalance(accountId, from, to), getTrialBalanceData, post journal entry with debit≠credit guard)
 - [x] T098 [US4] Create `Modules/Accounting/Services/TrialBalanceService.php` (computes debit/credit totals per account for date range, asserts totals balance)
-- [ ] T099 [US4] Create `Modules/Accounting/Services/IncomeStatementService.php` (groups revenues and expenses, computes net income for period)
+- [x] T099 [US4] Create `Modules/Accounting/Services/IncomeStatementService.php` (groups revenues and expenses, computes net income for period)
 - [x] T100 [US4] Create `Modules/Accounting/Actions/PostJournalEntryAction.php` (validates debit≠credit, calls JournalRepository, updates running account balances)
 - [x] T101 [US4] Create `Modules/Accounting/Actions/RecordTreasuryEntryAction.php` (calls TreasuryRepository, optionally links to booking)
 - [x] T102 [US4] Create `Modules/Accounting/Actions/AutoPostBookingPaymentAction.php` (triggered when booking pay_status → paid: creates treasury_entry + 2 journal_entries per spec §auto-posting rules)
@@ -191,14 +191,14 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [x] T107 [US4] Create `Modules/Accounting/Controllers/JournalController.php` (index with all accounts in props, store)
 - [x] T108 [US4] Create `Modules/Accounting/Controllers/ChartOfAccountsController.php` (index as tree, store, update)
 - [ ] T109 [US4] Create `Modules/Accounting/Controllers/TrialBalanceController.php` (index with date range filter, returns balanced data)
-- [ ] T110 [US4] Create `Modules/Accounting/Controllers/IncomeStatementController.php` (index with date range)
+- [x] T110 [US4] Create `Modules/Accounting/Controllers/IncomeStatementController.php` (index with date range)
 - [ ] T111 [US4] Create `Modules/Accounting/Controllers/AccountStatementController.php` (index — consolidated statement per account)
 - [x] T112 [US4] Register all bindings + routes in `Modules/Accounting/Providers/AccountingServiceProvider.php` and `Modules/Accounting/Routes/web.php`
 - [x] T113 [US4] Create Vue page `resources/js/Pages/Accounting/Treasury.vue` (daily in/out entries, running balance, summary cards, add entry modal)
 - [x] T114 [US4] Create Vue page `resources/js/Pages/Accounting/Journal.vue` (journal entry list, add entry form with account selectors)
 - [x] T115 [US4] Create Vue page `resources/js/Pages/Accounting/ChartOfAccounts.vue` (tree view grouped by group type, add/edit account modal)
 - [x] T116 [US4] Create Vue page `resources/js/Pages/Accounting/TrialBalance.vue` (two-column debit/credit table, grand totals row, date range filter, export bar)
-- [ ] T117 [US4] Create Vue page `resources/js/Pages/Accounting/IncomeStatement.vue` (revenues section, expenses section, net income row — from HTML prototype `.is-section` styles)
+- [x] T117 [US4] Create Vue page `resources/js/Pages/Accounting/IncomeStatement.vue` (revenues section, expenses section, net income row — from HTML prototype `.is-section` styles)
 - [x] T118 [US4] Create Vue page `resources/js/Pages/Accounting/AccountStatement.vue` (account selector, chronological transaction list with running balance)
 
 **Checkpoint**: Full double-entry accounting functional. Payments auto-post journal entries. Trial balance is always balanced.
@@ -273,7 +273,7 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [x] T153 [P] [US7] Create `Modules/Doctor/Models/DoctorShift.php` + `Modules/Doctor/Models/DoctorPayment.php`
 - [ ] T154 [P] [US7] Create `Modules/Doctor/Repositories/Contracts/DoctorRepositoryInterface.php`
 - [ ] T155 [P] [US7] Create `Modules/Doctor/Repositories/DoctorRepository.php`
-- [ ] T156 [US7] Create `Modules/Doctor/Services/DoctorService.php` (CRUD, getActiveForDept, linkUserAccount)
+- [x] T156 [US7] Create `Modules/Doctor/Services/DoctorService.php` (CRUD, getActiveForDept, linkUserAccount)
 - [x] T157 [US7] Create `Modules/Doctor/Services/DoctorClaimsService.php` — implement all 5 fee calculation strategies:
   - `ClinicFeeStrategy`: dr_share = paid - service.center_share
   - `LabsFeeStrategy`: same as clinic
@@ -285,12 +285,12 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [ ] T158 [US7] Create `Modules/Doctor/Actions/CreateDoctorAction.php` + `RecordDoctorPaymentAction.php` + `OpenDoctorShiftAction.php`
 - [ ] T159 [US7] Create all Doctor HTTP Requests in `Modules/Doctor/Http/Requests/`
 - [x] T160 [US7] Create `Modules/Doctor/Controllers/DoctorController.php` + `DoctorClaimsController.php` + `DoctorPaymentController.php` + `DoctorShiftController.php`
-- [ ] T161 [US7] Create `Modules/Doctor/Controllers/ShiftHandoverController.php` (records shift handover summary, changes shift status to handed_over)
+- [x] T161 [US7] Create `Modules/Doctor/Controllers/ShiftHandoverController.php` (records shift handover summary, changes shift status to handed_over)
 - [x] T162 [US7] Register all bindings + routes in `Modules/Doctor/Providers/DoctorServiceProvider.php` and `Modules/Doctor/Routes/web.php`
 - [x] T163 [US7] Create Vue page `resources/js/Pages/Doctor/Index.vue` (doctor list with fee type badges, add/edit modal)
 - [x] T164 [US7] Create Vue page `resources/js/Pages/Doctor/Claims.vue` (date range filter, per-doctor accordion with case breakdown table + totals, export bar — from HTML prototype `.dc-section .dc-doctor-hd .dc-table` styles)
-- [ ] T165 [US7] Create Vue page `resources/js/Pages/Doctor/Payments.vue` (payment history per doctor, record payment modal)
-- [ ] T166 [US7] Create Vue page `resources/js/Pages/Doctor/Shifts.vue` (shift schedule per doctor, open/close shift, handover button)
+- [x] T165 [US7] Create Vue page `resources/js/Pages/Doctor/Payments.vue` (payment history per doctor, record payment modal)
+- [x] T166 [US7] Create Vue page `resources/js/Pages/Doctor/Shifts.vue` (shift schedule per doctor, open/close shift, handover button)
 
 **Checkpoint**: Doctor entitlements calculate correctly for all 5 formula types. Shift handover recorded. Payouts tracked.
 
@@ -303,25 +303,25 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 
 ### Implementation — Admin Module
 
-- [ ] T167 [P] [US8] Create `Modules/Admin/Models/Setting.php` (key-value store, group scopes)
-- [ ] T168 [P] [US8] Create `Modules/Admin/Models/ActivityLog.php` (no updated_at, immutable)
-- [ ] T169 [P] [US8] Create `Modules/Admin/Repositories/Contracts/UserRepositoryInterface.php`
-- [ ] T170 [P] [US8] Create `Modules/Admin/Repositories/UserRepository.php`
-- [ ] T171 [US8] Create `Modules/Admin/Services/UserManagementService.php` (createUser, assignRole, listUsers with roles, deactivateUser)
-- [ ] T172 [US8] Create `Modules/Admin/Services/ActivityLogService.php` (log() method: inserts activity_log row, captures old/new values, IP address — called by all Actions)
-- [ ] T173 [US8] Create `Modules/Admin/Actions/CreateUserAction.php` + `AssignRoleAction.php`
-- [ ] T174 [US8] Create `Modules/Admin/Http/Requests/StoreUserRequest.php` + `UpdateSettingsRequest.php`
+- [x] T167 [P] [US8] Create `Modules/Admin/Models/Setting.php` (key-value store, group scopes)
+- [x] T168 [P] [US8] Create `Modules/Admin/Models/ActivityLog.php` (no updated_at, immutable)
+- [x] T169 [P] [US8] Create `Modules/Admin/Repositories/Contracts/UserRepositoryInterface.php`
+- [x] T170 [P] [US8] Create `Modules/Admin/Repositories/UserRepository.php`
+- [x] T171 [US8] Create `Modules/Admin/Services/UserManagementService.php` (createUser, assignRole, listUsers with roles, deactivateUser)
+- [x] T172 [US8] Create `Modules/Admin/Services/ActivityLogService.php` (log() method: inserts activity_log row, captures old/new values, IP address — called by all Actions)
+- [x] T173 [US8] Create `Modules/Admin/Actions/CreateUserAction.php` + `AssignRoleAction.php`
+- [x] T174 [US8] Create `Modules/Admin/Http/Requests/StoreUserRequest.php` + `UpdateSettingsRequest.php`
 - [x] T175 [US8] Create `Modules/Admin/Controllers/UserController.php` (index, store, update, destroy — manage user accounts + role assignment)
-- [ ] T176 [US8] Create `Modules/Admin/Controllers/RoleController.php` (index — display roles and their permissions in grid, update permissions per role)
+- [x] T176 [US8] Create `Modules/Admin/Controllers/RoleController.php` (index — display roles and their permissions in grid, update permissions per role)
 - [x] T177 [US8] Create `Modules/Admin/Controllers/SettingsController.php` (index shows all setting groups, update saves key-value pairs)
 - [x] T178 [US8] Create `Modules/Admin/Controllers/SystemLogController.php` (index with user/module/action filters + date range)
-- [ ] T179 [US8] Create `Modules/Admin/Controllers/ArchiveController.php` (list archived bookings and records)
+- [x] T179 [US8] Create `Modules/Admin/Controllers/ArchiveController.php` (list archived bookings and records)
 - [x] T180 [US8] Register all bindings + routes in `Modules/Admin/Providers/AdminServiceProvider.php` and `Modules/Admin/Routes/web.php` (all routes guarded by `users.manage` or `settings.manage`)
 - [x] T181 [US8] Create Vue page `resources/js/Pages/Admin/Users.vue` (user cards with role pills from HTML prototype `.user-card .role-pill`, add user modal with role selector)
-- [ ] T182 [US8] Create Vue page `resources/js/Pages/Admin/Roles.vue` (role cards with permission checkbox grid from HTML prototype `.role-card .perm-grid`)
+- [x] T182 [US8] Create Vue page `resources/js/Pages/Admin/Roles.vue` (role cards with permission checkbox grid from HTML prototype `.role-card .perm-grid`)
 - [x] T183 [US8] Create Vue page `resources/js/Pages/Admin/Settings.vue` (grouped settings sections from HTML prototype `.settings-section .settings-title`)
 - [x] T184 [US8] Create Vue page `resources/js/Pages/Admin/SystemLog.vue` (activity log table with filters)
-- [ ] T185 [US8] Create Vue page `resources/js/Pages/Admin/Archive.vue`
+- [x] T185 [US8] Create Vue page `resources/js/Pages/Admin/Archive.vue`
 
 **Checkpoint**: RBAC fully enforced. All 6 roles have correct access. System log records all mutations.
 
@@ -378,13 +378,13 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 
 **Purpose**: Auth login page, Labs module, sales invoice, purchase returns, stocktake, final integration.
 
-- [ ] T221 [P] Create Vue page `resources/js/Pages/Auth/Login.vue` (Arabic login form matching HTML prototype login-screen: hospital logo, eye SVG, username/password fields — role selector removed; role is server-assigned)
+- [x] T221 [P] Create Vue page `resources/js/Pages/Auth/Login.vue` (Arabic login form matching HTML prototype login-screen: hospital logo, eye SVG, username/password fields — role selector removed; role is server-assigned)
 - [x] T222 [P] Implement Labs module `Modules/Labs/` (migration for diagnostic_results, Model, Repository interface, Repository, Service, Action, Controller, Routes, Vue page `resources/js/Pages/Labs/Index.vue`)
 - [ ] T223 [P] Create `Modules/Accounting/Controllers/SalesInvoiceController.php` (فاتورة البيع — generates invoice from booking, applies insurance coverage, triggers AutoPostBookingPaymentAction) + Vue page `resources/js/Pages/Accounting/SalesInvoice.vue`
 - [ ] T224 [P] Create `Modules/Inventory/Controllers/PurchaseReturnController.php` (مردودات المشتريات — returns items to supplier, adjusts inventory quantity upward, posts accounting reversal) + Vue page `resources/js/Pages/Inventory/PurchaseReturns.vue`
 - [ ] T225 [P] Create `Modules/Inventory/Controllers/StockTakeController.php` (تسوية الجرد — physical count entry, variance calculation, adjustment posting) + Vue page `resources/js/Pages/Inventory/StockTake.vue`
 - [x] T226 Create `resources/js/Pages/Booking/PatientFile.vue` (ملف المريض الطبي — cross-module patient history: all bookings, clinic sheets, diagnostics, surgeries displayed chronologically by file_no)
-- [ ] T227 Create `resources/js/Pages/Doctor/ShiftHandover.vue` (تسليم الورديات — shift summary: patient count, revenue, pending cases, hand-over signature/notes)
+- [x] T227 Create `resources/js/Pages/Doctor/ShiftHandover.vue` (تسليم الورديات — shift summary: patient count, revenue, pending cases, hand-over signature/notes)
 - [x] T228 Create `resources/js/Pages/Accounting/DailyJournal.vue` (قيود اليومية — alias to Journal.vue with date defaulted to today; ensure this route exists at GET /daily-journal)
 - [x] T229 [P] Add `@media print` CSS rules to Tailwind output or in `resources/css/app.css` (hide sidebar, topbar, action buttons; show full report content; format for A4 RTL paper)
 - [ ] T230 Run `composer test` (pint + phpunit) and fix any failures

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { computed, ref, watch } from 'vue';
 
 interface Service {
     id: string;
@@ -93,6 +93,7 @@ const isInsurance = computed(() => form.pay_method === 'insurance');
 // Auto-fill price when service is selected
 watch(() => form.service_id, (id) => {
     const service = props.services.find((s) => s.id === id);
+
     if (service) {
         form.service_name = service.name;
         form.price = isInsurance.value ? String(service.ins_price) : String(service.price);

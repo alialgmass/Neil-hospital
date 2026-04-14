@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Doctor\Controllers\DoctorClaimsController;
 use Modules\Doctor\Controllers\DoctorController;
+use Modules\Doctor\Controllers\DoctorPaymentController;
+use Modules\Doctor\Controllers\DoctorShiftController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Doctors management
@@ -20,7 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('update');
     });
 
-    // Doctor claims and payments
+    // Doctor claims
     Route::prefix('dr-claims')->name('dr-claims.')->group(function () {
         Route::get('/', [DoctorClaimsController::class, 'index'])
             ->middleware('can:drpayments.view')
@@ -33,5 +35,33 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/pay', [DoctorClaimsController::class, 'pay'])
             ->middleware('can:drpayments.write')
             ->name('pay');
+    });
+
+    // Doctor payments history
+    Route::get('/dr-payments', [DoctorPaymentController::class, 'index'])
+        ->middleware('can:drpayments.view')
+        ->name('dr-payments.index');
+
+    // Doctor shifts
+    Route::prefix('doctor-shifts')->name('doctor-shifts.')->group(function () {
+        Route::get('/', [DoctorShiftController::class, 'index'])
+            ->middleware('can:doctors.view')
+            ->name('index');
+
+        Route::post('/', [DoctorShiftController::class, 'store'])
+            ->middleware('can:doctors.write')
+            ->name('store');
+
+        Route::get('/{id}', [DoctorShiftController::class, 'show'])
+            ->middleware('can:doctors.view')
+            ->name('show');
+
+        Route::patch('/{id}/close', [DoctorShiftController::class, 'close'])
+            ->middleware('can:doctors.write')
+            ->name('close');
+
+        Route::post('/{id}/handover', [DoctorShiftController::class, 'handover'])
+            ->middleware('can:doctors.write')
+            ->name('handover');
     });
 });

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Users, TrendingUp, Clock, CheckCircle } from 'lucide-vue-next';
-import StatCard from '@/components/shared/StatCard.vue';
+import { ref, computed } from 'vue';
 import Modal from '@/components/shared/Modal.vue';
+import StatCard from '@/components/shared/StatCard.vue';
 
 interface ShiftSummary {
     id: string;
@@ -33,7 +33,9 @@ const handoverForm = useForm({
 
 function submitHandover() {
     handoverForm.post(`/doctor-shifts/${props.shift.id}/handover`, {
-        onSuccess: () => { showHandover.value = false; },
+        onSuccess: () => {
+ showHandover.value = false; 
+},
     });
 }
 </script>
@@ -66,16 +68,16 @@ function submitHandover() {
 
     <!-- Stats -->
     <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard title="عدد الحالات" :value="shift.bookings_count.toString()" variant="primary">
+        <StatCard label="عدد الحالات" :value="shift.bookings_count.toString()" color="primary">
             <template #icon><Users class="h-5 w-5" /></template>
         </StatCard>
-        <StatCard title="الإيراد الكلي" :value="`${fmt(shift.revenue)} ج.م`" variant="success">
+        <StatCard label="الإيراد الكلي" :value="`${fmt(shift.revenue)} ج.م`" color="success">
             <template #icon><TrendingUp class="h-5 w-5" /></template>
         </StatCard>
-        <StatCard title="حالات معلقة" :value="shift.pending_count.toString()" :variant="shift.pending_count > 0 ? 'danger' : 'success'">
+        <StatCard label="حالات معلقة" :value="shift.pending_count.toString()" :color="shift.pending_count > 0 ? 'danger' : 'success'">
             <template #icon><Clock class="h-5 w-5" /></template>
         </StatCard>
-        <StatCard title="بدأت الوردية" :value="shift.started_at ? shift.started_at.slice(11, 16) : '—'" variant="primary">
+        <StatCard label="بدأت الوردية" :value="shift.started_at ? shift.started_at.slice(11, 16) : '—'" color="primary">
             <template #icon><Clock class="h-5 w-5" /></template>
         </StatCard>
     </div>

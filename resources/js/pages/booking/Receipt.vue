@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 
-defineOptions({ layout: null }); // Print-only page — no sidebar/topbar
 
 interface Booking {
     file_no: string;

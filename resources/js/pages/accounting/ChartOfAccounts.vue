@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { PlusCircle, Pencil } from 'lucide-vue-next';
+import { ref, computed } from 'vue';
 import Modal from '@/components/shared/Modal.vue';
 
 interface Account {
@@ -35,10 +35,15 @@ const natureLabels: Record<string, string> = {
 const groups = ['assets', 'liabilities', 'equity', 'revenues', 'expenses'] as const;
 const byGroup = computed(() => {
     const map: Record<string, Account[]> = {};
-    groups.forEach(g => { map[g] = []; });
+    groups.forEach(g => {
+ map[g] = []; 
+});
     props.accounts.forEach(a => {
-        if (map[a.group]) { map[a.group].push(a); }
+        if (map[a.group]) {
+ map[a.group].push(a); 
+}
     });
+
     return map;
 });
 
@@ -60,7 +65,9 @@ const addForm = useForm({
 });
 function submitAdd() {
     addForm.post('/accounts', {
-        onSuccess: () => { showAdd.value = false; addForm.reset(); },
+        onSuccess: () => {
+ showAdd.value = false; addForm.reset(); 
+},
     });
 }
 
@@ -84,9 +91,14 @@ function openEdit(account: Account) {
     showEdit.value = true;
 }
 function submitEdit() {
-    if (!editTarget.value) { return; }
+    if (!editTarget.value) {
+ return; 
+}
+
     editForm.put(`/accounts/${editTarget.value.id}`, {
-        onSuccess: () => { showEdit.value = false; },
+        onSuccess: () => {
+ showEdit.value = false; 
+},
     });
 }
 </script>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     LayoutDashboard,
@@ -20,7 +19,12 @@ import {
     Archive,
     Users,
     Settings,
+    Shield,
+    TrendingUp,
+    Scale,
+    FileText,
 } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 interface NavGroup {
     label: string;
@@ -73,6 +77,9 @@ const navGroups: NavGroup[] = [
             { title: 'الخزنة', href: '/treasury', icon: Wallet, permission: 'treasury.view' },
             { title: 'قيود اليومية', href: '/journal', icon: BookOpen, permission: 'journal.view' },
             { title: 'الدليل المحاسبي', href: '/accounts', icon: Library, permission: 'journal.view' },
+            { title: 'ميزان المراجعة', href: '/ledger/trial-balance', icon: Scale, permission: 'reports.financial' },
+            { title: 'قائمة الدخل', href: '/ledger/income-statement', icon: TrendingUp, permission: 'reports.financial' },
+            { title: 'كشف الحساب', href: '/ledger/account-statement', icon: FileText, permission: 'reports.financial' },
         ],
     },
     {
@@ -89,6 +96,7 @@ const navGroups: NavGroup[] = [
             { title: 'التقارير', href: '/reports', icon: BarChart3, permission: 'reports.financial' },
             { title: 'الأرشيف الطبي', href: '/archive', icon: Archive, permission: 'reports.clinical' },
             { title: 'المستخدمون', href: '/users', icon: Users, permission: 'users.manage' },
+            { title: 'الأدوار والصلاحيات', href: '/roles', icon: Shield, permission: 'users.manage' },
             { title: 'الإعدادات', href: '/settings', icon: Settings, permission: 'settings.manage' },
         ],
     },
@@ -106,7 +114,10 @@ const visibleGroups = computed(() =>
 const currentPath = computed(() => page.url);
 
 function isActive(href: string): boolean {
-    if (href === '/dashboard') return currentPath.value === '/dashboard';
+    if (href === '/dashboard') {
+return currentPath.value === '/dashboard';
+}
+
     return currentPath.value.startsWith(href);
 }
 </script>

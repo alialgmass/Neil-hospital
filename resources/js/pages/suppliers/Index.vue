@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { PlusCircle } from 'lucide-vue-next';
+import { ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
@@ -30,12 +30,20 @@ const columns = [
 ];
 
 const search = ref(props.filters.search ?? '');
-function applySearch() { router.get('/suppliers', { search: search.value || undefined }, { preserveState: true }); }
-function goToPage(page: number) { router.get('/suppliers', { search: search.value || undefined, page }, { preserveState: true }); }
+function applySearch() {
+ router.get('/suppliers', { search: search.value || undefined }, { preserveState: true }); 
+}
+function goToPage(page: number) {
+ router.get('/suppliers', { search: search.value || undefined, page }, { preserveState: true }); 
+}
 
 const showAdd = ref(false);
 const form = useForm({ name: '', phone: '', email: '', address: '', tax_no: '' });
-function submit() { form.post('/suppliers', { onSuccess: () => { showAdd.value = false; form.reset(); } }); }
+function submit() {
+ form.post('/suppliers', { onSuccess: () => {
+ showAdd.value = false; form.reset(); 
+} }); 
+}
 </script>
 
 <template>

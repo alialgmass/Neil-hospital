@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { Printer, ChevronLeft } from 'lucide-vue-next';
+import { reactive, ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import { usePrint } from '@/composables/usePrint';
 
@@ -40,7 +40,7 @@ interface Booking {
     visit_date: string;
     status: string;
     pay_status: string;
-    doctor?: { name: string };
+    doctor?: { id: string; name: string };
     clinic_sheet?: ClinicSheet | null;
 }
 
@@ -71,8 +71,10 @@ const saving = ref(false);
 
 function saveSheet() {
     saving.value = true;
-    router.post(`/clinic/${props.booking.id}/sheet`, form as Record<string, unknown>, {
-        onFinish: () => { saving.value = false; },
+    router.post(`/clinic/${props.booking.id}/sheet`, form as unknown as Record<string, string>, {
+        onFinish: () => {
+ saving.value = false; 
+},
     });
 }
 

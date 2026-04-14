@@ -3,13 +3,12 @@
 namespace Modules\Booking\Repositories\Contracts;
 
 use Illuminate\Pagination\LengthAwarePaginator;
-use Modules\Booking\DTOs\BookingData;
 use Modules\Booking\DTOs\BookingFilterData;
 use Modules\Booking\Models\Booking;
 
 interface BookingRepositoryInterface
 {
-    public function paginate(BookingFilterData $filter): LengthAwarePaginator;
+    public function filterAndPaginate(BookingFilterData $filter): LengthAwarePaginator;
 
     public function findOrFail(string $id): Booking;
 

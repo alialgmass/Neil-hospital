@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Admin\Controllers\ActivityLogController;
+use Modules\Admin\Controllers\ArchiveController;
 use Modules\Admin\Controllers\InsuranceController;
+use Modules\Admin\Controllers\RoleController;
 use Modules\Admin\Controllers\ServicesController;
 use Modules\Admin\Controllers\SettingsController;
 use Modules\Admin\Controllers\UserManagementController;
@@ -48,6 +50,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->middleware('can:settings.manage')
             ->name('update');
     });
+
+    // Roles & permissions
+    Route::prefix('roles')->name('roles.')->group(function () {
+        Route::get('/', [RoleController::class, 'index'])
+            ->middleware('can:users.manage')
+            ->name('index');
+
+        Route::put('/{id}/permissions', [RoleController::class, 'updatePermissions'])
+            ->middleware('can:users.manage')
+            ->name('update-permissions');
+    });
+
+    // Archive
+    Route::get('/archive', [ArchiveController::class, 'index'])
+        ->middleware('can:reports.clinical')
+        ->name('archive');
 
     // Activity log
     Route::get('/activity-log', [ActivityLogController::class, 'index'])

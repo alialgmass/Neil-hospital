@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import SearchBar from '@/components/shared/SearchBar.vue';
 

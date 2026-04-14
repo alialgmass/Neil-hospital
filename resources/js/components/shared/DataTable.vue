@@ -1,6 +1,6 @@
-<script setup lang="ts" generic="T extends Record<string, unknown>">
-import { computed } from 'vue';
+<script setup lang="ts" generic="T extends object">
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 interface Column {
     key: string;
@@ -41,16 +41,27 @@ const emit = defineEmits<{
 }>();
 
 function sortIcon(col: Column) {
-    if (!col.sortable) return null;
-    if (props.sortKey !== col.key) return ChevronsUpDown;
+    if (!col.sortable) {
+return null;
+}
+
+    if (props.sortKey !== col.key) {
+return ChevronsUpDown;
+}
+
     return props.sortDir === 'asc' ? ChevronUp : ChevronDown;
 }
 
 const pages = computed<number[]>(() => {
     const total = props.lastPage;
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+    if (total <= 7) {
+return Array.from({ length: total }, (_, i) => i + 1);
+}
+
     const cur = props.currentPage;
     const set = new Set([1, total, cur, cur - 1, cur + 1].filter((p) => p >= 1 && p <= total));
+
     return [...set].sort((a, b) => a - b);
 });
 </script>
@@ -94,7 +105,7 @@ const pages = computed<number[]>(() => {
                 </tr>
                 <tr
                     v-for="(row, index) in rows"
-                    :key="(row['id'] as string) ?? index"
+                    :key="((row as Record<string, unknown>)['id'] as string) ?? index"
                     class="border-b border-hospital-border/50 transition-colors hover:bg-hospital-primary-pale/40"
                 >
                     <td
@@ -102,8 +113,8 @@ const pages = computed<number[]>(() => {
                         :key="col.key"
                         :class="['px-4 py-3 text-right text-hospital-text', col.class]"
                     >
-                        <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]">
-                            {{ row[col.key] }}
+                        <slot :name="`cell-${col.key}`" :row="row" :value="(row as Record<string, unknown>)[col.key]">
+                            {{ (row as Record<string, unknown>)[col.key] }}
                         </slot>
                     </td>
                     <td v-if="$slots.actions" class="px-4 py-3 text-right">

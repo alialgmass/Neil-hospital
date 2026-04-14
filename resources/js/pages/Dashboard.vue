@@ -28,7 +28,9 @@ const props = defineProps<{
 const deptLabels: Record<string, string> = {
     clinic: 'عيادة', labs: 'فحوصات', surgery: 'عمليات', lasik: 'ليزك', laser: 'ليزر',
 };
-function fmt(n: number) { return Number(n).toLocaleString('ar-EG') + ' ج.م'; }
+function fmt(n: number) {
+ return Number(n).toLocaleString('ar-EG') + ' ج.م'; 
+}
 </script>
 
 <template>
@@ -36,16 +38,16 @@ function fmt(n: number) { return Number(n).toLocaleString('ar-EG') + ' ج.م'; }
 
     <!-- Today stats -->
     <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard title="حجوزات اليوم" :value="String(todayStats.today_bookings)" variant="primary">
+        <StatCard label="حجوزات اليوم" :value="String(todayStats.today_bookings)" color="primary">
             <template #icon><Users class="h-5 w-5" /></template>
         </StatCard>
-        <StatCard title="إيرادات اليوم" :value="fmt(todayStats.today_revenue)" variant="success">
+        <StatCard label="إيرادات اليوم" :value="fmt(todayStats.today_revenue)" color="success">
             <template #icon><Banknote class="h-5 w-5" /></template>
         </StatCard>
-        <StatCard title="مسدد اليوم" :value="String(todayStats.today_paid)" variant="accent">
+        <StatCard label="مسدد اليوم" :value="String(todayStats.today_paid)" color="accent">
             <template #icon><Activity class="h-5 w-5" /></template>
         </StatCard>
-        <StatCard title="رصيد الخزنة" :value="fmt(treasury.balance)" :variant="treasury.balance >= 0 ? 'primary' : 'danger'">
+        <StatCard label="رصيد الخزنة" :value="fmt(treasury.balance)" :color="treasury.balance >= 0 ? 'primary' : 'danger'">
             <template #icon><Banknote class="h-5 w-5" /></template>
         </StatCard>
     </div>

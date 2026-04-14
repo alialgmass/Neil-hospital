@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { AlertTriangle, PlusCircle } from 'lucide-vue-next';
+import { ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
@@ -72,10 +72,14 @@ const form = useForm({
     location:     '',
 });
 function submit() {
-    form.post('/inventory', { onSuccess: () => { showAdd.value = false; form.reset(); } });
+    form.post('/inventory', { onSuccess: () => {
+ showAdd.value = false; form.reset(); 
+} });
 }
 
-function fmt(n: number) { return Number(n).toLocaleString('ar-EG') + ' ج.م'; }
+function fmt(n: number) {
+ return Number(n).toLocaleString('ar-EG') + ' ج.م'; 
+}
 </script>
 
 <template>

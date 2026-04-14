@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { PlusCircle } from 'lucide-vue-next';
+import { ref } from 'vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 
@@ -26,11 +26,17 @@ const columns = [
     { key: 'created_at', label: 'تاريخ الإنشاء' },
 ];
 
-function goToPage(page: number) { router.get('/users', { page }, { preserveState: true }); }
+function goToPage(page: number) {
+ router.get('/users', { page }, { preserveState: true }); 
+}
 
 const showAdd = ref(false);
 const form = useForm({ name: '', email: '', password: '', role: '' });
-function submit() { form.post('/users', { onSuccess: () => { showAdd.value = false; form.reset(); } }); }
+function submit() {
+ form.post('/users', { onSuccess: () => {
+ showAdd.value = false; form.reset(); 
+} }); 
+}
 
 const roleLabels: Record<string, string> = {
     admin: 'مدير النظام', doctor: 'طبيب', receptionist: 'استقبال',

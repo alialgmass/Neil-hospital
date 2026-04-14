@@ -17,7 +17,7 @@ class BookingService
 
     public function list(BookingFilterData $filter): LengthAwarePaginator
     {
-        return $this->bookingRepository->paginate($filter);
+        return $this->bookingRepository->filterAndPaginate($filter);
     }
 
     public function findOrFail(string $id): Booking
@@ -30,53 +30,53 @@ class BookingService
         $fileNo = $this->mrnGenerator->generate();
 
         return $this->bookingRepository->create([
-            'file_no'        => $fileNo,
-            'patient_name'   => $data->patientName,
-            'patient_phone'  => $data->patientPhone,
-            'patient_age'    => $data->patientAge,
-            'national_id'    => $data->nationalId,
-            'gender'         => $data->gender,
-            'dept'           => $data->dept,
-            'service_id'     => $data->serviceId,
-            'service_name'   => $data->serviceName,
-            'doctor_id'      => $data->doctorId,
+            'file_no' => $fileNo,
+            'patient_name' => $data->patientName,
+            'patient_phone' => $data->patientPhone,
+            'patient_age' => $data->patientAge,
+            'national_id' => $data->nationalId,
+            'gender' => $data->gender,
+            'dept' => $data->dept,
+            'service_id' => $data->serviceId,
+            'service_name' => $data->serviceName,
+            'doctor_id' => $data->doctorId,
             'ins_company_id' => $data->insCompanyId,
-            'visit_date'     => $data->visitDate,
-            'visit_time'     => $data->visitTime,
-            'price'          => $data->price,
-            'discount'       => $data->discount,
-            'ins_amount'     => $data->insAmount,
-            'paid_amount'    => $data->paidAmount,
-            'pay_method'     => $data->payMethod,
-            'pay_status'     => $data->payStatus,
-            'status'         => $data->status,
-            'visit_note'     => $data->visitNote,
-            'created_by'     => $createdBy,
+            'visit_date' => $data->visitDate,
+            'visit_time' => $data->visitTime,
+            'price' => $data->price,
+            'discount' => $data->discount,
+            'ins_amount' => $data->insAmount,
+            'paid_amount' => $data->paidAmount,
+            'pay_method' => $data->payMethod,
+            'pay_status' => $data->payStatus,
+            'status' => $data->status,
+            'visit_note' => $data->visitNote,
+            'created_by' => $createdBy,
         ]);
     }
 
     public function update(string $id, BookingData $data): Booking
     {
         return $this->bookingRepository->update($id, [
-            'patient_name'   => $data->patientName,
-            'patient_phone'  => $data->patientPhone,
-            'patient_age'    => $data->patientAge,
-            'national_id'    => $data->nationalId,
-            'gender'         => $data->gender,
-            'dept'           => $data->dept,
-            'service_id'     => $data->serviceId,
-            'service_name'   => $data->serviceName,
-            'doctor_id'      => $data->doctorId,
+            'patient_name' => $data->patientName,
+            'patient_phone' => $data->patientPhone,
+            'patient_age' => $data->patientAge,
+            'national_id' => $data->nationalId,
+            'gender' => $data->gender,
+            'dept' => $data->dept,
+            'service_id' => $data->serviceId,
+            'service_name' => $data->serviceName,
+            'doctor_id' => $data->doctorId,
             'ins_company_id' => $data->insCompanyId,
-            'visit_date'     => $data->visitDate,
-            'visit_time'     => $data->visitTime,
-            'price'          => $data->price,
-            'discount'       => $data->discount,
-            'ins_amount'     => $data->insAmount,
-            'paid_amount'    => $data->paidAmount,
-            'pay_method'     => $data->payMethod,
-            'pay_status'     => $data->payStatus,
-            'visit_note'     => $data->visitNote,
+            'visit_date' => $data->visitDate,
+            'visit_time' => $data->visitTime,
+            'price' => $data->price,
+            'discount' => $data->discount,
+            'ins_amount' => $data->insAmount,
+            'paid_amount' => $data->paidAmount,
+            'pay_method' => $data->payMethod,
+            'pay_status' => $data->payStatus,
+            'visit_note' => $data->visitNote,
         ]);
     }
 }

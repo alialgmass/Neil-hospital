@@ -1,5 +1,5 @@
 <script setup lang="ts">
-type Variant = 'waiting' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'paid' | 'partial' | 'unpaid' | 'active' | 'inactive' | 'info' | 'danger' | 'warning' | 'success';
+type Variant = 'waiting' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'paid' | 'partial' | 'unpaid' | 'active' | 'inactive' | 'info' | 'danger' | 'warning' | 'success' | 'scheduled' | 'prep';
 
 interface Props {
     variant: Variant;
@@ -27,6 +27,8 @@ const variantConfig: Record<Variant, { classes: string; defaultLabel: string }> 
     danger:      { classes: 'bg-hospital-danger-pale text-hospital-danger',            defaultLabel: 'خطر' },
     warning:     { classes: 'bg-hospital-warning-pale text-hospital-warning',          defaultLabel: 'تحذير' },
     success:     { classes: 'bg-hospital-success-pale text-hospital-success',          defaultLabel: 'ناجح' },
+    scheduled:   { classes: 'bg-hospital-primary-pale text-hospital-primary',          defaultLabel: 'مجدول' },
+    prep:        { classes: 'bg-hospital-warning-pale text-hospital-warning',          defaultLabel: 'تحضير' },
 };
 </script>
 

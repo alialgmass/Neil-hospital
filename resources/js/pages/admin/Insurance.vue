@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { PlusCircle, Pencil } from 'lucide-vue-next';
+import { ref } from 'vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 
@@ -52,7 +52,9 @@ const addForm = useForm({
 });
 function submitAdd() {
     addForm.post('/insurance', {
-        onSuccess: () => { showAdd.value = false; addForm.reset(); },
+        onSuccess: () => {
+ showAdd.value = false; addForm.reset(); 
+},
     });
 }
 
@@ -80,9 +82,14 @@ function openEdit(company: InsuranceCompany) {
     showEdit.value = true;
 }
 function submitEdit() {
-    if (!editTarget.value) { return; }
+    if (!editTarget.value) {
+ return; 
+}
+
     editForm.put(`/insurance/${editTarget.value.id}`, {
-        onSuccess: () => { showEdit.value = false; },
+        onSuccess: () => {
+ showEdit.value = false; 
+},
     });
 }
 

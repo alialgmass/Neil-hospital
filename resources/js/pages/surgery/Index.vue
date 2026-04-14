@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { CalendarPlus, ClipboardList, Package } from 'lucide-vue-next';
+import { ref, computed } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
@@ -139,7 +139,9 @@ function submitSupplies() {
         surgery_id: suppliesTarget.value,
         items:      supplyItems.value,
     }, {
-        onSuccess: () => { showSupplies.value = false; },
+        onSuccess: () => {
+ showSupplies.value = false; 
+},
     });
 }
 

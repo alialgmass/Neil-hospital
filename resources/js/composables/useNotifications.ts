@@ -30,10 +30,18 @@ export function useNotifications() {
         notifications.value = notifications.value.filter((n) => n.id !== id);
     }
 
-    function success(message: string) { show(message, 'success'); }
-    function error(message: string)   { show(message, 'error'); }
-    function warning(message: string) { show(message, 'warning'); }
-    function info(message: string)    { show(message, 'info'); }
+    function success(message: string) {
+ show(message, 'success'); 
+}
+    function error(message: string)   {
+ show(message, 'error'); 
+}
+    function warning(message: string) {
+ show(message, 'warning'); 
+}
+    function info(message: string)    {
+ show(message, 'info'); 
+}
 
     return { notifications, show, dismiss, success, error, warning, info, colorMap };
 }

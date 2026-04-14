@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { Save } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 interface Setting {
     key: string;
@@ -15,7 +15,9 @@ const props = defineProps<{
 }>();
 
 const form = ref<Record<string, string>>({});
-Object.values(props.settings).forEach(s => { form.value[s.key] = s.value ?? ''; });
+Object.values(props.settings).forEach(s => {
+ form.value[s.key] = s.value ?? ''; 
+});
 
 function submit() {
     const payload = Object.entries(form.value).map(([key, value]) => ({ key, value }));
@@ -40,8 +42,13 @@ const settingLabels: Record<string, string> = {
 // Group settings by group field
 const grouped = Object.values(props.settings).reduce((acc, s) => {
     const g = s.group ?? 'system';
-    if (!acc[g]) { acc[g] = []; }
+
+    if (!acc[g]) {
+ acc[g] = []; 
+}
+
     acc[g].push(s);
+
     return acc;
 }, {} as Record<string, Setting[]>);
 </script>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { PlusCircle } from 'lucide-vue-next';
+import { ref, computed } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
@@ -37,8 +37,12 @@ const columns = [
 
 const fromFilter = ref(props.filters.from ?? '');
 const toFilter   = ref(props.filters.to   ?? '');
-function applyFilters() { router.get('/purchases', { from: fromFilter.value || undefined, to: toFilter.value || undefined }, { preserveState: true }); }
-function goToPage(page: number) { router.get('/purchases', { from: fromFilter.value || undefined, to: toFilter.value || undefined, page }, { preserveState: true }); }
+function applyFilters() {
+ router.get('/purchases', { from: fromFilter.value || undefined, to: toFilter.value || undefined }, { preserveState: true }); 
+}
+function goToPage(page: number) {
+ router.get('/purchases', { from: fromFilter.value || undefined, to: toFilter.value || undefined, page }, { preserveState: true }); 
+}
 
 const showAdd = ref(false);
 const formData = ref({
@@ -54,8 +58,12 @@ const items = ref<InvoiceItem[]>([{ item_id: '', item_name: '', qty: 1, unit_cos
 const subtotal = computed(() => items.value.reduce((s, i) => s + i.qty * i.unit_cost, 0));
 const total    = computed(() => subtotal.value - formData.value.discount);
 
-function addItem() { items.value.push({ item_id: '', item_name: '', qty: 1, unit_cost: 0 }); }
-function removeItem(idx: number) { items.value.splice(idx, 1); }
+function addItem() {
+ items.value.push({ item_id: '', item_name: '', qty: 1, unit_cost: 0 }); 
+}
+function removeItem(idx: number) {
+ items.value.splice(idx, 1); 
+}
 
 function submit() {
     router.post('/purchases', { ...formData.value, items: items.value }, {
@@ -68,7 +76,9 @@ function submit() {
 }
 
 const statusLabels: Record<string, string> = { draft: 'مسودة', posted: 'مرحلة', cancelled: 'ملغاة' };
-function fmt(n: number) { return Number(n).toLocaleString('ar-EG') + ' ج.م'; }
+function fmt(n: number) {
+ return Number(n).toLocaleString('ar-EG') + ' ج.م'; 
+}
 </script>
 
 <template>

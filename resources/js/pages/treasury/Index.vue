@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { ArrowDownCircle, ArrowUpCircle, PlusCircle } from 'lucide-vue-next';
+import { ref, computed } from 'vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 import StatCard from '@/components/shared/StatCard.vue';
@@ -74,7 +74,9 @@ const form = useForm({
 });
 function submit() {
     form.post('/treasury', {
-        onSuccess: () => { showAdd.value = false; form.reset(); },
+        onSuccess: () => {
+ showAdd.value = false; form.reset(); 
+},
     });
 }
 
@@ -89,23 +91,21 @@ const sourceLabels: Record<string, string> = {
     <!-- Stats -->
     <div class="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
-            title="إجمالي الوارد"
+            label="إجمالي الوارد"
             :value="`${balance.total_in.toLocaleString('ar-EG')} ج.م`"
-            variant="success"
-        >
-            <template #icon><ArrowDownCircle class="h-5 w-5" /></template>
-        </StatCard>
+            color="success"
+            :icon="ArrowDownCircle"
+        />
         <StatCard
-            title="إجمالي الصادر"
+            label="إجمالي الصادر"
             :value="`${balance.total_out.toLocaleString('ar-EG')} ج.م`"
-            variant="danger"
-        >
-            <template #icon><ArrowUpCircle class="h-5 w-5" /></template>
-        </StatCard>
+            color="danger"
+            :icon="ArrowUpCircle"
+        />
         <StatCard
-            title="رصيد الخزنة"
+            label="رصيد الخزنة"
             :value="`${balance.balance.toLocaleString('ar-EG')} ج.م`"
-            :variant="balance.balance >= 0 ? 'primary' : 'danger'"
+            :color="balance.balance >= 0 ? 'primary' : 'danger'"
         />
     </div>
 

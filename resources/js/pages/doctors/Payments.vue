@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { PlusCircle } from 'lucide-vue-next';
+import { ref } from 'vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 
@@ -74,7 +74,9 @@ const addForm = useForm({
 });
 function submitAdd() {
     addForm.post('/dr-claims/pay', {
-        onSuccess: () => { showAdd.value = false; addForm.reset(); },
+        onSuccess: () => {
+ showAdd.value = false; addForm.reset(); 
+},
     });
 }
 

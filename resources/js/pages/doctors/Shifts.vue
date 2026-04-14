@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { PlusCircle, CheckCircle, XCircle } from 'lucide-vue-next';
+import { ref } from 'vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 
@@ -69,7 +69,9 @@ const openForm = useForm({
 });
 function submitOpen() {
     openForm.post('/doctor-shifts', {
-        onSuccess: () => { showOpen.value = false; openForm.reset(); },
+        onSuccess: () => {
+ showOpen.value = false; openForm.reset(); 
+},
     });
 }
 

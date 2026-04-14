@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { TrendingUp, Users, Wallet, BarChart3 } from 'lucide-vue-next';
+import { ref } from 'vue';
 import StatCard from '@/components/shared/StatCard.vue';
 
 interface RevenueRow {
@@ -64,16 +64,16 @@ function fmt(n: number) {
 
     <!-- Summary Cards -->
     <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard title="إجمالي الإيرادات" :value="`${fmt(totalRevenue)} ج.م`" variant="primary">
+        <StatCard label="إجمالي الإيرادات" :value="`${fmt(totalRevenue)} ج.م`" color="primary">
             <template #icon><TrendingUp class="h-5 w-5" /></template>
         </StatCard>
-        <StatCard title="عدد الحالات" :value="totalCases.toString()" variant="success">
+        <StatCard label="عدد الحالات" :value="totalCases.toString()" color="success">
             <template #icon><Users class="h-5 w-5" /></template>
         </StatCard>
-        <StatCard title="إجمالي الوارد" :value="`${fmt(treasury.total_in)} ج.م`" variant="success">
+        <StatCard label="إجمالي الوارد" :value="`${fmt(treasury.total_in)} ج.م`" color="success">
             <template #icon><Wallet class="h-5 w-5" /></template>
         </StatCard>
-        <StatCard title="رصيد الخزنة" :value="`${fmt(treasury.balance)} ج.م`" :variant="treasury.balance >= 0 ? 'primary' : 'danger'">
+        <StatCard label="رصيد الخزنة" :value="`${fmt(treasury.balance)} ج.م`" :color="treasury.balance >= 0 ? 'primary' : 'danger'">
             <template #icon><BarChart3 class="h-5 w-5" /></template>
         </StatCard>
     </div>

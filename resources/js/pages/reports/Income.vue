@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { TrendingUp, Users } from 'lucide-vue-next';
+import { ref } from 'vue';
 import StatCard from '@/components/shared/StatCard.vue';
 
 interface RevenueRow {
@@ -41,7 +41,10 @@ function fmt(n: number) {
 }
 
 function pct(revenue: number) {
-    if (totalRevenue === 0) { return '0'; }
+    if (totalRevenue === 0) {
+ return '0'; 
+}
+
     return ((revenue / totalRevenue) * 100).toFixed(1);
 }
 </script>
@@ -76,10 +79,10 @@ function pct(revenue: number) {
 
     <!-- Summary Cards -->
     <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <StatCard title="إجمالي الإيرادات" :value="`${fmt(totalRevenue)} ج.م`" variant="primary">
+        <StatCard label="إجمالي الإيرادات" :value="`${fmt(totalRevenue)} ج.م`" color="primary">
             <template #icon><TrendingUp class="h-5 w-5" /></template>
         </StatCard>
-        <StatCard title="إجمالي الحالات" :value="totalCases.toString()" variant="success">
+        <StatCard label="إجمالي الحالات" :value="totalCases.toString()" color="success">
             <template #icon><Users class="h-5 w-5" /></template>
         </StatCard>
     </div>

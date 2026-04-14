@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { PlusCircle } from 'lucide-vue-next';
+import { ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
@@ -32,8 +32,12 @@ const columns = [
 ];
 
 const search = ref(props.filters.search ?? '');
-function applySearch() { router.get('/doctors', { search: search.value || undefined }, { preserveState: true }); }
-function goToPage(page: number) { router.get('/doctors', { search: search.value || undefined, page }, { preserveState: true }); }
+function applySearch() {
+ router.get('/doctors', { search: search.value || undefined }, { preserveState: true }); 
+}
+function goToPage(page: number) {
+ router.get('/doctors', { search: search.value || undefined, page }, { preserveState: true }); 
+}
 
 const showAdd = ref(false);
 const form = useForm({
@@ -44,7 +48,11 @@ const form = useForm({
     fee_value: 40,
     is_active: true,
 });
-function submit() { form.post('/doctors', { onSuccess: () => { showAdd.value = false; form.reset(); form.fee_type = 'percentage'; form.fee_value = 40; form.is_active = true; } }); }
+function submit() {
+ form.post('/doctors', { onSuccess: () => {
+ showAdd.value = false; form.reset(); form.fee_type = 'percentage'; form.fee_value = 40; form.is_active = true; 
+} }); 
+}
 
 const feeTypeLabels: Record<string, string> = {
     percentage: 'نسبة مئوية %',

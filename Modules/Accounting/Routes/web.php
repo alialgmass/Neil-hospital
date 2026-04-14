@@ -53,6 +53,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->middleware('can:reports.financial')
             ->name('trial-balance');
 
+        Route::get('/income-statement', [LedgerController::class, 'incomeStatement'])
+            ->middleware('can:reports.financial')
+            ->name('income-statement');
+
         Route::get('/account-statement', [LedgerController::class, 'accountStatement'])
             ->middleware('can:reports.financial')
             ->name('account-statement');

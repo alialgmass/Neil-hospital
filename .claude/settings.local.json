@@ -12,7 +12,15 @@
       "Bash(grep -v \"^$\")",
       "Bash(powershell.exe -NonInteractive -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)",
       "Bash(node -e ':*)",
-      "Bash(grep -v \"manual\\\\|php artisan\\\\|composer test\\\\|npm run\\\\|golden-path\\\\|Run \\\\`php\\\\|T019\\\\|T024\\\\|T071\\\\|T091\\\\|T123\\\\|T187\\\\|T230\\\\|T231\\\\|T232\")"
+      "Bash(grep -v \"manual\\\\|php artisan\\\\|composer test\\\\|npm run\\\\|golden-path\\\\|Run \\\\`php\\\\|T019\\\\|T024\\\\|T071\\\\|T091\\\\|T123\\\\|T187\\\\|T230\\\\|T231\\\\|T232\")",
+      "Bash(node:*)",
+      "Bash(/c/Users/Royal/.config/herd/bin/php vendor/bin/pint --dirty)",
+      "Bash(command -v php)",
+      "Read(//c/Users/Royal/.config/herd//**)",
+      "Read(//c/Users/Royal/**)",
+      "Bash(/c/Users/Royal/.config/herd/bin/php84 vendor/bin/pint --dirty)",
+      "Bash(\"/c/Users/Royal/.config/herd/bin/php84/php.exe\" vendor/bin/pint --dirty)",
+      "Bash(npm run:*)"
     ]
   }
 }

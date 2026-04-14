@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { PlusCircle } from 'lucide-vue-next';
+import { ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
@@ -37,8 +37,12 @@ const columns = [
 
 const deptFilter = ref(props.filters.dept   ?? '');
 const search     = ref(props.filters.search ?? '');
-function applyFilters() { router.get('/services', { dept: deptFilter.value || undefined, search: search.value || undefined }, { preserveState: true }); }
-function goToPage(page: number) { router.get('/services', { dept: deptFilter.value || undefined, search: search.value || undefined, page }, { preserveState: true }); }
+function applyFilters() {
+ router.get('/services', { dept: deptFilter.value || undefined, search: search.value || undefined }, { preserveState: true }); 
+}
+function goToPage(page: number) {
+ router.get('/services', { dept: deptFilter.value || undefined, search: search.value || undefined, page }, { preserveState: true }); 
+}
 
 const showAdd = ref(false);
 const form = useForm({
@@ -51,10 +55,16 @@ const form = useForm({
     duration_mins: 30,
     status:        'active',
 });
-function submit() { form.post('/services', { onSuccess: () => { showAdd.value = false; form.reset(); form.dept = 'clinic'; form.center_type = 'pct'; form.center_val = 40; form.duration_mins = 30; form.status = 'active'; } }); }
+function submit() {
+ form.post('/services', { onSuccess: () => {
+ showAdd.value = false; form.reset(); form.dept = 'clinic'; form.center_type = 'pct'; form.center_val = 40; form.duration_mins = 30; form.status = 'active'; 
+} }); 
+}
 
 const deptLabels: Record<string, string> = { clinic: 'عيادة', labs: 'فحوصات', surgery: 'عمليات', lasik: 'ليزك', laser: 'ليزر' };
-function fmt(n: number) { return Number(n).toLocaleString('ar-EG') + ' ج.م'; }
+function fmt(n: number) {
+ return Number(n).toLocaleString('ar-EG') + ' ج.م'; 
+}
 </script>
 
 <template>

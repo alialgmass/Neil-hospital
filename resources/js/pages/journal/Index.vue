@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { PlusCircle } from 'lucide-vue-next';
+import { ref } from 'vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 
@@ -64,7 +64,9 @@ const form = useForm({
 });
 function submit() {
     form.post('/journal', {
-        onSuccess: () => { showAdd.value = false; form.reset(); },
+        onSuccess: () => {
+ showAdd.value = false; form.reset(); 
+},
     });
 }
 </script>

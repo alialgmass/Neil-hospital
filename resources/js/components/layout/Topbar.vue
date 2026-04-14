@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { Bell, Search, Plus, ChevronDown, LogOut, User, Settings } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 import type { Auth } from '@/types';
 
 const page = usePage<{ auth: Auth; name?: string; low_stock_count?: number }>();

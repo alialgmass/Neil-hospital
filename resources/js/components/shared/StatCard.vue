@@ -14,7 +14,6 @@ withDefaults(defineProps<Props>(), {
     change: '',
     changePositive: true,
     color: 'primary',
-    icon: null,
 });
 
 const colorMap: Record<string, { bar: string; icon: string; bg: string }> = {
