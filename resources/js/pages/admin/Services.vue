@@ -91,7 +91,7 @@ function fmt(n: number) {
         <template #cell-center_share="{ value }"><span class="font-mono text-hospital-warning">{{ fmt(Number(value)) }}</span></template>
         <template #cell-dr_share="{ value }"><span class="font-mono text-hospital-primary">{{ fmt(Number(value)) }}</span></template>
         <template #cell-status="{ value }">
-            <Badge :variant="value as 'active' | 'inactive'" />
+            <Badge :variant="(value as 'active' | 'inactive')" />
         </template>
     </DataTable>
 

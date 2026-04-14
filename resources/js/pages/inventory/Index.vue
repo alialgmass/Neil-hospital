@@ -2,7 +2,6 @@
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { AlertTriangle, PlusCircle } from 'lucide-vue-next';
 import { ref } from 'vue';
-import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 import SearchBar from '@/components/shared/SearchBar.vue';

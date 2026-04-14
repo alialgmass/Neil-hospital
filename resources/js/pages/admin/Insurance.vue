@@ -18,7 +18,7 @@ interface InsuranceCompany {
     status: 'active' | 'inactive';
 }
 
-const props = defineProps<{
+defineProps<{
     companies: {
         data: InsuranceCompany[];
         current_page: number;

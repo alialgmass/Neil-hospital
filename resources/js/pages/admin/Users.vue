@@ -14,7 +14,7 @@ interface User {
     created_at: string;
 }
 
-const props = defineProps<{
+defineProps<{
     users: { data: User[]; current_page: number; last_page: number; total: number };
     roles: Role[];
 }>();

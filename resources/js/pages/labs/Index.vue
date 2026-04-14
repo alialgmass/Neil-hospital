@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { FlaskConical, PlusCircle } from 'lucide-vue-next';
+import { FlaskConical } from 'lucide-vue-next';
 import { ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
@@ -81,7 +81,6 @@ const labTests = [
     'OCT (مقطعية)', 'OCT عصب بصري', 'توبوغرافيا', 'أنجيوغرافيا',
     'سونار', 'مجال بصري', 'مقاس عدسة (A-Scan)', 'تصوير ملون', 'مقاس نظر أطفال',
 ];
-const eyeLabel: Record<string, string> = { OD: 'عين يمنى', OS: 'عين يسرى', OU: 'كلاهما' };
 </script>
 
 <template>
@@ -110,10 +109,10 @@ const eyeLabel: Record<string, string> = { OD: 'عين يمنى', OS: 'عين ي
             </span>
         </template>
         <template #cell-status="{ value }">
-            <Badge :variant="value as 'confirmed' | 'in_progress' | 'completed' | 'waiting'" />
+            <Badge :variant="(value as 'confirmed' | 'in_progress' | 'completed' | 'waiting')" />
         </template>
         <template #cell-pay_status="{ value }">
-            <Badge :variant="value as 'paid' | 'partial' | 'unpaid'" />
+            <Badge :variant="(value as 'paid' | 'partial' | 'unpaid')" />
         </template>
         <template #actions="{ row }">
             <button

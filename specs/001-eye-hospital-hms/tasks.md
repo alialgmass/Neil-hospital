@@ -190,9 +190,9 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [x] T106 [US4] Create `Modules/Accounting/Controllers/TreasuryController.php` (index with daily summary, store)
 - [x] T107 [US4] Create `Modules/Accounting/Controllers/JournalController.php` (index with all accounts in props, store)
 - [x] T108 [US4] Create `Modules/Accounting/Controllers/ChartOfAccountsController.php` (index as tree, store, update)
-- [ ] T109 [US4] Create `Modules/Accounting/Controllers/TrialBalanceController.php` (index with date range filter, returns balanced data)
+- [x] T109 [US4] Create `Modules/Accounting/Controllers/TrialBalanceController.php` (index with date range filter, returns balanced data)
 - [x] T110 [US4] Create `Modules/Accounting/Controllers/IncomeStatementController.php` (index with date range)
-- [ ] T111 [US4] Create `Modules/Accounting/Controllers/AccountStatementController.php` (index — consolidated statement per account)
+- [x] T111 [US4] Create `Modules/Accounting/Controllers/AccountStatementController.php` (index — consolidated statement per account)
 - [x] T112 [US4] Register all bindings + routes in `Modules/Accounting/Providers/AccountingServiceProvider.php` and `Modules/Accounting/Routes/web.php`
 - [x] T113 [US4] Create Vue page `resources/js/Pages/Accounting/Treasury.vue` (daily in/out entries, running balance, summary cards, add entry modal)
 - [x] T114 [US4] Create Vue page `resources/js/Pages/Accounting/Journal.vue` (journal entry list, add entry form with account selectors)
@@ -220,10 +220,10 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [x] T124 [P] [US5] Create `Modules/Inventory/Models/InventoryItem.php` (HasUlids, fillable, isLowStock() accessor: quantity <= min_quantity, supplier() relationship)
 - [x] T125 [P] [US5] Create `Modules/Inventory/Models/Supplier.php` + `PurchaseInvoice.php` + `PurchaseInvoiceItem.php` + `StockPermit.php` + `StockPermitItem.php`
 - [x] T126 [P] [US5] Create `Modules/Inventory/Models/Service.php` (the services table model — placed in Inventory module as per plan)
-- [ ] T127 [P] [US5] Create `Modules/Inventory/Repositories/Contracts/InventoryRepositoryInterface.php` + `SupplierRepositoryInterface.php`
-- [ ] T128 [P] [US5] Create `Modules/Inventory/Repositories/InventoryRepository.php` + `SupplierRepository.php`
+- [x] T127 [P] [US5] Create `Modules/Inventory/Repositories/Contracts/InventoryRepositoryInterface.php` + `SupplierRepositoryInterface.php`
+- [x] T128 [P] [US5] Create `Modules/Inventory/Repositories/InventoryRepository.php` + `SupplierRepository.php`
 - [x] T129 [US5] Create `Modules/Inventory/Services/InventoryService.php` (adjustQuantity() — adds or deducts stock qty with zero-floor guard, getLowStockItems())
-- [ ] T130 [US5] Create `Modules/Inventory/Services/StockAlertService.php` (getLowStockCount() — used by HandleInertiaRequests to populate notification badge)
+- [x] T130 [US5] Create `Modules/Inventory/Services/StockAlertService.php` (getLowStockCount() — used by HandleInertiaRequests to populate notification badge)
 - [x] T131 [US5] Create `Modules/Inventory/Services/PurchaseInvoiceService.php` (creates invoice + line items, calls InventoryService::adjustQuantity for each item, posts accounting entry)
 - [ ] T132 [US5] Create `Modules/Inventory/Actions/ReceivePurchaseInvoiceAction.php`
 - [ ] T133 [US5] Create `Modules/Inventory/Actions/IssueStockPermitAction.php` (type=out: validates sufficient qty, calls InventoryService::adjustQuantity, logs activity)
@@ -253,8 +253,8 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 
 **Note**: Accounting module was created in Phase 6 (US4). This phase adds the remaining financial report controllers and pages.
 
-- [ ] T148 [US6] Create `Modules/Accounting/Controllers/LedgerController.php` (دفتر الأستاذ — account ledger with all transactions for selected account + running balance)
-- [ ] T149 [US6] Add route GET /ledger to `Modules/Accounting/Routes/web.php`
+- [x] T148 [US6] Create `Modules/Accounting/Controllers/LedgerController.php` (دفتر الأستاذ — account ledger with all transactions for selected account + running balance)
+- [x] T149 [US6] Add route GET /ledger to `Modules/Accounting/Routes/web.php`
 - [x] T150 [US6] Create Vue page `resources/js/Pages/Accounting/Ledger.vue` (account selector dropdown, transaction table, running balance column, date filter)
 
 **Checkpoint**: All financial accounting screens functional — Chart of Accounts, Journal, Trial Balance, Income Statement, Account Statement, Ledger.
@@ -271,8 +271,8 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [x] T151 [P] [US7] Create migration `database/migrations/xxxx_create_doctor_shifts_table.php` + `xxxx_create_doctor_payments_table.php`
 - [x] T152 [US7] Run `php artisan migrate` for doctor tables
 - [x] T153 [P] [US7] Create `Modules/Doctor/Models/DoctorShift.php` + `Modules/Doctor/Models/DoctorPayment.php`
-- [ ] T154 [P] [US7] Create `Modules/Doctor/Repositories/Contracts/DoctorRepositoryInterface.php`
-- [ ] T155 [P] [US7] Create `Modules/Doctor/Repositories/DoctorRepository.php`
+- [x] T154 [P] [US7] Create `Modules/Doctor/Repositories/Contracts/DoctorRepositoryInterface.php`
+- [x] T155 [P] [US7] Create `Modules/Doctor/Repositories/DoctorRepository.php`
 - [x] T156 [US7] Create `Modules/Doctor/Services/DoctorService.php` (CRUD, getActiveForDept, linkUserAccount)
 - [x] T157 [US7] Create `Modules/Doctor/Services/DoctorClaimsService.php` — implement all 5 fee calculation strategies:
   - `ClinicFeeStrategy`: dr_share = paid - service.center_share
@@ -387,8 +387,8 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [x] T227 Create `resources/js/Pages/Doctor/ShiftHandover.vue` (تسليم الورديات — shift summary: patient count, revenue, pending cases, hand-over signature/notes)
 - [x] T228 Create `resources/js/Pages/Accounting/DailyJournal.vue` (قيود اليومية — alias to Journal.vue with date defaulted to today; ensure this route exists at GET /daily-journal)
 - [x] T229 [P] Add `@media print` CSS rules to Tailwind output or in `resources/css/app.css` (hide sidebar, topbar, action buttons; show full report content; format for A4 RTL paper)
-- [ ] T230 Run `composer test` (pint + phpunit) and fix any failures
-- [ ] T231 Run `npm run types:check` and `npm run lint:check` and fix any TypeScript / ESLint errors
+- [x] T230 Run `composer test` (pint + phpunit) and fix any failures
+- [x] T231 Run `npm run types:check` and `npm run lint:check` and fix any TypeScript / ESLint errors
 - [ ] T232 Perform golden-path validation per `specs/001-eye-hospital-hms/quickstart.md` checklist (all 6 flows manually verified)
 
 ---

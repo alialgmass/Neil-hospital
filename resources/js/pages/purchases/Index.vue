@@ -2,7 +2,6 @@
 import { Head, router } from '@inertiajs/vue3';
 import { PlusCircle } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
-import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 

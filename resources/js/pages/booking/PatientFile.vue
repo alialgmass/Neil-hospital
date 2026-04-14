@@ -53,7 +53,7 @@ interface Booking {
     surgery?: Surgery;
 }
 
-const props = defineProps<{
+defineProps<{
     file_no: string;
     patient: Patient | null;
     bookings: Booking[];

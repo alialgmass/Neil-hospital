@@ -20,7 +20,16 @@
       "Read(//c/Users/Royal/**)",
       "Bash(/c/Users/Royal/.config/herd/bin/php84 vendor/bin/pint --dirty)",
       "Bash(\"/c/Users/Royal/.config/herd/bin/php84/php.exe\" vendor/bin/pint --dirty)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(sed -n '83,89p' \"D:/Projects/neil hospital/v3/resources/js/pages/Dashboard.vue\")",
+      "Bash(sed -n '260,266p' \"D:/Projects/neil hospital/v3/resources/js/pages/booking/Index.vue\")",
+      "Bash(sed -n '111,119p' \"D:/Projects/neil hospital/v3/resources/js/pages/labs/Index.vue\")",
+      "Bash(sed -n '15,25p' \"D:/Projects/neil hospital/v3/resources/js/pages/Dashboard.vue\")",
+      "Bash(sed -n '17,25p' \"D:/Projects/neil hospital/v3/resources/js/pages/admin/Users.vue\")",
+      "Bash(sed -n '18,25p' \"D:/Projects/neil hospital/v3/resources/js/pages/admin/Insurance.vue\")",
+      "Bash(sed -n '1,6p' \"D:/Projects/neil hospital/v3/resources/js/pages/booking/Partials/BookingForm.vue\")",
+      "Bash(sed -n '1,6p' \"D:/Projects/neil hospital/v3/resources/js/pages/labs/Index.vue\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Fixed {len\\(d.get\\(\\\\\"files\\\\\",[]\\)\\)} files'\\)\")"
     ]
   }
 }

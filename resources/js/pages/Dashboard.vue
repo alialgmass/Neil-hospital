@@ -15,7 +15,7 @@ interface DocRow   { doctor_name: string; cases: number; revenue: number }
 interface Treasury { total_in: number; total_out: number; balance: number }
 interface QueueEntry { id: string; file_no: string; patient_name: string; dept: string; status: string; pay_status: string; time?: string; doctor_name?: string }
 
-const props = defineProps<{
+defineProps<{
     todayStats:    TodayStats;
     revenueByDept: DeptRow[];
     revenueByDoc:  DocRow[];
@@ -82,7 +82,7 @@ function fmt(n: number) {
                                 <td class="py-2.5">{{ entry.patient_name }}</td>
                                 <td class="py-2.5 text-xs text-hospital-text-2">{{ deptLabels[entry.dept] ?? entry.dept }}</td>
                                 <td class="py-2.5">
-                                    <Badge :variant="entry.status as 'confirmed' | 'waiting' | 'in_progress'" />
+                                    <Badge :variant="(entry.status as 'confirmed' | 'waiting' | 'in_progress')" />
                                 </td>
                             </tr>
                         </tbody>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { ArrowDownCircle, ArrowUpCircle, PlusCircle } from 'lucide-vue-next';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 import StatCard from '@/components/shared/StatCard.vue';

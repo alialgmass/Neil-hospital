@@ -158,7 +158,7 @@ const eyeLabel: Record<string, string> = { OD: 'عين يمنى', OS: 'عين ي
         <template #cell-eye="{ value }">{{ value ? eyeLabel[value as string] ?? value : '—' }}</template>
         <template #cell-surgeon="{ row }">{{ (row as Surgery).surgeon?.name ?? '—' }}</template>
         <template #cell-status="{ value }">
-            <Badge :variant="value as 'scheduled' | 'prep' | 'in_progress' | 'completed' | 'cancelled'" />
+            <Badge :variant="(value as 'scheduled' | 'prep' | 'in_progress' | 'completed' | 'cancelled')" />
         </template>
         <template #cell-supply_total="{ value }">
             <span class="font-mono text-sm">{{ Number(value).toLocaleString('ar-EG') }} ج.م</span>

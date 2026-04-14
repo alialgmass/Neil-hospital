@@ -80,10 +80,10 @@ function goToPage(page: number) {
             {{ (row as Booking).doctor?.name ?? '—' }}
         </template>
         <template #cell-status="{ value }">
-            <Badge :variant="value as 'waiting' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled'" />
+            <Badge :variant="(value as 'waiting' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled')" />
         </template>
         <template #cell-pay_status="{ value }">
-            <Badge :variant="value as 'paid' | 'partial' | 'unpaid'" />
+            <Badge :variant="(value as 'paid' | 'partial' | 'unpaid')" />
         </template>
         <template #cell-diagnosis="{ row }">
             <span class="line-clamp-1 max-w-xs text-xs text-hospital-text-2">

@@ -209,7 +209,7 @@ const eyeLabel: Record<string, string> = { OD: 'عين يمنى', OS: 'عين ي
             <span v-else class="text-hospital-text-2">—</span>
         </template>
         <template #cell-status="{ value }">
-            <Badge :variant="value as 'scheduled' | 'prep' | 'in_progress' | 'completed' | 'cancelled'" />
+            <Badge :variant="(value as 'scheduled' | 'prep' | 'in_progress' | 'completed' | 'cancelled')" />
         </template>
         <template #cell-supply_total="{ value }">
             <span class="font-mono text-sm">{{ Number(value).toLocaleString('ar-EG') }} ج.م</span>

@@ -6,7 +6,6 @@ import type { Auth } from '@/types';
 
 const page = usePage<{ auth: Auth; name?: string; low_stock_count?: number }>();
 const user = computed(() => page.props.auth?.user);
-const appName = computed(() => page.props.name ?? 'مستشفى النور');
 const lowStockCount = computed(() => page.props.low_stock_count ?? 0);
 
 const searchQuery = ref('');

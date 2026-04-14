@@ -2,11 +2,9 @@
 import { Head, router } from '@inertiajs/vue3';
 import {
     CalendarPlus,
-    Eye,
     Edit3,
     Trash2,
     Printer,
-    ChevronDown,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
@@ -259,19 +257,10 @@ const isCloseModalOpen = computed({
             {{ Number(value).toLocaleString('ar-EG') }} ج.م
         </template>
         <template #cell-pay_status="{ value }">
-            <Badge :variant="value as 'paid' | 'partial' | 'unpaid'" />
+            <Badge :variant="(value as 'paid' | 'partial' | 'unpaid')" />
         </template>
         <template #cell-status="{ value }">
-            <Badge
-                :variant="
-                    value as
-                        | 'waiting'
-                        | 'confirmed'
-                        | 'in_progress'
-                        | 'completed'
-                        | 'cancelled'
-                "
-            />
+            <Badge :variant="(value as 'waiting' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled')" />
         </template>
         <template #actions="{ row }">
             <div class="flex items-center justify-end gap-2">
