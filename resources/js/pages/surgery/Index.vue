@@ -39,6 +39,7 @@ interface Paginator {
 const props = defineProps<{
     surgeries: Paginator;
     availableBeds: OrBed[];
+    doctors: { id: string; name: string }[];
     dept: string;
     filters: { status?: string };
 }>();
@@ -353,6 +354,13 @@ function submitSupplies() {
                     <select v-model="scheduleForm.or_bed_id" class="dept-input">
                         <option value="">— اختر السرير —</option>
                         <option v-for="bed in availableBeds" :key="bed.id" :value="bed.id">{{ bed.label }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-hospital-text">الطبيب الجراح</label>
+                    <select v-model="scheduleForm.surgeon_id" class="dept-input">
+                        <option value="">— اختر الطبيب —</option>
+                        <option v-for="doc in doctors" :key="doc.id" :value="doc.id">{{ doc.name }}</option>
                     </select>
                 </div>
                 <div>

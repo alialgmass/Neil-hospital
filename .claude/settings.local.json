@@ -46,7 +46,13 @@
       "Bash(find /c /d -name \"php.exe\" -maxdepth 6)",
       "Bash(\"C:\\\\Users\\\\Royal\\\\.config\\\\herd\\\\bin\\\\php.bat\" vendor/bin/pint --dirty --format agent)",
       "Bash(\"C:\\\\Users\\\\Royal\\\\.config\\\\herd\\\\bin\\\\php.bat\" artisan *)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Bash(npx vue-tsc *)",
+      "Bash(php vendor/bin/pint Modules/Surgery/Controllers/SurgeryController.php --format agent)",
+      "Bash(/c/Users/Royal/.config/herd/bin/php84 vendor/bin/pint Modules/Surgery/Controllers/SurgeryController.php)",
+      "Bash(\"/c/Users/Royal/.config/herd/bin/php84/php.exe\" vendor/bin/pint Modules/Surgery/Controllers/SurgeryController.php)",
+      "Bash(\"/c/Users/Royal/.config/herd/bin/php84/php.exe\" artisan *)",
+      "Bash(\"/c/Users/Royal/.config/herd/bin/php84/php.exe\" vendor/bin/pint database/migrations/2026_04_15_203752_add_missing_settings_rows.php)"
     ]
   },
   "enableAllProjectMcpServers": true,

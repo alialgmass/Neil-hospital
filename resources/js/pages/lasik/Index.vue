@@ -34,6 +34,7 @@ interface Paginator {
 const props = defineProps<{
     surgeries: Paginator;
     availableBeds: OrBed[];
+    doctors: { id: string; name: string }[];
     dept: string;
     filters: { status?: string };
 }>();
@@ -372,9 +373,30 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
                         <option value="OU">كلاهما (OU)</option>
                     </select>
                 </div>
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-hospital-text">الطبيب الجراح</label>
+                    <select v-model="scheduleForm.surgeon_id" class="dept-input">
+                        <option value="">— اختر الطبيب —</option>
+                        <option v-for="doc in doctors" :key="doc.id" :value="doc.id">{{ doc.name }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-hospital-text">التخدير</label>
+                    <select v-model="scheduleForm.anaesthesia" class="dept-input">
+                        <option value="">—</option>
+                        <option value="local">موضعي (Local)</option>
+                        <option value="topical">سطحي (Topical)</option>
+                        <option value="sedation">مهدئ (Sedation)</option>
+                        <option value="general">عام (General)</option>
+                    </select>
+                </div>
                 <div class="col-span-2">
                     <label class="mb-1 block text-sm font-medium text-hospital-text">موعد الإجراء</label>
                     <input v-model="scheduleForm.scheduled_at" type="datetime-local" class="dept-input" />
+                </div>
+                <div class="col-span-2">
+                    <label class="mb-1 block text-sm font-medium text-hospital-text">ملاحظات ما قبل الإجراء</label>
+                    <textarea v-model="scheduleForm.pre_op_notes" rows="3" class="dept-input" />
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2">
