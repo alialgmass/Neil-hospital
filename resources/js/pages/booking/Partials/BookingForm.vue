@@ -92,6 +92,8 @@ const form = useForm({
     visit_note:     (props.booking?.visit_note as string) ?? '',
 });
 
+const isCreating = computed(() => props.submitMethod === 'post');
+
 const filteredServices = computed(() =>
     props.services.filter((s) => s.dept === form.dept),
 );
@@ -202,7 +204,7 @@ function submit() {
 
                 <!-- Service section -->
                 <div class="bk-section">
-                    <span class="bk-title bk-title-teal">الخدمة والدفع</span>
+                    <span class="bk-title bk-title-teal">{{ isCreating ? 'الخدمة' : 'الخدمة والدفع' }}</span>
                     <div class="bk-grid-2">
                         <!-- Service -->
                         <div>
@@ -220,70 +222,81 @@ function submit() {
                                 <option v-for="dr in doctors" :key="dr.id" :value="dr.id">{{ dr.name }}</option>
                             </select>
                         </div>
-                        <!-- Insurance company (conditional) -->
-                        <div v-if="isInsurance" class="col-span-2">
-                            <label class="bk-label">شركة التأمين</label>
-                            <select v-model="form.ins_company_id" class="bk-input">
-                                <option value="">— بدون تأمين —</option>
-                                <option v-for="ins in insuranceCompanies" :key="ins.id" :value="ins.id">{{ ins.name }}</option>
-                            </select>
-                        </div>
-                        <!-- Price -->
-                        <div>
-                            <label class="bk-label">السعر الأصلي (ج)</label>
-                            <input v-model="form.price" type="number" step="0.01" min="0" class="bk-input" />
-                        </div>
-                        <!-- Discount -->
-                        <div>
-                            <label class="bk-label">الخصم (ج)</label>
-                            <input v-model="form.discount" type="number" step="0.01" min="0" class="bk-input" />
-                        </div>
-                        <!-- Insurance amount (conditional) -->
-                        <div v-if="isInsurance">
-                            <label class="bk-label">مبلغ التأمين (ج)</label>
-                            <input v-model="form.ins_amount" type="number" step="0.01" min="0" class="bk-input bk-input-readonly" readonly />
-                        </div>
-                        <!-- Final price -->
-                        <div>
-                            <label class="bk-label">الإجمالي المستحق (ج)</label>
-                            <input
-                                :value="netAmount"
-                                type="number"
-                                class="bk-input bk-input-readonly"
-                                style="font-weight: 700; color: #0A4FA6; font-size: 14px"
-                                readonly
-                            />
-                        </div>
-                        <!-- Pay method -->
-                        <div>
-                            <label class="bk-label">طريقة الدفع</label>
-                            <select v-model="form.pay_method" class="bk-input">
-                                <option v-for="opt in payMethodOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                            </select>
-                        </div>
-                        <!-- Paid amount -->
-                        <div>
-                            <label class="bk-label">المبلغ المدفوع (ج)</label>
-                            <input v-model="form.paid_amount" type="number" step="0.01" min="0" class="bk-input" />
-                        </div>
-                        <!-- Pay status -->
-                        <div class="col-span-2">
-                            <label class="bk-label">حالة السداد</label>
-                            <select v-model="form.pay_status" class="bk-input">
-                                <option v-for="opt in payStatusOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                            </select>
-                        </div>
                     </div>
 
-                    <!-- Invoice preview -->
-                    <div v-if="showInvoicePreview" class="inv-preview mt-3">
-                        <p class="inv-preview-title">🧾 فاتورة تلقائية — ستُنشأ عند الحفظ</p>
-                        <div class="inv-line"><span>الخدمة</span><span>{{ selectedServiceName || '—' }}</span></div>
-                        <div class="inv-line"><span>السعر الأصلي</span><span>{{ Number(form.price).toLocaleString('ar-EG') }} ج</span></div>
-                        <div class="inv-line"><span>الخصم</span><span>{{ Number(form.discount).toLocaleString('ar-EG') }} ج</span></div>
-                        <div v-if="isInsurance" class="inv-line"><span>مبلغ التأمين</span><span>{{ Number(form.ins_amount).toLocaleString('ar-EG') }} ج</span></div>
-                        <div class="inv-line font-bold"><span>💰 الإجمالي المستحق</span><span>{{ netAmount.toLocaleString('ar-EG') }} ج</span></div>
-                    </div>
+                    <!-- Pricing & payment — edit only -->
+                    <template v-if="!isCreating">
+                        <div class="bk-grid-2 mt-3">
+                            <!-- Insurance company (conditional) -->
+                            <div v-if="isInsurance" class="col-span-2">
+                                <label class="bk-label">شركة التأمين</label>
+                                <select v-model="form.ins_company_id" class="bk-input">
+                                    <option value="">— بدون تأمين —</option>
+                                    <option v-for="ins in insuranceCompanies" :key="ins.id" :value="ins.id">{{ ins.name }}</option>
+                                </select>
+                            </div>
+                            <!-- Price -->
+                            <div>
+                                <label class="bk-label">السعر الأصلي (ج)</label>
+                                <input v-model="form.price" type="number" step="0.01" min="0" class="bk-input" />
+                            </div>
+                            <!-- Discount -->
+                            <div>
+                                <label class="bk-label">الخصم (ج)</label>
+                                <input v-model="form.discount" type="number" step="0.01" min="0" class="bk-input" />
+                            </div>
+                            <!-- Insurance amount (conditional) -->
+                            <div v-if="isInsurance">
+                                <label class="bk-label">مبلغ التأمين (ج)</label>
+                                <input v-model="form.ins_amount" type="number" step="0.01" min="0" class="bk-input bk-input-readonly" readonly />
+                            </div>
+                            <!-- Final price -->
+                            <div>
+                                <label class="bk-label">الإجمالي المستحق (ج)</label>
+                                <input
+                                    :value="netAmount"
+                                    type="number"
+                                    class="bk-input bk-input-readonly"
+                                    style="font-weight: 700; color: #0A4FA6; font-size: 14px"
+                                    readonly
+                                />
+                            </div>
+                            <!-- Pay method -->
+                            <div>
+                                <label class="bk-label">طريقة الدفع</label>
+                                <select v-model="form.pay_method" class="bk-input">
+                                    <option v-for="opt in payMethodOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                                </select>
+                            </div>
+                            <!-- Paid amount -->
+                            <div>
+                                <label class="bk-label">المبلغ المدفوع (ج)</label>
+                                <input v-model="form.paid_amount" type="number" step="0.01" min="0" class="bk-input" />
+                            </div>
+                            <!-- Pay status -->
+                            <div class="col-span-2">
+                                <label class="bk-label">حالة السداد</label>
+                                <select v-model="form.pay_status" class="bk-input">
+                                    <option v-for="opt in payStatusOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Invoice preview -->
+                        <div v-if="showInvoicePreview" class="inv-preview mt-3">
+                            <p class="inv-preview-title">🧾 فاتورة تلقائية — ستُنشأ عند الحفظ</p>
+                            <div class="inv-line"><span>الخدمة</span><span>{{ selectedServiceName || '—' }}</span></div>
+                            <div class="inv-line"><span>السعر الأصلي</span><span>{{ Number(form.price).toLocaleString('ar-EG') }} ج</span></div>
+                            <div class="inv-line"><span>الخصم</span><span>{{ Number(form.discount).toLocaleString('ar-EG') }} ج</span></div>
+                            <div v-if="isInsurance" class="inv-line"><span>مبلغ التأمين</span><span>{{ Number(form.ins_amount).toLocaleString('ar-EG') }} ج</span></div>
+                            <div class="inv-line font-bold"><span>💰 الإجمالي المستحق</span><span>{{ netAmount.toLocaleString('ar-EG') }} ج</span></div>
+                        </div>
+                    </template>
+
+                    <!-- Creating hint -->
+                    <p v-else class="mt-3 rounded-lg border border-hospital-warning-pale bg-hospital-warning-pale/40 px-3 py-2 text-xs text-hospital-warning">
+                        💡 يمكن تسجيل الدفع لاحقاً من خلال زر "دفع" في قائمة الحجوزات
+                    </p>
                 </div>
             </div>
 

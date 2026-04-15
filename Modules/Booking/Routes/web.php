@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Booking\Controllers\BookingController;
 use Modules\Booking\Controllers\BookingStatusController;
+use Modules\Booking\Controllers\PayBookingController;
 
 Route::middleware(['auth', 'verified'])->prefix('booking')->name('booking.')->group(function () {
     Route::get('/', [BookingController::class, 'index'])
@@ -20,6 +21,10 @@ Route::middleware(['auth', 'verified'])->prefix('booking')->name('booking.')->gr
     Route::patch('/{id}/status', [BookingStatusController::class, 'update'])
         ->middleware('can:booking.edit')
         ->name('status.update');
+
+    Route::patch('/{id}/pay', PayBookingController::class)
+        ->middleware('can:booking.pay')
+        ->name('pay');
 
     Route::delete('/{id}', [BookingController::class, 'destroy'])
         ->middleware('can:booking.delete')

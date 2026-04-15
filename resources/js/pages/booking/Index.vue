@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import {
     CalendarPlus,
     Edit3,
     Trash2,
     Printer,
     X,
+    CreditCard,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import Badge from '@/components/shared/Badge.vue';
@@ -54,10 +55,46 @@ interface Props {
 
 const props = defineProps<Props>();
 
+// ── Permissions ──
+const page = usePage<{ permissions?: string[] }>();
+const permissions = computed<string[]>(() => (page.props.permissions as string[]) ?? []);
+function can(permission: string): boolean {
+    return permissions.value.includes('*') || permissions.value.includes(permission);
+}
+const canPay = computed(() => can('booking.pay'));
+
+// ── State ──
 const showCreateModal = ref(false);
 const editBooking = ref<Booking | null>(null);
 const cancelTarget = ref<Booking | null>(null);
 const cancelReason = ref('');
+
+// ── Pay modal ──
+const payTarget = ref<Booking | null>(null);
+const payForm = useForm({ paid_amount: '', pay_method: 'cash' });
+
+const isPayModalOpen = computed({
+    get: () => !!payTarget.value,
+    set: (val) => { if (!val) { payTarget.value = null; payForm.reset(); } },
+});
+
+const payRemaining = computed(() => {
+    if (!payTarget.value) return 0;
+    const net = Math.max(0, Number(payTarget.value.price) - (Number((payTarget.value as any).discount) || 0) - (Number((payTarget.value as any).ins_amount) || 0));
+    return Math.max(0, net - Number(payTarget.value.paid_amount));
+});
+
+function openPay(booking: Booking) {
+    payTarget.value = booking;
+    payForm.paid_amount = String(payRemaining.value || '');
+}
+
+function submitPay() {
+    if (!payTarget.value) return;
+    payForm.patch(`/booking/${payTarget.value.id}/pay`, {
+        onSuccess: () => { payTarget.value = null; payForm.reset(); },
+    });
+}
 const search = ref(props.filters.search ?? '');
 const selectedDept = ref(props.filters.dept ?? '');
 const selectedStatus = ref(props.filters.status ?? '');
@@ -296,6 +333,16 @@ const isCloseModalOpen = computed({
             </template>
             <template #actions="{ row }">
                 <div class="flex items-center justify-end gap-2">
+                    <!-- Pay button — only for users with booking.pay and not fully paid -->
+                    <button
+                        v-if="canPay && (row as Booking).pay_status !== 'paid'"
+                        type="button"
+                        title="تسجيل دفعة"
+                        class="rounded p-1.5 text-hospital-text-3 transition-colors hover:bg-hospital-success-pale hover:text-hospital-success"
+                        @click="openPay(row as Booking)"
+                    >
+                        <CreditCard class="h-4 w-4" />
+                    </button>
                     <button
                         type="button"
                         title="طباعة إيصال"
@@ -387,6 +434,68 @@ const isCloseModalOpen = computed({
             @success="editBooking = null"
             @cancel="editBooking = null"
         />
+    </Modal>
+
+    <!-- Pay Modal -->
+    <Modal v-model="isPayModalOpen" size="sm" title="تسجيل دفعة">
+        <div v-if="payTarget" class="space-y-4">
+            <!-- Booking summary -->
+            <div class="rounded-lg bg-hospital-bg px-4 py-3 text-sm">
+                <p class="font-semibold text-hospital-text">{{ payTarget.patient_name }}</p>
+                <p class="text-xs text-hospital-text-3">{{ payTarget.file_no }} — {{ payTarget.dept }}</p>
+                <div class="mt-2 flex items-center justify-between text-xs">
+                    <span class="text-hospital-text-3">المبلغ المتبقي</span>
+                    <span class="font-bold text-hospital-danger">{{ payRemaining.toLocaleString('ar-EG') }} ج</span>
+                </div>
+            </div>
+
+            <!-- Amount -->
+            <div>
+                <label class="mb-1 block text-xs font-semibold text-hospital-text-2">المبلغ المدفوع (ج) *</label>
+                <input
+                    v-model="payForm.paid_amount"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    :max="payRemaining"
+                    class="w-full rounded-lg border border-hospital-border bg-hospital-bg px-3 py-2 text-sm text-hospital-text focus:border-hospital-primary focus:outline-none"
+                    :class="{ 'border-hospital-danger': payForm.errors.paid_amount }"
+                />
+                <p v-if="payForm.errors.paid_amount" class="mt-1 text-xs text-hospital-danger">{{ payForm.errors.paid_amount }}</p>
+            </div>
+
+            <!-- Pay method -->
+            <div>
+                <label class="mb-1 block text-xs font-semibold text-hospital-text-2">طريقة الدفع</label>
+                <select
+                    v-model="payForm.pay_method"
+                    class="w-full rounded-lg border border-hospital-border bg-hospital-bg px-3 py-2 text-sm text-hospital-text focus:border-hospital-primary focus:outline-none"
+                >
+                    <option value="cash">كاش</option>
+                    <option value="card">شبكة</option>
+                    <option value="transfer">تحويل</option>
+                    <option value="insurance">تأمين</option>
+                </select>
+            </div>
+        </div>
+        <template #footer>
+            <button
+                type="button"
+                class="rounded-lg border border-hospital-border px-4 py-2 text-sm font-medium text-hospital-text-2 hover:bg-hospital-bg"
+                @click="isPayModalOpen = false"
+            >
+                إلغاء
+            </button>
+            <button
+                type="button"
+                :disabled="payForm.processing || !payForm.paid_amount"
+                class="flex items-center gap-2 rounded-lg bg-hospital-success px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-700 disabled:opacity-50"
+                @click="submitPay"
+            >
+                <CreditCard class="h-4 w-4" />
+                تأكيد الدفع
+            </button>
+        </template>
     </Modal>
 
     <!-- Cancel Confirm Modal -->

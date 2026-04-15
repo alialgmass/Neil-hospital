@@ -14,35 +14,44 @@ class AutoPostBookingPaymentAction
         private readonly JournalService $journalService,
     ) {}
 
-    public function execute(Booking $booking): void
+    /**
+     * Post a payment for a booking to the treasury and journal.
+     *
+     * @param  float|null  $amount  Payment amount; defaults to booking's paid_amount.
+     */
+    public function execute(Booking $booking, ?float $amount = null): void
     {
-        if ((float) $booking->price <= 0) {
+        $amount ??= (float) $booking->paid_amount;
+
+        if ($amount <= 0) {
             return;
         }
 
+        $date = $booking->visit_date->toDateString();
+
         // 1. Create treasury entry
         $this->treasuryService->record([
-            'type'        => 'in',
+            'type' => 'in',
             'description' => "دفعة حجز: {$booking->file_no} — {$booking->patient_name}",
-            'amount'      => $booking->price,
-            'date'        => $booking->date,
-            'source'      => 'booking',
-            'booking_id'  => $booking->id,
+            'amount' => $amount,
+            'date' => $date,
+            'source' => 'booking',
+            'booking_id' => $booking->id,
         ]);
 
         // 2. Auto-post journal entry: Debit Cash / Credit Revenue
-        $cashAccount    = $this->findAccount($booking->pay_method === 'card' ? '1100' : '1000'); // Bank or Cash
+        $cashAccount = $this->findAccount($booking->pay_method === 'card' ? '1100' : '1000');
         $revenueAccount = $this->findRevenueAccount($booking->dept);
 
         if ($cashAccount && $revenueAccount) {
             $this->journalService->record([
-                'date'              => $booking->date,
-                'description'       => "إيراد حجز: {$booking->file_no} — {$booking->service}",
-                'debit_account_id'  => $cashAccount,
+                'date' => $date,
+                'description' => "إيراد حجز: {$booking->file_no} — {$booking->service_name}",
+                'debit_account_id' => $cashAccount,
                 'credit_account_id' => $revenueAccount,
-                'amount'            => $booking->price,
-                'source'            => 'auto_booking',
-                'reference'         => $booking->file_no,
+                'amount' => $amount,
+                'source' => 'auto_booking',
+                'reference' => $booking->file_no,
             ]);
         }
     }
@@ -55,15 +64,13 @@ class AutoPostBookingPaymentAction
     private function findRevenueAccount(string $dept): ?string
     {
         $codeMap = [
-            'clinic'  => '2000',
-            'labs'    => '2100',
+            'clinic' => '2000',
+            'labs' => '2100',
             'surgery' => '2200',
-            'lasik'   => '2300',
-            'laser'   => '2400',
+            'lasik' => '2300',
+            'laser' => '2400',
         ];
 
-        $code = $codeMap[$dept] ?? '2000';
-
-        return $this->findAccount($code);
+        return $this->findAccount($codeMap[$dept] ?? '2000');
     }
 }
