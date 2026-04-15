@@ -16,13 +16,14 @@ class StoreSurgeryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'booking_id'   => ['required', 'exists:bookings,id'],
-            'dept'         => ['required', 'in:surgery,lasik,laser'],
-            'or_bed_id'    => ['nullable', 'exists:or_beds,id'],
-            'surgeon_id'   => ['nullable', 'exists:doctors,id'],
-            'eye'          => ['nullable', 'in:OD,OS,OU'],
-            'procedure'    => ['nullable', 'string', 'max:300'],
-            'anaesthesia'  => ['nullable', 'in:local,general,topical,sedation'],
+            'booking_id' => ['required', 'exists:bookings,id'],
+            'dept' => ['required', 'in:surgery,lasik,laser'],
+            'or_bed_id' => ['nullable', 'exists:or_beds,id'],
+            'bed_no' => ['nullable', 'integer', 'min:1', 'max:999'],
+            'surgeon_id' => ['nullable', 'exists:doctors,id'],
+            'eye' => ['nullable', 'in:OD,OS,OU'],
+            'procedure' => ['nullable', 'string', 'max:300'],
+            'anaesthesia' => ['nullable', 'in:local,general,topical,sedation'],
             'pre_op_notes' => ['nullable', 'string', 'max:5000'],
             'scheduled_at' => ['nullable', 'date'],
         ];

@@ -6,18 +6,13 @@ import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 
-interface OrBed {
-    id: number;
-    label: string;
-}
-
 interface Surgery {
     id: string;
     booking: { file_no: string; patient_name: string };
     procedure: string;
     eye: 'OD' | 'OS' | 'OU' | null;
     surgeon: { id: string; name: string } | null;
-    or_bed: { id: number; bed_number: string; room: { name: string } } | null;
+    bed_no: number | null;
     status: 'scheduled' | 'prep' | 'in_progress' | 'completed' | 'cancelled';
     scheduled_at: string | null;
     supply_total: number;
@@ -33,13 +28,11 @@ interface Paginator {
 
 const props = defineProps<{
     surgeries: Paginator;
-    availableBeds: OrBed[];
+    totalBeds: number;
     doctors: { id: string; name: string }[];
     dept: string;
     filters: { status?: string };
 }>();
-
-const TOTAL_BEDS = 20;
 
 const columns = [
     { key: 'scheduled_at', label: 'الموعد',     sortable: true },
@@ -48,6 +41,7 @@ const columns = [
     { key: 'procedure',    label: 'الإجراء' },
     { key: 'eye',          label: 'العين' },
     { key: 'surgeon',      label: 'الطبيب' },
+    { key: 'bed_no',       label: 'السرير' },
     { key: 'status',       label: 'الحالة' },
     { key: 'supply_total', label: 'المستلزمات' },
 ];
@@ -63,25 +57,28 @@ function goToPage(page: number) {
 /* ── Beds grid ── */
 const bedMap = computed(() => {
     const map: Record<number, Surgery | null> = {};
-    for (let i = 1; i <= TOTAL_BEDS; i++) map[i] = null;
+    for (let i = 1; i <= props.totalBeds; i++) map[i] = null;
 
     props.surgeries.data.forEach((s) => {
-        if (s.or_bed) {
-            const n = parseInt(s.or_bed.bed_number);
-            if (n >= 1 && n <= TOTAL_BEDS) map[n] = s;
-        }
+        if (s.bed_no && s.bed_no >= 1 && s.bed_no <= props.totalBeds) map[s.bed_no] = s;
     });
 
     let slot = 1;
     props.surgeries.data
-        .filter((s) => !s.or_bed)
+        .filter((s) => !s.bed_no)
         .forEach((s) => {
-            while (slot <= TOTAL_BEDS && map[slot]) slot++;
-            if (slot <= TOTAL_BEDS) { map[slot] = s; slot++; }
+            while (slot <= props.totalBeds && map[slot]) slot++;
+            if (slot <= props.totalBeds) { map[slot] = s; slot++; }
         });
 
     return map;
 });
+
+const occupiedBedNos = computed(() =>
+    props.surgeries.data
+        .filter((s) => s.bed_no && ['scheduled', 'prep', 'in_progress'].includes(s.status))
+        .map((s) => s.bed_no as number),
+);
 
 const bedStatusColor: Record<string, string> = {
     scheduled:   '#7B2FA6',
@@ -111,14 +108,20 @@ const showSchedule = ref(false);
 const scheduleForm = useForm({
     booking_id:   '',
     dept:         'lasik',
-    or_bed_id:    '' as string | number,
+    bed_no:       null as number | null,
     surgeon_id:   '',
-    eye:          '',
+    eye:          '' as string,
     procedure:    '',
     anaesthesia:  'topical',
     pre_op_notes: '',
     scheduled_at: '',
 });
+
+function selectBed(num: number) {
+    if (occupiedBedNos.value.includes(num)) return;
+    scheduleForm.bed_no = scheduleForm.bed_no === num ? null : num;
+}
+
 function submitSchedule() {
     scheduleForm.post('/lasik', {
         onSuccess: () => { showSchedule.value = false; scheduleForm.reset(); },
@@ -179,46 +182,47 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
     <div class="dept-card mb-4">
         <div class="dept-card-hd">
             <div>
-                <p class="dept-card-title">لوحة أسرّة قسم الليزك ({{ TOTAL_BEDS }} سرير)</p>
+                <p class="dept-card-title">لوحة أسرّة قسم الليزك ({{ totalBeds }} سرير)</p>
                 <p class="dept-card-sub">اضغط على السرير لعرض بيانات الحالة</p>
             </div>
             <button
-                class="flex items-center gap-1.5 rounded-lg bg-hospital-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-hospital-primary/90"
+                class="flex items-center gap-1.5 rounded-lg bg-[#7B2FA6] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#6A2890]"
                 @click="showSchedule = true"
             >
                 <CalendarPlus class="h-3.5 w-3.5" />
                 جدولة ليزك
             </button>
         </div>
-        <div class="grid grid-cols-10 gap-2 p-3">
-            <button
-                v-for="i in TOTAL_BEDS"
-                :key="i"
-                class="lasik-bed"
-                :class="bedMap[i] ? 'lasik-bed-occupied' : 'lasik-bed-empty'"
-                :style="bedMap[i] ? { background: bedStatusColor[bedMap[i]!.status], borderColor: bedStatusColor[bedMap[i]!.status] } : {}"
-                :title="bedMap[i] ? `${bedMap[i]!.booking?.patient_name} — ${statusAr[bedMap[i]!.status]}` : `سرير ${i} فارغ`"
-                @click="bedMap[i] ? openCase(bedMap[i]!) : (showSchedule = true)"
-            >{{ i }}</button>
-        </div>
-        <div class="flex items-center gap-4 border-t border-hospital-border px-3 py-2 text-[10px] text-hospital-text-2">
-            <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-[#7B2FA6]"></span>مجدولة</span>
-            <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-[#E74C3C]"></span>جارية</span>
-            <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-[#1A8C5B]"></span>مكتملة</span>
-            <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm border border-hospital-border bg-white"></span>فارغ</span>
+        <div class="p-3">
+            <div class="beds-row">
+                <button
+                    v-for="i in totalBeds"
+                    :key="i"
+                    class="bed"
+                    :class="bedMap[i] ? 'bed-occupied' : 'bed-empty'"
+                    :style="bedMap[i] ? { background: bedStatusColor[bedMap[i]!.status], borderColor: bedStatusColor[bedMap[i]!.status], color: '#fff' } : {}"
+                    :title="bedMap[i] ? `${bedMap[i]!.booking?.patient_name} — ${statusAr[bedMap[i]!.status]}` : `سرير ${i} فارغ`"
+                    @click="bedMap[i] ? openCase(bedMap[i]!) : (showSchedule = true)"
+                >{{ i }}</button>
+            </div>
+            <div class="mt-2 flex items-center gap-4 text-[10px] text-hospital-text-2">
+                <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-[#7B2FA6]"></span>مجدولة</span>
+                <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-[#E74C3C]"></span>جارية</span>
+                <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-[#1A8C5B]"></span>مكتملة</span>
+                <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm border border-hospital-border bg-white"></span>فارغ</span>
+            </div>
         </div>
     </div>
 
     <!-- ── Table + Case panel ── -->
     <div class="grid gap-4" :class="activeCase ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'">
-        <!-- Table -->
         <div :class="activeCase ? 'lg:col-span-2' : ''">
             <div class="dept-card">
                 <div class="dept-card-hd">
                     <p class="dept-card-title">جدول جلسات الليزك</p>
                     <select
                         v-model="statusFilter"
-                        class="rounded-lg border border-hospital-border bg-hospital-bg px-2 py-1.5 text-xs text-hospital-text focus:border-hospital-primary focus:outline-none"
+                        class="rounded-lg border border-hospital-border bg-hospital-bg px-2 py-1.5 text-xs text-hospital-text focus:border-[#7B2FA6] focus:outline-none"
                         @change="applyFilters"
                     >
                         <option value="">جميع الحالات</option>
@@ -244,6 +248,10 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
                     <template #cell-patient="{ row }">{{ (row as Surgery).booking?.patient_name ?? '—' }}</template>
                     <template #cell-eye="{ value }">{{ value ? eyeLabel[value as string] ?? value : '—' }}</template>
                     <template #cell-surgeon="{ row }">{{ (row as Surgery).surgeon?.name ?? '—' }}</template>
+                    <template #cell-bed_no="{ value }">
+                        <span v-if="value" class="inline-flex h-6 w-6 items-center justify-center rounded bg-purple-50 text-xs font-bold text-[#7B2FA6]">{{ value }}</span>
+                        <span v-else class="text-hospital-text-2">—</span>
+                    </template>
                     <template #cell-status="{ value }">
                         <Badge :variant="(value as 'scheduled' | 'prep' | 'in_progress' | 'completed' | 'cancelled')" />
                     </template>
@@ -267,12 +275,11 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
         <!-- Case panel -->
         <div v-if="activeCase" class="lg:col-span-1">
             <div class="dept-card overflow-hidden">
-                <!-- Panel header -->
                 <div class="case-panel-hd">
                     <div>
                         <p class="text-[13px] font-bold text-white">{{ activeCase.booking?.patient_name ?? '—' }}</p>
                         <p class="mt-0.5 text-[11px] text-white/60">
-                            {{ activeCase.procedure }} — {{ activeCase.or_bed ? `سرير ${activeCase.or_bed.bed_number}` : 'بدون سرير' }}
+                            {{ activeCase.procedure }} — {{ activeCase.bed_no ? `سرير ${activeCase.bed_no}` : 'بدون سرير' }}
                         </p>
                     </div>
                     <button class="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25" @click="closeCase">
@@ -280,59 +287,28 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
                     </button>
                 </div>
                 <div class="p-3">
-                    <!-- Info grid -->
                     <div class="mb-3 grid grid-cols-2 gap-2">
-                        <div class="case-info-cell">
-                            <p class="case-info-lbl">الحالة</p>
-                            <p class="case-info-val">{{ statusAr[activeCase.status] }}</p>
-                        </div>
-                        <div class="case-info-cell">
-                            <p class="case-info-lbl">العين</p>
-                            <p class="case-info-val">{{ activeCase.eye ? eyeLabel[activeCase.eye] : '—' }}</p>
-                        </div>
-                        <div class="case-info-cell">
-                            <p class="case-info-lbl">الطبيب</p>
-                            <p class="case-info-val">{{ activeCase.surgeon?.name ?? '—' }}</p>
-                        </div>
-                        <div class="case-info-cell">
-                            <p class="case-info-lbl">الموعد</p>
-                            <p class="case-info-val">{{ activeCase.scheduled_at ? activeCase.scheduled_at.slice(0, 10) : '—' }}</p>
-                        </div>
-                        <div class="case-info-cell">
-                            <p class="case-info-lbl">رقم الملف</p>
-                            <p class="case-info-val">{{ activeCase.booking?.file_no ?? '—' }}</p>
-                        </div>
-                        <div class="case-info-cell">
-                            <p class="case-info-lbl">المستلزمات</p>
-                            <p class="case-info-val">{{ Number(activeCase.supply_total).toLocaleString('ar-EG') }} ج</p>
-                        </div>
+                        <div class="case-info-cell"><p class="case-info-lbl">الحالة</p><p class="case-info-val">{{ statusAr[activeCase.status] }}</p></div>
+                        <div class="case-info-cell"><p class="case-info-lbl">العين</p><p class="case-info-val">{{ activeCase.eye ? eyeLabel[activeCase.eye] : '—' }}</p></div>
+                        <div class="case-info-cell"><p class="case-info-lbl">الطبيب</p><p class="case-info-val">{{ activeCase.surgeon?.name ?? '—' }}</p></div>
+                        <div class="case-info-cell"><p class="case-info-lbl">الموعد</p><p class="case-info-val">{{ activeCase.scheduled_at ? activeCase.scheduled_at.slice(0, 10) : '—' }}</p></div>
+                        <div class="case-info-cell"><p class="case-info-lbl">رقم الملف</p><p class="case-info-val">{{ activeCase.booking?.file_no ?? '—' }}</p></div>
+                        <div class="case-info-cell"><p class="case-info-lbl">المستلزمات</p><p class="case-info-val">{{ Number(activeCase.supply_total).toLocaleString('ar-EG') }} ج</p></div>
                     </div>
-
                     <p class="mb-2 border-b-2 border-purple-100 pb-1 text-[11px] font-bold text-[#7B2FA6]">المستلزمات المستخدمة في الليزك</p>
-
                     <div class="mb-3 min-h-[40px] rounded-lg bg-gray-50 px-3 py-2 text-xs text-hospital-text-2">
                         <span v-if="!activeCase.supply_total">لا توجد مستلزمات مسجلة بعد</span>
                         <span v-else>إجمالي المستلزمات: {{ Number(activeCase.supply_total).toLocaleString('ar-EG') }} ج</span>
                     </div>
-
-                    <button
-                        class="mb-3 w-full rounded-lg bg-[#7B2FA6] py-2 text-xs font-medium text-white hover:bg-[#6A2890] transition-colors"
-                        @click="openSupplies(activeCase.id)"
-                    >+ إضافة مستلزم</button>
-
-                    <!-- Totals bar -->
+                    <button class="mb-3 w-full rounded-lg bg-[#7B2FA6] py-2 text-xs font-medium text-white transition-colors hover:bg-[#6A2890]" @click="openSupplies(activeCase.id)">+ إضافة مستلزم</button>
                     <div class="case-totals-bar">
                         <div class="flex justify-between text-xs">
                             <span class="text-white/70">إجمالي المستلزمات</span>
                             <span class="font-bold text-white">{{ Number(activeCase.supply_total).toLocaleString('ar-EG') }} ج</span>
                         </div>
                     </div>
-
                     <div class="mt-3 flex gap-2">
-                        <button
-                            class="flex flex-1 items-center justify-center gap-1 rounded-lg border border-[#7B2FA6] px-3 py-1.5 text-xs font-medium text-[#7B2FA6] hover:bg-purple-50"
-                            @click="openReport(activeCase.id)"
-                        >
+                        <button class="flex flex-1 items-center justify-center gap-1 rounded-lg border border-[#7B2FA6] px-3 py-1.5 text-xs font-medium text-[#7B2FA6] hover:bg-purple-50" @click="openReport(activeCase.id)">
                             <ClipboardList class="h-3.5 w-3.5" /> تقرير
                         </button>
                     </div>
@@ -351,10 +327,10 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
                     <p v-if="scheduleForm.errors.booking_id" class="mt-1 text-xs text-hospital-danger">{{ scheduleForm.errors.booking_id }}</p>
                 </div>
                 <div>
-                    <label class="mb-1 block text-sm font-medium text-hospital-text">السرير</label>
-                    <select v-model="scheduleForm.or_bed_id" class="dept-input">
-                        <option value="">— اختر السرير —</option>
-                        <option v-for="bed in availableBeds" :key="bed.id" :value="bed.id">{{ bed.label }}</option>
+                    <label class="mb-1 block text-sm font-medium text-hospital-text">الطبيب الجراح</label>
+                    <select v-model="scheduleForm.surgeon_id" class="dept-input">
+                        <option value="">— اختر الطبيب —</option>
+                        <option v-for="doc in doctors" :key="doc.id" :value="doc.id">{{ doc.name }}</option>
                     </select>
                 </div>
                 <div>
@@ -374,13 +350,6 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
                     </select>
                 </div>
                 <div>
-                    <label class="mb-1 block text-sm font-medium text-hospital-text">الطبيب الجراح</label>
-                    <select v-model="scheduleForm.surgeon_id" class="dept-input">
-                        <option value="">— اختر الطبيب —</option>
-                        <option v-for="doc in doctors" :key="doc.id" :value="doc.id">{{ doc.name }}</option>
-                    </select>
-                </div>
-                <div>
                     <label class="mb-1 block text-sm font-medium text-hospital-text">التخدير</label>
                     <select v-model="scheduleForm.anaesthesia" class="dept-input">
                         <option value="">—</option>
@@ -390,15 +359,44 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
                         <option value="general">عام (General)</option>
                     </select>
                 </div>
-                <div class="col-span-2">
+                <div>
                     <label class="mb-1 block text-sm font-medium text-hospital-text">موعد الإجراء</label>
                     <input v-model="scheduleForm.scheduled_at" type="datetime-local" class="dept-input" />
                 </div>
-                <div class="col-span-2">
-                    <label class="mb-1 block text-sm font-medium text-hospital-text">ملاحظات ما قبل الإجراء</label>
-                    <textarea v-model="scheduleForm.pre_op_notes" rows="3" class="dept-input" />
+            </div>
+
+            <!-- ── Bed picker ── -->
+            <div class="beds-panel">
+                <div class="beds-panel-lbl">
+                    اختر السرير:
+                    <span v-if="scheduleForm.bed_no" class="beds-panel-selected">سرير {{ scheduleForm.bed_no }} محدد</span>
+                </div>
+                <div class="beds-row">
+                    <button
+                        v-for="n in totalBeds"
+                        :key="n"
+                        type="button"
+                        class="bed"
+                        :class="{
+                            'bed-occupied-picker': occupiedBedNos.includes(n),
+                            'bed-selected': scheduleForm.bed_no === n,
+                        }"
+                        :title="occupiedBedNos.includes(n) ? `سرير ${n} مشغول` : `سرير ${n}`"
+                        @click="selectBed(n)"
+                    >{{ n }}</button>
+                </div>
+                <div class="beds-legend">
+                    <span class="legend-item"><span class="bed" style="cursor:default">1</span> فارغ</span>
+                    <span class="legend-item"><span class="bed bed-occupied-picker" style="cursor:default">2</span> مشغول</span>
+                    <span class="legend-item"><span class="bed bed-selected" style="cursor:default">3</span> محجوز</span>
                 </div>
             </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-hospital-text">ملاحظات ما قبل الإجراء</label>
+                <textarea v-model="scheduleForm.pre_op_notes" rows="3" class="dept-input" />
+            </div>
+
             <div class="flex justify-end gap-2 pt-2">
                 <button type="button" class="rounded-lg border border-hospital-border px-4 py-2 text-sm hover:bg-hospital-bg" @click="showSchedule = false">إلغاء</button>
                 <button type="submit" :disabled="scheduleForm.processing" class="rounded-lg bg-[#7B2FA6] px-4 py-2 text-sm font-medium text-white disabled:opacity-60">جدولة</button>
@@ -409,18 +407,9 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
     <!-- ── Report Modal ── -->
     <Modal v-model="showReport" title="تقرير الليزك" size="md">
         <form class="space-y-4" @submit.prevent="submitReport">
-            <div>
-                <label class="mb-1 block text-sm font-medium">تقرير الإجراء</label>
-                <textarea v-model="reportForm.op_report" rows="4" class="dept-input" />
-            </div>
-            <div>
-                <label class="mb-1 block text-sm font-medium">ملاحظات ما بعد الإجراء</label>
-                <textarea v-model="reportForm.post_op_notes" rows="3" class="dept-input" />
-            </div>
-            <div>
-                <label class="mb-1 block text-sm font-medium">المضاعفات</label>
-                <textarea v-model="reportForm.complications" rows="2" class="dept-input" />
-            </div>
+            <div><label class="mb-1 block text-sm font-medium">تقرير الإجراء</label><textarea v-model="reportForm.op_report" rows="4" class="dept-input" /></div>
+            <div><label class="mb-1 block text-sm font-medium">ملاحظات ما بعد الإجراء</label><textarea v-model="reportForm.post_op_notes" rows="3" class="dept-input" /></div>
+            <div><label class="mb-1 block text-sm font-medium">المضاعفات</label><textarea v-model="reportForm.complications" rows="2" class="dept-input" /></div>
             <div class="flex justify-end gap-2 pt-2">
                 <button type="button" class="rounded-lg border border-hospital-border px-4 py-2 text-sm hover:bg-hospital-bg" @click="showReport = false">إلغاء</button>
                 <button type="submit" :disabled="reportForm.processing" class="rounded-lg bg-[#7B2FA6] px-4 py-2 text-sm font-medium text-white disabled:opacity-60">حفظ التقرير</button>
@@ -435,7 +424,7 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
                 <input v-model="item.name" type="text" placeholder="اسم الصنف" class="col-span-5 dept-input" />
                 <input v-model.number="item.qty" type="number" min="1" placeholder="الكمية" class="col-span-3 dept-input" />
                 <input v-model.number="item.unit_cost" type="number" min="0" step="0.01" placeholder="السعر" class="col-span-3 dept-input" />
-                <button class="col-span-1 h-9 w-9 text-hospital-danger hover:bg-hospital-danger/10 rounded-lg" @click="removeSupplyRow(idx)">×</button>
+                <button class="col-span-1 h-9 w-9 rounded-lg text-hospital-danger hover:bg-hospital-danger/10" @click="removeSupplyRow(idx)">×</button>
             </div>
             <button class="text-sm text-[#7B2FA6] hover:underline" @click="addSupplyRow">+ إضافة صنف</button>
             <div class="flex justify-end gap-2 border-t border-hospital-border pt-3">
@@ -478,23 +467,81 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
 .dept-card-title { font-size: 13px; font-weight: 700; color: var(--color-hospital-text, #0D1F3C); }
 .dept-card-sub   { font-size: 11px; color: var(--color-hospital-text-3, #8A96AE); margin-top: 1px; }
 
-/* ── Bed squares ── */
-.lasik-bed {
-    aspect-ratio: 1;
-    border-radius: 5px;
+/* ── Beds row (dashboard) — small squares like mockup ── */
+.beds-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+.bed {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
     border: 1.5px solid var(--color-hospital-border, #DDE4EF);
+    background: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all .15s;
     color: var(--color-hospital-text-3, #8A96AE);
-    background: #fff;
+    font-family: inherit;
+    padding: 0;
 }
-.lasik-bed-occupied { color: #fff !important; border-color: transparent !important; }
-.lasik-bed-empty:hover { border-color: #7B2FA6; background: #F3E8FD; color: #7B2FA6; }
+.bed-occupied { cursor: pointer; }
+.bed-empty:hover {
+    border-color: #7B2FA6;
+    background: #F3E8FD;
+    color: #7B2FA6;
+}
+
+/* ── Bed picker in modal ── */
+.beds-panel {
+    background: var(--color-hospital-bg, #F3F6FA);
+    border: 1.5px solid var(--color-hospital-border, #DDE4EF);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+.beds-panel-lbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-hospital-text-2, #4A5878);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.beds-panel-selected {
+    font-size: 10px;
+    font-weight: 700;
+    background: #7B2FA6;
+    color: #fff;
+    border-radius: 12px;
+    padding: 2px 8px;
+}
+.bed-occupied-picker {
+    background: var(--color-hospital-primary-pale, #E8F1FB) !important;
+    border-color: var(--color-hospital-primary, #0A4FA6) !important;
+    color: var(--color-hospital-primary, #0A4FA6) !important;
+    cursor: not-allowed !important;
+    opacity: .7;
+}
+.bed-selected {
+    background: #7B2FA6 !important;
+    border-color: #7B2FA6 !important;
+    color: #fff !important;
+    opacity: 1 !important;
+}
+.beds-legend {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 10px;
+    color: var(--color-hospital-text-2, #4A5878);
+}
+.legend-item { display: flex; align-items: center; gap: 4px; }
 
 /* ── Case panel ── */
 .case-panel-hd {
@@ -504,20 +551,12 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
     align-items: center;
     justify-content: space-between;
 }
-.case-info-cell {
-    background: var(--color-hospital-bg, #F3F6FA);
-    border-radius: 6px;
-    padding: 7px 10px;
-}
+.case-info-cell { background: var(--color-hospital-bg, #F3F6FA); border-radius: 6px; padding: 7px 10px; }
 .case-info-lbl { font-size: 10px; color: var(--color-hospital-text-3, #8A96AE); margin-bottom: 2px; }
 .case-info-val { font-size: 12px; font-weight: 600; color: var(--color-hospital-text, #0D1F3C); }
-.case-totals-bar {
-    background: linear-gradient(135deg, #5B2080, #7B2FA6);
-    border-radius: 8px;
-    padding: 10px 12px;
-}
+.case-totals-bar { background: linear-gradient(135deg, #5B2080, #7B2FA6); border-radius: 8px; padding: 10px 12px; }
 
-/* ── Input ── */
+/* ── Form input ── */
 .dept-input {
     width: 100%;
     padding: 7px 10px;
@@ -534,7 +573,4 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
     border-color: #7B2FA6;
     box-shadow: 0 0 0 3px rgba(123,47,166,.1);
 }
-
-/* ── DataTable inside card ── */
-:deep(.dept-card > div > table) { border-radius: 0; border: none; box-shadow: none; }
 </style>

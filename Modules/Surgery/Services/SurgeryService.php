@@ -30,6 +30,7 @@ class SurgeryService
             'booking_id' => $data->bookingId,
             'dept' => $data->dept,
             'or_bed_id' => $data->orBedId,
+            'bed_no' => $data->bedNo,
             'surgeon_id' => $data->surgeonId,
             'eye' => $data->eye,
             'procedure' => $data->procedure,

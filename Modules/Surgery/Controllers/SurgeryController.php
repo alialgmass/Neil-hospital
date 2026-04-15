@@ -4,6 +4,7 @@ namespace Modules\Surgery\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Doctor\Models\Doctor;
@@ -36,9 +37,16 @@ class SurgeryController extends Controller
             default => 'surgery/Index',
         };
 
+        $settings = DB::table('settings')->whereIn('key', ['surgery_beds', 'lasik_beds'])->pluck('value', 'key');
+        $totalBeds = (int) ($dept === 'lasik'
+            ? ($settings['lasik_beds'] ?? 20)
+            : ($settings['surgery_beds'] ?? 30));
+
+        $surgeries = $this->surgeryService->list($dept, $status, 200); // load more to fill bed map
+
         return Inertia::render($page, [
-            'surgeries' => $this->surgeryService->list($dept, $status, 20),
-            'availableBeds' => $dept !== 'laser' ? $this->surgeryService->getAvailableBeds() : collect(),
+            'surgeries' => $surgeries,
+            'totalBeds' => $totalBeds,
             'doctors' => Doctor::select('id', 'name')->orderBy('name')->get(),
             'dept' => $dept,
             'filters' => ['status' => $status],

@@ -6,24 +6,14 @@ import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 
-interface OrBed {
-    id: number;
-    label: string;
-}
-
-interface Doctor {
-    id: string;
-    name: string;
-}
-
 interface Surgery {
     id: string;
     booking: { file_no: string; patient_name: string };
     procedure: string;
     eye: 'OD' | 'OS' | 'OU' | null;
     anaesthesia: string | null;
-    surgeon: Doctor | null;
-    or_bed: { id: number; bed_number: string; room: { name: string } } | null;
+    surgeon: { id: string; name: string } | null;
+    bed_no: number | null;
     status: 'scheduled' | 'prep' | 'in_progress' | 'completed' | 'cancelled';
     scheduled_at: string | null;
     supply_total: number;
@@ -38,13 +28,11 @@ interface Paginator {
 
 const props = defineProps<{
     surgeries: Paginator;
-    availableBeds: OrBed[];
+    totalBeds: number;
     doctors: { id: string; name: string }[];
     dept: string;
     filters: { status?: string };
 }>();
-
-const TOTAL_BEDS = 30;
 
 const columns = [
     { key: 'scheduled_at', label: 'الموعد',          sortable: true },
@@ -53,7 +41,7 @@ const columns = [
     { key: 'procedure',    label: 'الإجراء' },
     { key: 'eye',          label: 'العين' },
     { key: 'surgeon',      label: 'الطبيب' },
-    { key: 'or_bed',       label: 'السرير' },
+    { key: 'bed_no',       label: 'السرير' },
     { key: 'status',       label: 'الحالة' },
     { key: 'supply_total', label: 'تكلفة المستلزمات' },
 ];
@@ -71,32 +59,32 @@ function goToPage(page: number) {
 /* ── Beds grid ── */
 const bedMap = computed(() => {
     const map: Record<number, Surgery | null> = {};
-    for (let i = 1; i <= TOTAL_BEDS; i++) map[i] = null;
+    for (let i = 1; i <= props.totalBeds; i++) map[i] = null;
 
-    // Assign beds that have a bed number
     props.surgeries.data.forEach((s) => {
-        if (s.or_bed) {
-            const n = parseInt(s.or_bed.bed_number);
-            if (n >= 1 && n <= TOTAL_BEDS) {
-                map[n] = s;
-            }
+        if (s.bed_no && s.bed_no >= 1 && s.bed_no <= props.totalBeds) {
+            map[s.bed_no] = s;
         }
     });
 
-    // Fill remaining surgeries without beds into first free slots
+    // Fill remaining without beds into first free slots
     let slot = 1;
     props.surgeries.data
-        .filter((s) => !s.or_bed)
+        .filter((s) => !s.bed_no)
         .forEach((s) => {
-            while (slot <= TOTAL_BEDS && map[slot]) slot++;
-            if (slot <= TOTAL_BEDS) {
-                map[slot] = s;
-                slot++;
-            }
+            while (slot <= props.totalBeds && map[slot]) slot++;
+            if (slot <= props.totalBeds) { map[slot] = s; slot++; }
         });
 
     return map;
 });
+
+// Occupied bed numbers for the bed picker in the modal
+const occupiedBedNos = computed(() =>
+    props.surgeries.data
+        .filter((s) => s.bed_no && ['scheduled', 'prep', 'in_progress'].includes(s.status))
+        .map((s) => s.bed_no as number),
+);
 
 const bedBg: Record<string, string> = {
     scheduled:   '#27AE60',
@@ -113,17 +101,17 @@ const statusAr: Record<string, string> = {
 const eyeLabel: Record<string, string> = { OD: 'عين يمنى', OS: 'عين يسرى', OU: 'كلاهما' };
 
 /* ── Stats ── */
-const scheduledCount   = computed(() => props.surgeries.data.filter((s) => s.status === 'scheduled').length);
-const inProgressCount  = computed(() => props.surgeries.data.filter((s) => s.status === 'in_progress' || s.status === 'prep').length);
-const completedCount   = computed(() => props.surgeries.data.filter((s) => s.status === 'completed').length);
-const supplyTotal      = computed(() => props.surgeries.data.reduce((s, b) => s + Number(b.supply_total ?? 0), 0));
+const scheduledCount  = computed(() => props.surgeries.data.filter((s) => s.status === 'scheduled').length);
+const inProgressCount = computed(() => props.surgeries.data.filter((s) => s.status === 'in_progress' || s.status === 'prep').length);
+const completedCount  = computed(() => props.surgeries.data.filter((s) => s.status === 'completed').length);
+const supplyTotal     = computed(() => props.surgeries.data.reduce((s, b) => s + Number(b.supply_total ?? 0), 0));
 
 /* ── Schedule Modal ── */
 const showSchedule = ref(false);
 const scheduleForm = useForm({
     booking_id:   '',
     dept:         'surgery',
-    or_bed_id:    '' as string | number,
+    bed_no:       null as number | null,
     surgeon_id:   '',
     eye:          '',
     procedure:    '',
@@ -131,6 +119,12 @@ const scheduleForm = useForm({
     pre_op_notes: '',
     scheduled_at: '',
 });
+
+function selectBed(num: number) {
+    if (occupiedBedNos.value.includes(num)) return;
+    scheduleForm.bed_no = scheduleForm.bed_no === num ? null : num;
+}
+
 function submitSchedule() {
     scheduleForm.post('/surgery', {
         onSuccess: () => { showSchedule.value = false; scheduleForm.reset(); },
@@ -159,7 +153,7 @@ interface SupplyItem { name: string; qty: number; unit_cost: number }
 const supplyItems   = ref<SupplyItem[]>([{ name: '', qty: 1, unit_cost: 0 }]);
 const suppliesTotal = computed(() => supplyItems.value.reduce((s, i) => s + i.qty * i.unit_cost, 0));
 
-function addSupplyRow()         { supplyItems.value.push({ name: '', qty: 1, unit_cost: 0 }); }
+function addSupplyRow()             { supplyItems.value.push({ name: '', qty: 1, unit_cost: 0 }); }
 function removeSupplyRow(i: number) { supplyItems.value.splice(i, 1); }
 function openSupplies(id: string) {
     suppliesTarget.value = id;
@@ -190,7 +184,6 @@ function submitSupplies() {
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <!-- View toggle -->
             <div class="flex items-center gap-0.5 rounded-lg border border-hospital-border bg-white p-1">
                 <button
                     class="rounded p-1.5 transition-colors"
@@ -254,36 +247,26 @@ function submitSupplies() {
     <!-- ── GRID VIEW ── -->
     <div v-if="viewMode === 'grid'" class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <div
-            v-for="i in TOTAL_BEDS"
+            v-for="i in totalBeds"
             :key="i"
             class="bed-card group"
             :style="bedMap[i] ? { background: bedBg[bedMap[i]!.status] ?? '#27AE60' } : { background: '#BDC3C7', opacity: '0.75' }"
             @click="bedMap[i] ? openReport(bedMap[i]!.id) : (showSchedule = true)"
         >
-            <!-- Card header -->
             <div class="bed-card-hd">
                 <span class="font-black text-[13px]">غرفة {{ i }}</span>
                 <span v-if="bedMap[i]" class="bed-status-badge">{{ statusAr[bedMap[i]!.status] }}</span>
             </div>
-            <!-- Occupied -->
             <div v-if="bedMap[i]" class="bed-card-body">
                 <p class="mb-1 text-[13px] font-extrabold leading-tight">{{ bedMap[i]!.booking?.patient_name ?? '—' }}</p>
                 <p class="bed-info-row"><span>العملية:</span><strong>{{ bedMap[i]!.procedure }}</strong></p>
                 <p class="bed-info-row"><span>الطبيب:</span><strong>{{ bedMap[i]!.surgeon?.name ?? '—' }}</strong></p>
                 <p v-if="bedMap[i]!.eye" class="bed-info-row"><span>العين:</span><strong>{{ eyeLabel[bedMap[i]!.eye!] ?? bedMap[i]!.eye }}</strong></p>
                 <div class="mt-2 flex gap-1.5" @click.stop>
-                    <button
-                        v-if="bedMap[i]!.status !== 'completed' && bedMap[i]!.status !== 'in_progress'"
-                        class="bed-action-btn"
-                        @click="openReport(bedMap[i]!.id)"
-                    >▶ تقرير</button>
-                    <button
-                        class="bed-action-btn"
-                        @click="openSupplies(bedMap[i]!.id)"
-                    >💊 مستلزمات</button>
+                    <button class="bed-action-btn" @click="openReport(bedMap[i]!.id)">▶ تقرير</button>
+                    <button class="bed-action-btn" @click="openSupplies(bedMap[i]!.id)">💊 مستلزمات</button>
                 </div>
             </div>
-            <!-- Empty -->
             <div v-else class="bed-card-empty">
                 <div class="text-2xl">🛏️</div>
                 <p class="mt-1 text-[11px] opacity-80">غرفة فارغة</p>
@@ -310,10 +293,8 @@ function submitSupplies() {
         <template #cell-patient="{ row }">{{ (row as Surgery).booking?.patient_name ?? '—' }}</template>
         <template #cell-eye="{ value }">{{ value ? eyeLabel[value as string] ?? value : '—' }}</template>
         <template #cell-surgeon="{ row }">{{ (row as Surgery).surgeon?.name ?? '—' }}</template>
-        <template #cell-or_bed="{ row }">
-            <span v-if="(row as Surgery).or_bed">
-                {{ (row as Surgery).or_bed!.room.name }} — {{ (row as Surgery).or_bed!.bed_number }}
-            </span>
+        <template #cell-bed_no="{ value }">
+            <span v-if="value" class="inline-flex h-6 w-6 items-center justify-center rounded bg-hospital-primary-pale text-xs font-bold text-hospital-primary">{{ value }}</span>
             <span v-else class="text-hospital-text-2">—</span>
         </template>
         <template #cell-status="{ value }">
@@ -350,13 +331,6 @@ function submitSupplies() {
                     <p v-if="scheduleForm.errors.booking_id" class="mt-1 text-xs text-hospital-danger">{{ scheduleForm.errors.booking_id }}</p>
                 </div>
                 <div>
-                    <label class="mb-1 block text-sm font-medium text-hospital-text">السرير</label>
-                    <select v-model="scheduleForm.or_bed_id" class="dept-input">
-                        <option value="">— اختر السرير —</option>
-                        <option v-for="bed in availableBeds" :key="bed.id" :value="bed.id">{{ bed.label }}</option>
-                    </select>
-                </div>
-                <div>
                     <label class="mb-1 block text-sm font-medium text-hospital-text">الطبيب الجراح</label>
                     <select v-model="scheduleForm.surgeon_id" class="dept-input">
                         <option value="">— اختر الطبيب —</option>
@@ -390,11 +364,40 @@ function submitSupplies() {
                     <label class="mb-1 block text-sm font-medium text-hospital-text">موعد العملية</label>
                     <input v-model="scheduleForm.scheduled_at" type="datetime-local" class="dept-input" />
                 </div>
-                <div class="col-span-2">
-                    <label class="mb-1 block text-sm font-medium text-hospital-text">ملاحظات ما قبل العملية</label>
-                    <textarea v-model="scheduleForm.pre_op_notes" rows="3" class="dept-input" />
+            </div>
+
+            <!-- ── Bed picker ── -->
+            <div class="beds-panel">
+                <div class="beds-panel-lbl">
+                    اختر السرير:
+                    <span v-if="scheduleForm.bed_no" class="beds-panel-selected">سرير {{ scheduleForm.bed_no }} محدد</span>
+                </div>
+                <div class="beds-row">
+                    <button
+                        v-for="n in totalBeds"
+                        :key="n"
+                        type="button"
+                        class="bed"
+                        :class="{
+                            'bed-occupied': occupiedBedNos.includes(n),
+                            'bed-selected': scheduleForm.bed_no === n,
+                        }"
+                        :title="occupiedBedNos.includes(n) ? `سرير ${n} مشغول` : `سرير ${n}`"
+                        @click="selectBed(n)"
+                    >{{ n }}</button>
+                </div>
+                <div class="beds-legend">
+                    <span class="legend-item"><span class="bed" style="cursor:default">1</span> فارغ</span>
+                    <span class="legend-item"><span class="bed bed-occupied" style="cursor:default">2</span> مشغول</span>
+                    <span class="legend-item"><span class="bed bed-selected" style="cursor:default">3</span> محجوز</span>
                 </div>
             </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-hospital-text">ملاحظات ما قبل العملية</label>
+                <textarea v-model="scheduleForm.pre_op_notes" rows="3" class="dept-input" />
+            </div>
+
             <div class="flex justify-end gap-2 pt-2">
                 <button type="button" class="rounded-lg border border-hospital-border px-4 py-2 text-sm hover:bg-hospital-bg" @click="showSchedule = false">إلغاء</button>
                 <button type="submit" :disabled="scheduleForm.processing" class="rounded-lg bg-hospital-primary px-4 py-2 text-sm font-medium text-white hover:bg-hospital-primary/90 disabled:opacity-60">جدولة</button>
@@ -454,22 +457,11 @@ function submitSupplies() {
     border-right-width: 4px;
     padding: 12px 14px;
     box-shadow: 0 1px 4px rgba(0,0,0,.06);
-    position: relative;
 }
-.stat-lbl {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--color-hospital-text-3, #8A96AE);
-    margin-bottom: 4px;
-}
-.stat-val {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--color-hospital-text, #0D1F3C);
-    line-height: 1;
-}
+.stat-lbl { font-size: 10px; font-weight: 600; color: var(--color-hospital-text-3, #8A96AE); margin-bottom: 4px; }
+.stat-val { font-size: 22px; font-weight: 800; color: var(--color-hospital-text, #0D1F3C); line-height: 1; }
 
-/* ── Bed cards ── */
+/* ── Bed cards (grid view) ── */
 .bed-card {
     border-radius: 10px;
     overflow: hidden;
@@ -478,10 +470,7 @@ function submitSupplies() {
     box-shadow: 0 3px 12px rgba(0,0,0,.18);
     transition: transform 0.18s, box-shadow 0.18s;
 }
-.bed-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,.28);
-}
+.bed-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,.28); }
 .bed-card-hd {
     background: rgba(0,0,0,.18);
     padding: 7px 11px;
@@ -495,18 +484,9 @@ function submitSupplies() {
     padding: 2px 8px;
     border-radius: 12px;
 }
-.bed-card-body {
-    padding: 9px 11px;
-    font-size: 11px;
-    line-height: 1.85;
-}
-.bed-info-row {
-    display: flex;
-    gap: 4px;
-}
-.bed-info-row span {
-    opacity: .75;
-}
+.bed-card-body { padding: 9px 11px; font-size: 11px; line-height: 1.85; }
+.bed-info-row { display: flex; gap: 4px; }
+.bed-info-row span { opacity: .75; }
 .bed-action-btn {
     flex: 1;
     padding: 4px;
@@ -519,15 +499,82 @@ function submitSupplies() {
     font-family: inherit;
     transition: background 0.15s;
 }
-.bed-action-btn:hover {
-    background: rgba(255,255,255,.35);
-}
-.bed-card-empty {
-    padding: 16px 11px;
-    text-align: center;
-}
+.bed-action-btn:hover { background: rgba(255,255,255,.35); }
+.bed-card-empty { padding: 16px 11px; text-align: center; }
 
-/* ── Form inputs shared ── */
+/* ── Bed picker (modal) — matches mockup .bed / .beds-row ── */
+.beds-panel {
+    background: var(--color-hospital-bg, #F3F6FA);
+    border: 1.5px solid var(--color-hospital-border, #DDE4EF);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+.beds-panel-lbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-hospital-text-2, #4A5878);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.beds-panel-selected {
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--color-hospital-primary, #0A4FA6);
+    color: #fff;
+    border-radius: 12px;
+    padding: 2px 8px;
+}
+.beds-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+.bed {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    border: 1.5px solid var(--color-hospital-border, #DDE4EF);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+    color: var(--color-hospital-text-3, #8A96AE);
+    font-family: inherit;
+    padding: 0;
+}
+.bed:hover:not(.bed-occupied) {
+    background: var(--color-hospital-primary-pale, #E8F1FB);
+    border-color: var(--color-hospital-primary, #0A4FA6);
+}
+.bed-occupied {
+    background: var(--color-hospital-primary-pale, #E8F1FB);
+    border-color: var(--color-hospital-primary, #0A4FA6);
+    color: var(--color-hospital-primary, #0A4FA6);
+    cursor: not-allowed;
+    opacity: .7;
+}
+.bed-selected {
+    background: var(--color-hospital-primary, #0A4FA6) !important;
+    border-color: var(--color-hospital-primary, #0A4FA6) !important;
+    color: #fff !important;
+    opacity: 1 !important;
+}
+.beds-legend {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 10px;
+    color: var(--color-hospital-text-2, #4A5878);
+}
+.legend-item { display: flex; align-items: center; gap: 4px; }
+
+/* ── Form inputs ── */
 .dept-input {
     width: 100%;
     padding: 7px 10px;

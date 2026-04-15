@@ -16,7 +16,7 @@ class SurgeryRepository extends BaseRepository implements SurgeryRepositoryInter
 
     public function paginateByDept(string $dept, ?string $status = null, int $perPage = 20): LengthAwarePaginator
     {
-        return Surgery::with(['booking:id,patient_name,file_no', 'surgeon:id,name', 'orBed:id,bed_number'])
+        return Surgery::with(['booking:id,patient_name,file_no', 'surgeon:id,name'])
             ->where('dept', $dept)
             ->when($status, fn ($q) => $q->where('status', $status))
             ->latest('scheduled_at')

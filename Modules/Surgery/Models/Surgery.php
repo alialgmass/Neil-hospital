@@ -5,6 +5,8 @@ namespace Modules\Surgery\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Booking\Models\Booking;
+use Modules\Doctor\Models\Doctor;
 
 class Surgery extends Model
 {
@@ -13,6 +15,7 @@ class Surgery extends Model
     protected $fillable = [
         'booking_id',
         'or_bed_id',
+        'bed_no',
         'surgeon_id',
         'dept',
         'eye',
@@ -32,20 +35,20 @@ class Surgery extends Model
 
     protected $casts = [
         'supplies_used' => 'array',
-        'supply_total'  => 'decimal:2',
-        'scheduled_at'  => 'datetime',
-        'started_at'    => 'datetime',
-        'ended_at'      => 'datetime',
+        'supply_total' => 'decimal:2',
+        'scheduled_at' => 'datetime',
+        'started_at' => 'datetime',
+        'ended_at' => 'datetime',
     ];
 
     public function booking(): BelongsTo
     {
-        return $this->belongsTo(\Modules\Booking\Models\Booking::class);
+        return $this->belongsTo(Booking::class);
     }
 
     public function surgeon(): BelongsTo
     {
-        return $this->belongsTo(\Modules\Doctor\Models\Doctor::class, 'surgeon_id');
+        return $this->belongsTo(Doctor::class, 'surgeon_id');
     }
 
     public function orBed(): BelongsTo
