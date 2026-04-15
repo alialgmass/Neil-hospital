@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Inventory\Controllers\InventoryController;
 use Modules\Inventory\Controllers\PurchaseInvoiceController;
+use Modules\Inventory\Controllers\PurchaseReturnController;
+use Modules\Inventory\Controllers\ServiceController;
+use Modules\Inventory\Controllers\StockPermitController;
+use Modules\Inventory\Controllers\StockTakeController;
 use Modules\Inventory\Controllers\SupplierController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -45,5 +49,65 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/', [PurchaseInvoiceController::class, 'store'])
             ->middleware('can:inventory.write')
             ->name('store');
+    });
+
+    // Stock permits (issue/add)
+    Route::prefix('stock-permits')->name('stock-permits.')->group(function () {
+        Route::get('/', [StockPermitController::class, 'index'])
+            ->middleware('can:inventory.view')
+            ->name('index');
+
+        Route::post('/issue', [StockPermitController::class, 'issue'])
+            ->middleware('can:inventory.write')
+            ->name('issue');
+
+        Route::post('/add', [StockPermitController::class, 'add'])
+            ->middleware('can:inventory.write')
+            ->name('add');
+    });
+
+    // Purchase Returns
+    Route::prefix('purchase-returns')->name('purchase-returns.')->group(function () {
+        Route::get('/', [PurchaseReturnController::class, 'index'])
+            ->middleware('can:inventory.view')
+            ->name('index');
+
+        Route::post('/', [PurchaseReturnController::class, 'store'])
+            ->middleware('can:inventory.write')
+            ->name('store');
+    });
+
+    // Stock Take (Inventory Adjustment)
+    Route::prefix('stock-take')->name('stock-take.')->group(function () {
+        Route::get('/', [StockTakeController::class, 'index'])
+            ->middleware('can:inventory.view')
+            ->name('index');
+
+        Route::post('/', [StockTakeController::class, 'store'])
+            ->middleware('can:inventory.write')
+            ->name('store');
+    });
+
+    // Services & Pricing
+    Route::prefix('services')->name('services.')->group(function () {
+        Route::get('/', [ServiceController::class, 'index'])
+            ->middleware('can:services.view')
+            ->name('index');
+
+        Route::post('/', [ServiceController::class, 'store'])
+            ->middleware('can:services.write')
+            ->name('store');
+
+        Route::put('/{id}', [ServiceController::class, 'update'])
+            ->middleware('can:services.write')
+            ->name('update');
+
+        Route::delete('/{id}', [ServiceController::class, 'destroy'])
+            ->middleware('can:services.write')
+            ->name('destroy');
+
+        Route::post('/import', [ServiceController::class, 'import'])
+            ->middleware('can:services.write')
+            ->name('import');
     });
 });

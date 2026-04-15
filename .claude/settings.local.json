@@ -29,7 +29,8 @@
       "Bash(sed -n '18,25p' \"D:/Projects/neil hospital/v3/resources/js/pages/admin/Insurance.vue\")",
       "Bash(sed -n '1,6p' \"D:/Projects/neil hospital/v3/resources/js/pages/booking/Partials/BookingForm.vue\")",
       "Bash(sed -n '1,6p' \"D:/Projects/neil hospital/v3/resources/js/pages/labs/Index.vue\")",
-      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Fixed {len\\(d.get\\(\\\\\"files\\\\\",[]\\)\\)} files'\\)\")"
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Fixed {len\\(d.get\\(\\\\\"files\\\\\",[]\\)\\)} files'\\)\")",
+      "Bash(/c/Users/Royal/.config/herd/bin/php84/php.exe vendor/bin/pint --dirty)"
     ]
   }
 }

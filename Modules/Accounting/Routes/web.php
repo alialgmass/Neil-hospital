@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Accounting\Controllers\ChartOfAccountsController;
 use Modules\Accounting\Controllers\JournalController;
 use Modules\Accounting\Controllers\LedgerController;
+use Modules\Accounting\Controllers\SalesInvoiceController;
 use Modules\Accounting\Controllers\TreasuryController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -45,6 +46,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/{id}', [ChartOfAccountsController::class, 'update'])
             ->middleware('can:journal.write')
             ->name('update');
+    });
+
+    // Sales Invoices (Billing)
+    Route::prefix('sales-invoices')->name('sales-invoices.')->group(function () {
+        Route::get('/booking/{bookingId}', [SalesInvoiceController::class, 'show'])
+            ->middleware('can:booking.view')
+            ->name('show');
+
+        Route::post('/', [SalesInvoiceController::class, 'store'])
+            ->middleware('can:booking.edit')
+            ->name('store');
     });
 
     // Ledger

@@ -215,7 +215,7 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [x] T119 [P] [US5] Create migration `database/migrations/xxxx_create_suppliers_table.php`
 - [x] T120 [P] [US5] Create migration `database/migrations/xxxx_create_inventory_items_table.php` (all columns from data-model.md including min_quantity, unit_cost, sell_price, expiry_date, supplier_id FK)
 - [x] T121 [P] [US5] Create migration `database/migrations/xxxx_create_purchase_invoices_table.php` + `xxxx_create_purchase_invoice_items_table.php`
-- [ ] T122 [P] [US5] Create migration `database/migrations/xxxx_create_stock_permits_table.php` + `xxxx_create_stock_permit_items_table.php`
+- [x] T122 [P] [US5] Create migration `database/migrations/xxxx_create_stock_permits_table.php` + `xxxx_create_stock_permit_items_table.php`
 - [ ] T123 [US5] Run `php artisan migrate` for inventory tables
 - [x] T124 [P] [US5] Create `Modules/Inventory/Models/InventoryItem.php` (HasUlids, fillable, isLowStock() accessor: quantity <= min_quantity, supplier() relationship)
 - [x] T125 [P] [US5] Create `Modules/Inventory/Models/Supplier.php` + `PurchaseInvoice.php` + `PurchaseInvoiceItem.php` + `StockPermit.php` + `StockPermitItem.php`
@@ -225,22 +225,22 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 - [x] T129 [US5] Create `Modules/Inventory/Services/InventoryService.php` (adjustQuantity() — adds or deducts stock qty with zero-floor guard, getLowStockItems())
 - [x] T130 [US5] Create `Modules/Inventory/Services/StockAlertService.php` (getLowStockCount() — used by HandleInertiaRequests to populate notification badge)
 - [x] T131 [US5] Create `Modules/Inventory/Services/PurchaseInvoiceService.php` (creates invoice + line items, calls InventoryService::adjustQuantity for each item, posts accounting entry)
-- [ ] T132 [US5] Create `Modules/Inventory/Actions/ReceivePurchaseInvoiceAction.php`
-- [ ] T133 [US5] Create `Modules/Inventory/Actions/IssueStockPermitAction.php` (type=out: validates sufficient qty, calls InventoryService::adjustQuantity, logs activity)
-- [ ] T134 [US5] Create `Modules/Inventory/Actions/AddStockPermitAction.php` (type=in: calls InventoryService::adjustQuantity with positive delta)
-- [ ] T135 [US5] Create `Modules/Inventory/Actions/StockTakeAdjustmentAction.php` (computes variance between physical count and system qty, posts adjustment)
-- [ ] T136 [US5] Create all Inventory HTTP Requests in `Modules/Inventory/Http/Requests/`
+- [x] T132 [US5] Create `Modules/Inventory/Actions/ReceivePurchaseInvoiceAction.php`
+- [x] T133 [US5] Create `Modules/Inventory/Actions/IssueStockPermitAction.php` (type=out: validates sufficient qty, calls InventoryService::adjustQuantity, logs activity)
+- [x] T134 [US5] Create `Modules/Inventory/Actions/AddStockPermitAction.php` (type=in: calls InventoryService::adjustQuantity with positive delta)
+- [x] T135 [US5] Create `Modules/Inventory/Actions/StockTakeAdjustmentAction.php` (computes variance between physical count and system qty, posts adjustment)
+- [x] T136 [US5] Create all Inventory HTTP Requests in `Modules/Inventory/Http/Requests/`
 - [x] T137 [US5] Create `Modules/Inventory/Controllers/InventoryController.php` + `SupplierController.php` + `PurchaseInvoiceController.php` + `StockPermitController.php` + `StockTakeController.php` + `PurchaseReturnController.php`
-- [ ] T138 [US5] Create `Modules/Inventory/Controllers/ServiceController.php` (CRUD for services table + Excel import via maatwebsite/laravel-excel `ServicesImport` class)
-- [ ] T139 [US5] Create `Modules/Inventory/Imports/ServicesImport.php` (implements `ToModel`, `WithHeadings`, `WithUpserts` — adds new, updates existing by name match)
-- [ ] T140 [US5] Create `Modules/Inventory/Imports/InventoryImport.php` (same pattern for inventory items)
+- [x] T138 [US5] Create `Modules/Inventory/Controllers/ServiceController.php` (CRUD for services table + Excel import via maatwebsite/laravel-excel `ServicesImport` class)
+- [x] T139 [US5] Create `Modules/Inventory/Imports/ServicesImport.php` (implements `ToModel`, `WithHeadings`, `WithUpserts` — adds new, updates existing by name match)
+- [x] T140 [US5] Create `Modules/Inventory/Imports/InventoryImport.php` (same pattern for inventory items)
 - [x] T141 [US5] Register all bindings + routes in `Modules/Inventory/Providers/InventoryServiceProvider.php` and `Modules/Inventory/Routes/web.php`
 - [x] T142 [US5] Update `app/Http/Middleware/HandleInertiaRequests.php` to include `low_stock_count` from `StockAlertService::getLowStockCount()` in shared Inertia data
 - [x] T143 [US5] Create Vue page `resources/js/Pages/Inventory/Index.vue` (item list with low-stock row highlighting, add item modal, Excel import button)
 - [x] T144 [P] [US5] Create Vue page `resources/js/Pages/Inventory/Suppliers.vue`
 - [x] T145 [P] [US5] Create Vue page `resources/js/Pages/Inventory/PurchaseInvoices.vue` (invoice list, create invoice with line items)
-- [ ] T146 [P] [US5] Create Vue page `resources/js/Pages/Inventory/StockPermit.vue` (dispensing/addition permit form with item multi-select + qty)
-- [ ] T147 [P] [US5] Create Vue page `resources/js/Pages/Inventory/Services.vue` (services CRUD table with Excel import)
+- [x] T146 [P] [US5] Create Vue page `resources/js/Pages/Inventory/StockPermit.vue` (dispensing/addition permit form with item multi-select + qty)
+- [x] T147 [P] [US5] Create Vue page `resources/js/Pages/Inventory/Services.vue` (services CRUD table with Excel import)
 
 **Checkpoint**: Full inventory management. Low-stock alerts appear in notification bell. Purchases update stock.
 
@@ -282,8 +282,8 @@ description: "Task list for Al-Nour Eye Hospital Management System"
   - `LasikFeeStrategy`: same as surgery
   - `InsuranceSurgeryStrategy`: dr_share=fixed amount; center=total-supplies-dr_share
   - Dispatch to correct strategy based on booking.dept + booking.pay_method + doctor.fee_type
-- [ ] T158 [US7] Create `Modules/Doctor/Actions/CreateDoctorAction.php` + `RecordDoctorPaymentAction.php` + `OpenDoctorShiftAction.php`
-- [ ] T159 [US7] Create all Doctor HTTP Requests in `Modules/Doctor/Http/Requests/`
+- [x] T158 [US7] Create `Modules/Doctor/Actions/CreateDoctorAction.php` + `RecordDoctorPaymentAction.php` + `OpenDoctorShiftAction.php`
+- [x] T159 [US7] Create all Doctor HTTP Requests in `Modules/Doctor/Http/Requests/`
 - [x] T160 [US7] Create `Modules/Doctor/Controllers/DoctorController.php` + `DoctorClaimsController.php` + `DoctorPaymentController.php` + `DoctorShiftController.php`
 - [x] T161 [US7] Create `Modules/Doctor/Controllers/ShiftHandoverController.php` (records shift handover summary, changes shift status to handed_over)
 - [x] T162 [US7] Register all bindings + routes in `Modules/Doctor/Providers/DoctorServiceProvider.php` and `Modules/Doctor/Routes/web.php`
@@ -334,41 +334,41 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 
 ### Implementation — Reporting Module + Insurance Module
 
-- [ ] T186 [P] [US9] Create migration `database/migrations/xxxx_create_price_lists_table.php` + `xxxx_create_price_list_items_table.php`
-- [ ] T187 [US9] Run `php artisan migrate` for price lists
-- [ ] T188 [P] [US9] Create `Modules/Insurance/Models/InsuranceCompany.php` + `Modules/Insurance/Models/PriceList.php` + `Modules/Insurance/Models/PriceListItem.php`
-- [ ] T189 [P] [US9] Create `Modules/Insurance/Repositories/Contracts/InsuranceRepositoryInterface.php`
-- [ ] T190 [P] [US9] Create `Modules/Insurance/Repositories/InsuranceRepository.php`
-- [ ] T191 [US9] Create `Modules/Insurance/Services/InsuranceService.php` (CRUD for companies + price lists, calculateInsuranceCoverage(serviceId, companyId))
-- [ ] T192 [US9] Create `Modules/Insurance/Actions/CreateInsuranceCompanyAction.php` + `ManagePriceListAction.php`
-- [ ] T193 [US9] Create `Modules/Insurance/Controllers/InsuranceCompanyController.php` + `PriceListController.php`
-- [ ] T194 [US9] Register all bindings + routes in `Modules/Insurance/Providers/InsuranceServiceProvider.php` and `Modules/Insurance/Routes/web.php`
-- [ ] T195 [US9] Create Vue page `resources/js/Pages/Insurance/Companies.vue` (company list with CRUD modal, coverage % badge)
-- [ ] T196 [US9] Create Vue page `resources/js/Pages/Insurance/PriceLists.vue` (price list with per-service override table, printable price sheet)
-- [ ] T197 [US9] Create `Modules/Reporting/Services/ReportingService.php` (all 10 report data queries: dept revenue, cases, doctor claims, doctor payments, insurance claims, inventory movement, purchase prices, profit/loss, expense analysis, system log)
-- [ ] T198 [US9] Create `Modules/Reporting/Services/ExcelExportService.php` (dispatch to correct `maatwebsite/laravel-excel` Export class based on report type)
-- [ ] T199 [P] [US9] Create Excel Export classes in `Modules/Reporting/Exports/` (one per report type: DeptRevenueExport, CasesExport, DoctorClaimsExport, DoctorPaymentsExport, InsuranceClaimsExport, InventoryMovementExport, ProfitLossExport — each implements `FromQuery + WithHeadings`)
+- [x] T186 [P] [US9] Create migration `database/migrations/xxxx_create_price_lists_table.php` + `xxxx_create_price_list_items_table.php`
+- [x] T187 [US9] Run `php artisan migrate` for price lists
+- [x] T188 [P] [US9] Create `Modules/Insurance/Models/InsuranceCompany.php` + `Modules/Insurance/Models/PriceList.php` + `Modules/Insurance/Models/PriceListItem.php`
+- [x] T189 [P] [US9] Create `Modules/Insurance/Repositories/Contracts/InsuranceRepositoryInterface.php`
+- [x] T190 [P] [US9] Create `Modules/Insurance/Repositories/InsuranceRepository.php`
+- [x] T191 [US9] Create `Modules/Insurance/Services/InsuranceService.php` (CRUD for companies + price lists, calculateInsuranceCoverage(serviceId, companyId))
+- [x] T192 [US9] Create `Modules/Insurance/Actions/CreateInsuranceCompanyAction.php` + `ManagePriceListAction.php`
+- [x] T193 [US9] Create `Modules/Insurance/Controllers/InsuranceCompanyController.php` + `PriceListController.php`
+- [x] T194 [US9] Register all bindings + routes in `Modules/Insurance/Providers/InsuranceServiceProvider.php` and `Modules/Insurance/Routes/web.php`
+- [x] T195 [US9] Create Vue page `resources/js/Pages/Insurance/Companies.vue` (company list with CRUD modal, coverage % badge)
+- [x] T196 [US9] Create Vue page `resources/js/Pages/Insurance/PriceLists.vue` (price list with per-service override table, printable price sheet)
+- [x] T197 [US9] Create `Modules/Reporting/Services/ReportingService.php` (all 10 report data queries: dept revenue, cases, doctor claims, doctor payments, insurance claims, inventory movement, purchase prices, profit/loss, expense analysis, system log)
+- [x] T198 [US9] Create `Modules/Reporting/Services/ExcelExportService.php` (dispatch to correct `maatwebsite/laravel-excel` Export class based on report type)
+- [x] T199 [P] [US9] Create Excel Export classes in `Modules/Reporting/Exports/` (one per report type: DeptRevenueExport, CasesExport, DoctorClaimsExport, DoctorPaymentsExport, InsuranceClaimsExport, InventoryMovementExport, ProfitLossExport — each implements `FromQuery + WithHeadings`)
 - [x] T200 [US9] Create `Modules/Reporting/Controllers/DashboardController.php` (stats, recent bookings, dept revenue today, low stock count — from contracts/reporting.md)
-- [ ] T201 [US9] Create `Modules/Reporting/Controllers/DeptRevenueReportController.php`
-- [ ] T202 [US9] Create `Modules/Reporting/Controllers/CasesReportController.php`
-- [ ] T203 [US9] Create `Modules/Reporting/Controllers/DoctorClaimsReportController.php` (delegates to DoctorClaimsService for fee calculations)
-- [ ] T204 [US9] Create `Modules/Reporting/Controllers/DoctorPaymentsReportController.php`
-- [ ] T205 [US9] Create `Modules/Reporting/Controllers/InsuranceReportController.php`
-- [ ] T206 [US9] Create `Modules/Reporting/Controllers/InventoryMovementController.php`
-- [ ] T207 [US9] Create `Modules/Reporting/Controllers/PurchasePriceReportController.php`
-- [ ] T208 [US9] Create `Modules/Reporting/Controllers/ProfitLossController.php`
-- [ ] T209 [US9] Create `Modules/Reporting/Controllers/ExpenseAnalysisController.php`
-- [ ] T210 [US9] Register all routes in `Modules/Reporting/Routes/web.php` (GET /dashboard, GET /reports/{type}, GET /reports/{type}/export — each guarded by appropriate permission)
-- [ ] T211 [US9] Create Vue page `resources/js/Pages/Dashboard/Index.vue` (stat cards row, dept revenue today bar, recent bookings table, notifications — from HTML prototype `#pg-dashboard`)
-- [ ] T212 [US9] Create Vue page `resources/js/Pages/Reporting/Index.vue` (report card grid from HTML prototype `.report-card` style — 10 clickable cards)
-- [ ] T213 [US9] Create Vue page `resources/js/Pages/Reporting/DeptRevenue.vue` (date filter, per-dept per-doctor revenue table, totals, ExportBar)
-- [ ] T214 [US9] Create Vue page `resources/js/Pages/Reporting/CasesReport.vue`
-- [ ] T215 [US9] Create Vue page `resources/js/Pages/Reporting/DoctorClaims.vue` (same layout as Doctor/Claims.vue — doctor entitlement breakdown, ExportBar)
-- [ ] T216 [US9] Create Vue page `resources/js/Pages/Reporting/DoctorPayments.vue`
-- [ ] T217 [US9] Create Vue page `resources/js/Pages/Reporting/InsuranceClaims.vue`
-- [ ] T218 [US9] Create Vue page `resources/js/Pages/Reporting/InventoryMovement.vue`
-- [ ] T219 [US9] Create Vue page `resources/js/Pages/Reporting/ProfitLoss.vue`
-- [ ] T220 [US9] Create Vue page `resources/js/Pages/Reporting/ExpenseAnalysis.vue`
+- [x] T201 [US9] Create `Modules/Reporting/Controllers/DeptRevenueReportController.php`
+- [x] T202 [US9] Create `Modules/Reporting/Controllers/CasesReportController.php`
+- [x] T203 [US9] Create `Modules/Reporting/Controllers/DoctorClaimsReportController.php` (delegates to DoctorClaimsService for fee calculations)
+- [x] T204 [US9] Create `Modules/Reporting/Controllers/DoctorPaymentsReportController.php`
+- [x] T205 [US9] Create `Modules/Reporting/Controllers/InsuranceReportController.php`
+- [x] T206 [US9] Create `Modules/Reporting/Controllers/InventoryMovementController.php`
+- [x] T207 [US9] Create `Modules/Reporting/Controllers/PurchasePriceReportController.php`
+- [x] T208 [US9] Create `Modules/Reporting/Controllers/ProfitLossController.php`
+- [x] T209 [US9] Create `Modules/Reporting/Controllers/ExpenseAnalysisController.php`
+- [x] T210 [US9] Register all routes in `Modules/Reporting/Routes/web.php` (GET /dashboard, GET /reports/{type}, GET /reports/{type}/export — each guarded by appropriate permission)
+- [x] T211 [US9] Create Vue page `resources/js/Pages/Dashboard/Index.vue` (stat cards row, dept revenue today bar, recent bookings table, notifications — from HTML prototype `#pg-dashboard`)
+- [x] T212 [US9] Create Vue page `resources/js/Pages/Reporting/Index.vue` (report card grid from HTML prototype `.report-card` style — 10 clickable cards)
+- [x] T213 [US9] Create Vue page `resources/js/Pages/Reporting/DeptRevenue.vue` (date filter, per-dept per-doctor revenue table, totals, ExportBar)
+- [x] T214 [US9] Create Vue page `resources/js/Pages/Reporting/CasesReport.vue`
+- [x] T215 [US9] Create Vue page `resources/js/Pages/Reporting/DoctorClaims.vue` (same layout as Doctor/Claims.vue — doctor entitlement breakdown, ExportBar)
+- [x] T216 [US9] Create Vue page `resources/js/Pages/Reporting/DoctorPayments.vue`
+- [x] T217 [US9] Create Vue page `resources/js/Pages/Reporting/InsuranceClaims.vue`
+- [x] T218 [US9] Create Vue page `resources/js/Pages/Reporting/InventoryMovement.vue`
+- [x] T219 [US9] Create Vue page `resources/js/Pages/Reporting/ProfitLoss.vue`
+- [x] T220 [US9] Create Vue page `resources/js/Pages/Reporting/ExpenseAnalysis.vue`
 
 **Checkpoint**: All reports load with correct data. Excel export works for all 10 report types. Insurance module fully functional.
 
@@ -380,9 +380,9 @@ description: "Task list for Al-Nour Eye Hospital Management System"
 
 - [x] T221 [P] Create Vue page `resources/js/Pages/Auth/Login.vue` (Arabic login form matching HTML prototype login-screen: hospital logo, eye SVG, username/password fields — role selector removed; role is server-assigned)
 - [x] T222 [P] Implement Labs module `Modules/Labs/` (migration for diagnostic_results, Model, Repository interface, Repository, Service, Action, Controller, Routes, Vue page `resources/js/Pages/Labs/Index.vue`)
-- [ ] T223 [P] Create `Modules/Accounting/Controllers/SalesInvoiceController.php` (فاتورة البيع — generates invoice from booking, applies insurance coverage, triggers AutoPostBookingPaymentAction) + Vue page `resources/js/Pages/Accounting/SalesInvoice.vue`
-- [ ] T224 [P] Create `Modules/Inventory/Controllers/PurchaseReturnController.php` (مردودات المشتريات — returns items to supplier, adjusts inventory quantity upward, posts accounting reversal) + Vue page `resources/js/Pages/Inventory/PurchaseReturns.vue`
-- [ ] T225 [P] Create `Modules/Inventory/Controllers/StockTakeController.php` (تسوية الجرد — physical count entry, variance calculation, adjustment posting) + Vue page `resources/js/Pages/Inventory/StockTake.vue`
+- [x] T223 [P] Create `Modules/Accounting/Controllers/SalesInvoiceController.php` (فاتورة البيع — generates invoice from booking, applies insurance coverage, triggers AutoPostBookingPaymentAction) + Vue page `resources/js/Pages/Accounting/SalesInvoice.vue`
+- [x] T224 [P] Create `Modules/Inventory/Controllers/PurchaseReturnController.php` (مردودات المشتريات — returns items to supplier, adjusts inventory quantity upward, posts accounting reversal) + Vue page `resources/js/Pages/Inventory/PurchaseReturns.vue`
+- [x] T225 [P] Create `Modules/Inventory/Controllers/StockTakeController.php` (تسوية الجرد — physical count entry, variance calculation, adjustment posting) + Vue page `resources/js/Pages/Inventory/StockTake.vue`
 - [x] T226 Create `resources/js/Pages/Booking/PatientFile.vue` (ملف المريض الطبي — cross-module patient history: all bookings, clinic sheets, diagnostics, surgeries displayed chronologically by file_no)
 - [x] T227 Create `resources/js/Pages/Doctor/ShiftHandover.vue` (تسليم الورديات — shift summary: patient count, revenue, pending cases, hand-over signature/notes)
 - [x] T228 Create `resources/js/Pages/Accounting/DailyJournal.vue` (قيود اليومية — alias to Journal.vue with date defaulted to today; ensure this route exists at GET /daily-journal)
