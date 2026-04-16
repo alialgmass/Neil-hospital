@@ -30,6 +30,7 @@ const props = defineProps<{
     surgeries: Paginator;
     totalBeds: number;
     doctors: { id: string; name: string }[];
+    bookings: { id: string; file_no: string; patient_name: string }[];
     dept: string;
     filters: { status?: string };
 }>();
@@ -325,9 +326,14 @@ function submitSupplies() {
     <Modal v-model="showSchedule" title="جدولة عملية جراحية" size="lg">
         <form class="space-y-4" @submit.prevent="submitSchedule">
             <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-hospital-text">رقم الحجز</label>
-                    <input v-model="scheduleForm.booking_id" type="text" placeholder="معرّف الحجز" class="dept-input" />
+                <div class="col-span-2">
+                    <label class="mb-1 block text-sm font-medium text-hospital-text">المريض / الحجز</label>
+                    <select v-model="scheduleForm.booking_id" class="dept-input">
+                        <option value="">— اختر المريض —</option>
+                        <option v-for="b in bookings" :key="b.id" :value="b.id">
+                            {{ b.file_no }} — {{ b.patient_name }}
+                        </option>
+                    </select>
                     <p v-if="scheduleForm.errors.booking_id" class="mt-1 text-xs text-hospital-danger">{{ scheduleForm.errors.booking_id }}</p>
                 </div>
                 <div>

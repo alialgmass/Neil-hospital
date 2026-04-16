@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\Booking\Models\Booking;
 use Modules\Doctor\Models\Doctor;
 use Modules\Surgery\Actions\RecordSuppliesUsedAction;
 use Modules\Surgery\Actions\RecordSurgeryReportAction;
@@ -44,10 +45,17 @@ class SurgeryController extends Controller
 
         $surgeries = $this->surgeryService->list($dept, $status, 200); // load more to fill bed map
 
+        $bookings = Booking::where('dept', $dept)
+            ->whereIn('status', ['waiting', 'confirmed'])
+            ->select('id', 'file_no', 'patient_name')
+            ->orderByDesc('visit_date')
+            ->get();
+
         return Inertia::render($page, [
             'surgeries' => $surgeries,
             'totalBeds' => $totalBeds,
             'doctors' => Doctor::select('id', 'name')->orderBy('name')->get(),
+            'bookings' => $bookings,
             'dept' => $dept,
             'filters' => ['status' => $status],
         ]);

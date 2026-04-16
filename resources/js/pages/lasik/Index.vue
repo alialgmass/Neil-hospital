@@ -30,6 +30,7 @@ const props = defineProps<{
     surgeries: Paginator;
     totalBeds: number;
     doctors: { id: string; name: string }[];
+    bookings: { id: string; file_no: string; patient_name: string }[];
     dept: string;
     filters: { status?: string };
 }>();
@@ -178,38 +179,53 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
         </div>
     </div>
 
-    <!-- ── Beds dashboard card ── -->
-    <div class="dept-card mb-4">
-        <div class="dept-card-hd">
-            <div>
-                <p class="dept-card-title">لوحة أسرّة قسم الليزك ({{ totalBeds }} سرير)</p>
-                <p class="dept-card-sub">اضغط على السرير لعرض بيانات الحالة</p>
-            </div>
-            <button
-                class="flex items-center gap-1.5 rounded-lg bg-[#7B2FA6] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#6A2890]"
-                @click="showSchedule = true"
-            >
-                <CalendarPlus class="h-3.5 w-3.5" />
-                جدولة ليزك
-            </button>
-        </div>
-        <div class="p-3">
-            <div class="beds-row">
-                <button
-                    v-for="i in totalBeds"
-                    :key="i"
-                    class="bed"
-                    :class="bedMap[i] ? 'bed-occupied' : 'bed-empty'"
-                    :style="bedMap[i] ? { background: bedStatusColor[bedMap[i]!.status], borderColor: bedStatusColor[bedMap[i]!.status], color: '#fff' } : {}"
-                    :title="bedMap[i] ? `${bedMap[i]!.booking?.patient_name} — ${statusAr[bedMap[i]!.status]}` : `سرير ${i} فارغ`"
-                    @click="bedMap[i] ? openCase(bedMap[i]!) : (showSchedule = true)"
-                >{{ i }}</button>
-            </div>
-            <div class="mt-2 flex items-center gap-4 text-[10px] text-hospital-text-2">
+    <!-- ── Beds grid (same card style as surgery) ── -->
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h2 class="text-base font-bold text-hospital-text">غرف الإقامة — قسم الليزك ({{ totalBeds }} سرير)</h2>
+            <div class="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-hospital-text-2">
                 <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-[#7B2FA6]"></span>مجدولة</span>
                 <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-[#E74C3C]"></span>جارية</span>
+                <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-[#2980B9]"></span>تحضير</span>
                 <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-[#1A8C5B]"></span>مكتملة</span>
-                <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm border border-hospital-border bg-white"></span>فارغ</span>
+                <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-sm bg-gray-300"></span>فارغة</span>
+            </div>
+        </div>
+        <button
+            class="flex items-center gap-1.5 rounded-lg bg-[#7B2FA6] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#6A2890]"
+            @click="showSchedule = true"
+        >
+            <CalendarPlus class="h-4 w-4" />
+            جدولة ليزك
+        </button>
+    </div>
+
+    <div class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div
+            v-for="i in totalBeds"
+            :key="i"
+            class="bed-card group"
+            :style="bedMap[i] ? { background: bedStatusColor[bedMap[i]!.status] ?? '#7B2FA6' } : { background: '#BDC3C7', opacity: '0.75' }"
+            @click="bedMap[i] ? openCase(bedMap[i]!) : (showSchedule = true)"
+        >
+            <div class="bed-card-hd">
+                <span class="font-black text-[13px]">سرير {{ i }}</span>
+                <span v-if="bedMap[i]" class="bed-status-badge">{{ statusAr[bedMap[i]!.status] }}</span>
+            </div>
+            <div v-if="bedMap[i]" class="bed-card-body">
+                <p class="mb-1 text-[13px] font-extrabold leading-tight">{{ bedMap[i]!.booking?.patient_name ?? '—' }}</p>
+                <p class="bed-info-row"><span>الإجراء:</span><strong>{{ bedMap[i]!.procedure }}</strong></p>
+                <p class="bed-info-row"><span>الطبيب:</span><strong>{{ bedMap[i]!.surgeon?.name ?? '—' }}</strong></p>
+                <p v-if="bedMap[i]!.eye" class="bed-info-row"><span>العين:</span><strong>{{ eyeLabel[bedMap[i]!.eye!] ?? bedMap[i]!.eye }}</strong></p>
+                <div class="mt-2 flex gap-1.5" @click.stop>
+                    <button class="bed-action-btn" @click="openReport(bedMap[i]!.id)">▶ تقرير</button>
+                    <button class="bed-action-btn" @click="openSupplies(bedMap[i]!.id)">💊 مستلزمات</button>
+                </div>
+            </div>
+            <div v-else class="bed-card-empty">
+                <div class="text-2xl">🛏️</div>
+                <p class="mt-1 text-[11px] opacity-80">سرير فارغ</p>
+                <div class="mt-2 rounded bg-white/30 px-2 py-1 text-[10px]">+ جدولة ليزك</div>
             </div>
         </div>
     </div>
@@ -321,9 +337,14 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
     <Modal v-model="showSchedule" title="جدولة إجراء ليزك" size="lg">
         <form class="space-y-4" @submit.prevent="submitSchedule">
             <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-hospital-text">رقم الحجز</label>
-                    <input v-model="scheduleForm.booking_id" type="text" class="dept-input" />
+                <div class="col-span-2">
+                    <label class="mb-1 block text-sm font-medium text-hospital-text">المريض / الحجز</label>
+                    <select v-model="scheduleForm.booking_id" class="dept-input">
+                        <option value="">— اختر المريض —</option>
+                        <option v-for="b in bookings" :key="b.id" :value="b.id">
+                            {{ b.file_no }} — {{ b.patient_name }}
+                        </option>
+                    </select>
                     <p v-if="scheduleForm.errors.booking_id" class="mt-1 text-xs text-hospital-danger">{{ scheduleForm.errors.booking_id }}</p>
                 </div>
                 <div>
@@ -448,7 +469,7 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
 .stat-val { font-size: 22px; font-weight: 800; color: var(--color-hospital-text, #0D1F3C); line-height: 1; margin-bottom: 2px; }
 .stat-sub { font-size: 10px; color: var(--color-hospital-text-3, #8A96AE); }
 
-/* ── Card ── */
+/* ── Card (table section) ── */
 .dept-card {
     background: #fff;
     border: 1px solid var(--color-hospital-border, #DDE4EF);
@@ -467,35 +488,46 @@ const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'
 .dept-card-title { font-size: 13px; font-weight: 700; color: var(--color-hospital-text, #0D1F3C); }
 .dept-card-sub   { font-size: 11px; color: var(--color-hospital-text-3, #8A96AE); margin-top: 1px; }
 
-/* ── Beds row (dashboard) — small squares like mockup ── */
-.beds-row {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-}
-.bed {
-    width: 22px;
-    height: 22px;
-    border-radius: 4px;
-    border: 1.5px solid var(--color-hospital-border, #DDE4EF);
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
-    font-weight: 700;
+/* ── Bed cards (grid view) — same as surgery ── */
+.bed-card {
+    border-radius: 10px;
+    overflow: hidden;
     cursor: pointer;
-    transition: all .15s;
-    color: var(--color-hospital-text-3, #8A96AE);
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(0,0,0,.18);
+    transition: transform 0.18s, box-shadow 0.18s;
+}
+.bed-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,.28); }
+.bed-card-hd {
+    background: rgba(0,0,0,.18);
+    padding: 7px 11px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.bed-status-badge {
+    font-size: 9px;
+    background: rgba(255,255,255,.25);
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+.bed-card-body { padding: 9px 11px; font-size: 11px; line-height: 1.85; }
+.bed-info-row { display: flex; gap: 4px; }
+.bed-info-row span { opacity: .75; }
+.bed-action-btn {
+    flex: 1;
+    padding: 4px;
+    background: rgba(255,255,255,.22);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.45);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 10px;
     font-family: inherit;
-    padding: 0;
+    transition: background 0.15s;
 }
-.bed-occupied { cursor: pointer; }
-.bed-empty:hover {
-    border-color: #7B2FA6;
-    background: #F3E8FD;
-    color: #7B2FA6;
-}
+.bed-action-btn:hover { background: rgba(255,255,255,.35); }
+.bed-card-empty { padding: 16px 11px; text-align: center; }
 
 /* ── Bed picker in modal ── */
 .beds-panel {
