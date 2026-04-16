@@ -4,7 +4,6 @@ namespace Modules\Surgery\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Booking\Models\Booking;
@@ -16,6 +15,7 @@ use Modules\Surgery\DTOs\SuppliesUsedData;
 use Modules\Surgery\DTOs\SurgeryData;
 use Modules\Surgery\Http\Requests\RecordSuppliesRequest;
 use Modules\Surgery\Http\Requests\StoreSurgeryRequest;
+use Modules\Surgery\Models\OrRoom;
 use Modules\Surgery\Services\SurgeryService;
 
 class SurgeryController extends Controller
@@ -29,7 +29,7 @@ class SurgeryController extends Controller
 
     public function index(): Response
     {
-        $dept = request()->segment(1, 'surgery'); // derive dept from URL segment
+        $dept = request()->segment(1, 'surgery');
         $status = request('status');
 
         $page = match ($dept) {
@@ -38,12 +38,7 @@ class SurgeryController extends Controller
             default => 'surgery/Index',
         };
 
-        $settings = DB::table('settings')->whereIn('key', ['surgery_beds', 'lasik_beds'])->pluck('value', 'key');
-        $totalBeds = (int) ($dept === 'lasik'
-            ? ($settings['lasik_beds'] ?? 20)
-            : ($settings['surgery_beds'] ?? 30));
-
-        $surgeries = $this->surgeryService->list($dept, $status, 200); // load more to fill bed map
+        $surgeries = $this->surgeryService->list($dept, $status, 200);
 
         $bookings = Booking::where('dept', $dept)
             ->whereIn('status', ['waiting', 'confirmed'])
@@ -51,9 +46,16 @@ class SurgeryController extends Controller
             ->orderByDesc('visit_date')
             ->get();
 
+        $orRooms = OrRoom::with(['beds' => function ($q) use ($dept) {
+            $q->orderBy('bed_number')
+                ->with(['surgery' => function ($sq) use ($dept) {
+                    $sq->where('dept', $dept)->with(['booking', 'surgeon']);
+                }]);
+        }])->orderBy('name')->get();
+
         return Inertia::render($page, [
             'surgeries' => $surgeries,
-            'totalBeds' => $totalBeds,
+            'orRooms' => $orRooms,
             'doctors' => Doctor::select('id', 'name')->orderBy('name')->get(),
             'bookings' => $bookings,
             'dept' => $dept,

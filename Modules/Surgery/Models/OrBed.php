@@ -15,4 +15,9 @@ class OrBed extends Model
     {
         return $this->belongsTo(OrRoom::class, 'room_id');
     }
+
+    public function surgery(): BelongsTo
+    {
+        return $this->belongsTo(Surgery::class);
+    }
 }

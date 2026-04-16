@@ -13,8 +13,10 @@ use Modules\Booking\DTOs\BookingData;
 use Modules\Booking\DTOs\BookingFilterData;
 use Modules\Booking\Http\Requests\StoreBookingRequest;
 use Modules\Booking\Http\Requests\UpdateBookingRequest;
+use Modules\Booking\Models\Booking;
 use Modules\Booking\Repositories\Contracts\BookingRepositoryInterface;
 use Modules\Booking\Services\BookingService;
+use Modules\Surgery\Models\OrRoom;
 
 class BookingController extends Controller
 {
@@ -31,10 +33,16 @@ class BookingController extends Controller
         $filter = BookingFilterData::fromArray(request()->all());
         $bookings = $this->bookingService->list($filter);
 
+        $dept = request('dept');
+        $orRooms = in_array($dept, ['surgery', 'lasik', 'laser'])
+            ? OrRoom::with(['beds' => fn ($q) => $q->orderBy('bed_number')])->orderBy('name')->get()
+            : null;
+
         return Inertia::render('booking/Index', [
             'bookings' => $bookings,
-            'filters'  => request()->only(['date', 'dept', 'status', 'pay_status', 'search']),
+            'filters' => request()->only(['date', 'dept', 'status', 'pay_status', 'search']),
             'todayStats' => $this->bookingRepository->countByDeptForDate(today()->toDateString()),
+            'orRooms' => $orRooms,
         ]);
     }
 
@@ -58,8 +66,8 @@ class BookingController extends Controller
     public function destroy(string $id): RedirectResponse
     {
         $this->cancelAction->execute(
-            id:            $id,
-            cancelReason:  request('cancel_reason', 'حذف من قبل المستخدم'),
+            id: $id,
+            cancelReason: request('cancel_reason', 'حذف من قبل المستخدم'),
             adminOverride: request()->user()->hasRole('admin'),
         );
 
@@ -77,7 +85,7 @@ class BookingController extends Controller
 
     public function patientFile(string $fileNo): Response
     {
-        $bookings = \Modules\Booking\Models\Booking::query()
+        $bookings = Booking::query()
             ->where('file_no', $fileNo)
             ->with(['doctor:id,name', 'clinicSheet', 'diagnosticResults', 'surgery'])
             ->orderByDesc('visit_date')
@@ -86,11 +94,11 @@ class BookingController extends Controller
         $patient = $bookings->first();
 
         return Inertia::render('booking/PatientFile', [
-            'file_no'  => $fileNo,
-            'patient'  => $patient ? [
-                'name'    => $patient->patient_name,
-                'phone'   => $patient->patient_phone,
-                'age'     => $patient->patient_age,
+            'file_no' => $fileNo,
+            'patient' => $patient ? [
+                'name' => $patient->patient_name,
+                'phone' => $patient->patient_phone,
+                'age' => $patient->patient_age,
                 'file_no' => $patient->file_no,
             ] : null,
             'bookings' => $bookings,

@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             AccountsSeeder::class,
             SettingsSeeder::class,
             AdminUserSeeder::class,
+            OrRoomsAndBedsSeeder::class,
         ]);
     }
 }
