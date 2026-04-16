@@ -15,6 +15,7 @@ class RolesPermissionsSeeder extends Seeder
         'booking.create',
         'booking.edit',
         'booking.delete',
+        'booking.pay',
         'clinic.view',
         'clinic.write',
         'labs.view',
@@ -78,6 +79,7 @@ class RolesPermissionsSeeder extends Seeder
         'accountant' => [
             'dashboard',
             'booking.view',
+            'booking.pay',
             'treasury.view',
             'treasury.write',
             'journal.view',
