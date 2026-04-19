@@ -2,7 +2,10 @@
 import { Head, useForm } from '@inertiajs/vue3';
 import { Shield } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
+import AppLayout from '@/components/layout/AppLayout.vue';
 import Modal from '@/components/shared/Modal.vue';
+
+defineOptions({ layout: AppLayout });
 
 interface Role {
     id: number;
@@ -16,7 +19,7 @@ interface Permission {
 
 const props = defineProps<{
     roles: Role[];
-    permissions: Permission[];
+    allPermissions: Permission[];
 }>();
 
 const roleLabels: Record<string, string> = {
@@ -32,7 +35,7 @@ const roleLabels: Record<string, string> = {
 const permissionGroups = computed(() => {
     const groups: Record<string, string[]> = {};
 
-    for (const p of props.permissions) {
+    for (const p of props.allPermissions) {
         const group = p.name.split('.')[0];
 
         if (!groups[group]) {

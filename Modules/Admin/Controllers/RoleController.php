@@ -19,7 +19,7 @@ class RoleController extends Controller
 
         return Inertia::render('admin/Roles', [
             'roles' => $roles,
-            'permissions' => $permissions,
+            'allPermissions' => $permissions,
         ]);
     }
 
