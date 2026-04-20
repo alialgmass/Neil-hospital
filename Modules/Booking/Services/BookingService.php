@@ -3,9 +3,12 @@
 namespace Modules\Booking\Services;
 
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Modules\Booking\DTOs\BookingData;
 use Modules\Booking\DTOs\BookingFilterData;
 use Modules\Booking\Models\Booking;
+use Modules\Booking\Models\InsuranceCompany;
+use Modules\Booking\Models\Service;
 use Modules\Booking\Repositories\Contracts\BookingRepositoryInterface;
 
 class BookingService
@@ -14,6 +17,15 @@ class BookingService
         private readonly BookingRepositoryInterface $bookingRepository,
         private readonly MrnGeneratorService $mrnGenerator,
     ) {}
+
+    /** @return array{services: Collection, insuranceCompanies: Collection} */
+    public function getFormResources(): array
+    {
+        return [
+            'services' => Service::select('id', 'name', 'dept', 'price', 'ins_price')->orderBy('name')->get(),
+            'insuranceCompanies' => InsuranceCompany::select('id', 'name')->orderBy('name')->get(),
+        ];
+    }
 
     public function list(BookingFilterData $filter): LengthAwarePaginator
     {
@@ -61,6 +73,9 @@ class BookingService
 
     public function update(string $id, BookingData $data): Booking
     {
+        $netDue = max(0.0, $data->price - $data->discount - $data->insAmount);
+        $payStatus = $data->paidAmount >= $netDue ? 'paid' : ($data->paidAmount > 0 ? 'partial' : 'unpaid');
+
         return $this->bookingRepository->update($id, [
             'patient_name' => $data->patientName,
             'patient_phone' => $data->patientPhone,
@@ -79,7 +94,8 @@ class BookingService
             'ins_amount' => $data->insAmount,
             'paid_amount' => $data->paidAmount,
             'pay_method' => $data->payMethod,
-            'pay_status' => $data->payStatus,
+            'pay_status' => $payStatus,
+            'status' => $data->status,
             'visit_note' => $data->visitNote,
             'bed_no' => $data->bedNo,
             'eye_side' => $data->eyeSide,

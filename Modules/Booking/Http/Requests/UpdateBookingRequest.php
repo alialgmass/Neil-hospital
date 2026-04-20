@@ -32,6 +32,7 @@ class UpdateBookingRequest extends FormRequest
             'paid_amount' => ['nullable', 'numeric', 'min:0'],
             'pay_method' => ['required', 'in:cash,card,transfer,insurance'],
             'pay_status' => ['required', 'in:unpaid,partial,paid'],
+            'status' => ['nullable', 'in:waiting,confirmed,in_progress,completed,cancelled'],
             'visit_note' => ['nullable', 'string', 'max:2000'],
             'bed_no' => ['nullable', 'integer', 'min:1', 'max:9999'],
             'eye_side' => ['nullable', 'in:OD,OS,OU'],

@@ -24,6 +24,11 @@ class SurgeryService
         return $this->surgeryRepository->findOrFail($id);
     }
 
+    public function findByBooking(string $bookingId): ?Surgery
+    {
+        return $this->surgeryRepository->findByBooking($bookingId);
+    }
+
     public function schedule(SurgeryData $data): Surgery
     {
         return $this->surgeryRepository->create([
@@ -41,13 +46,36 @@ class SurgeryService
         ]);
     }
 
+    public function update(string $id, SurgeryData $data): Surgery
+    {
+        return $this->surgeryRepository->update($id, [
+            'or_bed_id' => $data->orBedId,
+            'bed_no' => $data->bedNo,
+            'surgeon_id' => $data->surgeonId,
+            'eye' => $data->eye,
+            'procedure' => $data->procedure,
+            'anaesthesia' => $data->anaesthesia,
+            'pre_op_notes' => $data->preOpNotes,
+            'scheduled_at' => $data->scheduledAt,
+        ]);
+    }
+
     public function isBedAvailable(int $bedId, string $scheduledAt): bool
     {
-        // A bed is "available" if no in-progress or prep surgery is scheduled at the same time
         return ! Surgery::where('or_bed_id', $bedId)
             ->whereIn('status', ['scheduled', 'prep', 'in_progress'])
             ->whereDate('scheduled_at', date('Y-m-d', strtotime($scheduledAt)))
             ->exists();
+    }
+
+    public function markBedOccupied(int $bedId): void
+    {
+        OrBed::where('id', $bedId)->update(['status' => 'occupied']);
+    }
+
+    public function markBedAvailable(int $bedId): void
+    {
+        OrBed::where('id', $bedId)->update(['status' => 'available']);
     }
 
     public function recordSupplies(SuppliesUsedData $data): Surgery

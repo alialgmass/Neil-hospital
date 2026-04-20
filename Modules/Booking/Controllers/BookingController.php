@@ -16,7 +16,7 @@ use Modules\Booking\Http\Requests\UpdateBookingRequest;
 use Modules\Booking\Models\Booking;
 use Modules\Booking\Repositories\Contracts\BookingRepositoryInterface;
 use Modules\Booking\Services\BookingService;
-use Modules\Surgery\Models\OrRoom;
+use Modules\Doctor\Models\Doctor;
 
 class BookingController extends Controller
 {
@@ -32,17 +32,15 @@ class BookingController extends Controller
     {
         $filter = BookingFilterData::fromArray(request()->all());
         $bookings = $this->bookingService->list($filter);
-
-        $dept = request('dept');
-        $orRooms = in_array($dept, ['surgery', 'lasik', 'laser'])
-            ? OrRoom::with(['beds' => fn ($q) => $q->orderBy('bed_number')])->orderBy('name')->get()
-            : null;
+        $formResources = $this->bookingService->getFormResources();
 
         return Inertia::render('booking/Index', [
             'bookings' => $bookings,
-            'filters' => request()->only(['date', 'dept', 'status', 'pay_status', 'search']),
+            'filters' => request()->only(['date', 'date_from', 'date_to', 'dept', 'status', 'pay_status', 'search']),
             'todayStats' => $this->bookingRepository->countByDeptForDate(today()->toDateString()),
-            'orRooms' => $orRooms,
+            'services' => $formResources['services'],
+            'insuranceCompanies' => $formResources['insuranceCompanies'],
+            'doctors' => Doctor::select('id', 'name')->where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 

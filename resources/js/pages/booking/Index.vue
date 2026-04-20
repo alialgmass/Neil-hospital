@@ -42,15 +42,17 @@ interface Props {
     };
     filters: {
         date?: string;
+        date_from?: string;
+        date_to?: string;
         dept?: string;
         status?: string;
         pay_status?: string;
         search?: string;
     };
     todayStats: Record<string, number>;
-    services?: unknown[];
-    doctors?: unknown[];
-    insuranceCompanies?: unknown[];
+    services?: { id: string; name: string; dept: string; price: number; ins_price: number }[];
+    doctors?: { id: string; name: string; is_active: boolean }[];
+    insuranceCompanies?: { id: string; name: string }[];
 }
 
 const props = defineProps<Props>();

@@ -17,6 +17,7 @@ use Modules\Surgery\DTOs\SurgeryData;
 use Modules\Surgery\Http\Requests\RecordSuppliesRequest;
 use Modules\Surgery\Http\Requests\StoreSurgeryRequest;
 use Modules\Surgery\Models\OrRoom;
+use Modules\Surgery\Models\Surgery;
 use Modules\Surgery\Services\SurgeryService;
 
 class SurgeryController extends Controller
@@ -41,8 +42,13 @@ class SurgeryController extends Controller
 
         $surgeries = $this->surgeryService->list($dept, $status, 200);
 
+        $scheduledBookingIds = Surgery::where('dept', $dept)
+            ->whereIn('status', ['scheduled', 'prep', 'in_progress'])
+            ->pluck('booking_id');
+
         $bookings = Booking::where('dept', $dept)
             ->whereIn('status', ['waiting', 'confirmed'])
+            ->whereNotIn('id', $scheduledBookingIds)
             ->select('id', 'file_no', 'patient_name')
             ->orderByDesc('visit_date')
             ->get();

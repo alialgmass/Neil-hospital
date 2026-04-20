@@ -57,7 +57,14 @@
       "Bash(\"/c/Users/Royal/.config/herd/bin/php84/php.exe\" vendor/bin/pint Modules/Surgery/Controllers/SurgeryController.php Modules/Surgery/DTOs/SurgeryData.php Modules/Surgery/Http/Requests/StoreSurgeryRequest.php Modules/Surgery/Services/SurgeryService.php Modules/Surgery/Repositories/SurgeryRepository.php Modules/Surgery/Models/Surgery.php database/migrations/2026_04_15_204942_add_bed_no_to_surgeries_table.php)",
       "Bash(php artisan *)",
       "Bash(cmd *)",
-      "mcp__laravel-boost__browser-logs"
+      "mcp__laravel-boost__browser-logs",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \".specify/scripts/powershell/setup-plan.ps1\" -Json)",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \".specify/scripts/powershell/update-agent-context.ps1\" -AgentType claude)",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json)",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)",
+      "Bash(\"/c/Users/Royal/AppData/Roaming/Herd/bin/php84/php\" artisan *)",
+      "Bash(\"C:/Users/Royal/.config/herd/bin/php.bat\" artisan *)",
+      "Bash(\"C:/Users/Royal/.config/herd/bin/php.bat\" vendor/bin/pint --dirty --format agent)"
     ]
   },
   "enableAllProjectMcpServers": true,
