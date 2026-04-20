@@ -636,55 +636,37 @@ function submitSupplies() {
 
             <!-- ── OR Bed picker ── -->
             <div class="beds-panel">
-                <div class="beds-panel-lbl">
-                    اختر السرير:
-                    <span
-                        v-if="scheduleForm.or_bed_id"
-                        class="beds-panel-selected"
-                        >{{ getBedLabel(scheduleForm.or_bed_id) }}</span
-                    >
+                <div class="beds-panel-legend">
+                    <span class="beds-legend-dot beds-legend-free" /> فارغ
+                    <span class="beds-legend-dot beds-legend-busy" /> مشغول
+                    <span class="beds-legend-dot beds-legend-selected" /> محدد
+                    <span v-if="scheduleForm.or_bed_id" class="beds-panel-selected ms-auto">
+                        ✓ {{ getBedLabel(scheduleForm.or_bed_id) }}
+                    </span>
                 </div>
-                <div class="beds-row">
-                    <template v-for="(item, idx) in bedMap" :key="idx">
+                <div v-for="room in orRooms" :key="room.id" class="beds-room">
+                    <p class="beds-room-label">{{ room.name }}</p>
+                    <div class="beds-row">
                         <button
+                            v-for="bed in room.beds"
+                            :key="bed.id"
                             type="button"
-                            class="bed"
-                            :class="{
-                                'bed-occupied': occupiedBedIds.includes(
-                                    item.bed.id,
-                                ),
-                                'bed-selected':
-                                    scheduleForm.or_bed_id === item.bed.id,
-                            }"
+                            :class="[
+                                'or-bed',
+                                occupiedBedIds.includes(bed.id) ? 'or-bed-busy' : 'or-bed-free',
+                                scheduleForm.or_bed_id === bed.id ? 'or-bed-selected' : '',
+                            ]"
                             :title="
-                                occupiedBedIds.includes(item.bed.id)
-                                    ? `${item.room.name} - سرير ${item.bed.bed_number} مشغول`
-                                    : `${item.room.name} - سرير ${item.bed.bed_number}`
+                                occupiedBedIds.includes(bed.id)
+                                    ? `${room.name} - سرير ${bed.bed_number} مشغول`
+                                    : `${room.name} - سرير ${bed.bed_number}`
                             "
-                            @click="selectOrBed(item.bed.id)"
+                            @click="selectOrBed(bed.id)"
                         >
-                            {{ item.room.name }}:{{ item.bed.bed_number }}
+                            <span class="or-bed-num">{{ bed.bed_number }}</span>
+                            <span v-if="occupiedBedIds.includes(bed.id)" class="or-bed-busy-dot" />
                         </button>
-                    </template>
-                </div>
-                <div class="beds-legend">
-                    <span class="legend-item"
-                        ><span class="bed" style="cursor: default">غ:س</span>
-                        فارغ</span
-                    >
-                    <span class="legend-item"
-                        ><span class="bed bed-occupied" style="cursor: default"
-                            >غ:س</span
-                        >
-                        مشغول</span
-                    >
-                    <span class="legend-item"
-                        ><span class="bed bed-selected" style="cursor: default"
-                            >غ:س</span
-                        >
-                        محجوز</span
-                    >
-                    >
+                    </div>
                 </div>
             </div>
 
@@ -932,81 +914,112 @@ function submitSupplies() {
     text-align: center;
 }
 
-/* ── Bed picker (modal) — matches mockup .bed / .beds-row ── */
+/* ── Bed picker (modal) ── */
 .beds-panel {
-    background: var(--color-hospital-bg, #f3f6fa);
-    border: 1.5px solid var(--color-hospital-border, #dde4ef);
-    border-radius: 8px;
-    padding: 10px 12px;
+    background: #f3f6fa;
+    border: 1.5px solid #dde4ef;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
-.beds-panel-lbl {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--color-hospital-text-2, #4a5878);
-    margin-bottom: 8px;
+.beds-panel-legend {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #4a5878;
+    border-bottom: 1px solid #dde4ef;
+    padding-bottom: 8px;
+    flex-wrap: wrap;
 }
+.beds-legend-dot {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    border: 1.5px solid transparent;
+}
+.beds-legend-free  { background: #fff; border-color: #dde4ef; }
+.beds-legend-busy  { background: #fff0ee; border-color: #e74c3c; }
+.beds-legend-selected { background: #27ae60; border-color: #27ae60; }
 .beds-panel-selected {
     font-size: 10px;
     font-weight: 700;
-    background: var(--color-hospital-primary, #0a4fa6);
+    background: #27ae60;
     color: #fff;
     border-radius: 12px;
-    padding: 2px 8px;
+    padding: 2px 10px;
+}
+.beds-room {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.beds-room-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #4a5878;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
 }
 .beds-row {
     display: flex;
-    gap: 4px;
+    gap: 6px;
     flex-wrap: wrap;
 }
-.bed {
-    width: 22px;
-    height: 22px;
-    border-radius: 4px;
-    border: 1.5px solid var(--color-hospital-border, #dde4ef);
+.or-bed {
+    width: 48px;
+    height: 42px;
+    border-radius: 8px;
+    border: 1.5px solid #dde4ef;
     background: #fff;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 9px;
-    font-weight: 700;
     cursor: pointer;
     transition: all 0.15s;
-    color: var(--color-hospital-text-3, #8a96ae);
     font-family: inherit;
     padding: 0;
+    position: relative;
+    gap: 3px;
 }
-.bed:hover:not(.bed-occupied) {
-    background: var(--color-hospital-primary-pale, #e8f1fb);
-    border-color: var(--color-hospital-primary, #0a4fa6);
+.or-bed-num {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0d1f3c;
+    line-height: 1;
 }
-.bed-occupied {
-    background: var(--color-hospital-primary-pale, #e8f1fb);
-    border-color: var(--color-hospital-primary, #0a4fa6);
-    color: var(--color-hospital-primary, #0a4fa6);
+.or-bed-free:hover {
+    border-color: #27ae60;
+    background: #edfaf3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(39,174,96,0.18);
+}
+.or-bed-free:hover .or-bed-num { color: #27ae60; }
+.or-bed-busy {
+    background: #fff0ee;
+    border-color: #e74c3c;
     cursor: not-allowed;
-    opacity: 0.7;
+    opacity: 0.8;
 }
-.bed-selected {
-    background: var(--color-hospital-primary, #0a4fa6) !important;
-    border-color: var(--color-hospital-primary, #0a4fa6) !important;
-    color: #fff !important;
-    opacity: 1 !important;
+.or-bed-busy .or-bed-num { color: #e74c3c; }
+.or-bed-busy-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #e74c3c;
 }
-.beds-legend {
-    display: flex;
-    gap: 12px;
-    margin-top: 8px;
-    font-size: 10px;
-    color: var(--color-hospital-text-2, #4a5878);
+.or-bed-selected {
+    background: #27ae60 !important;
+    border-color: #27ae60 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39,174,96,0.35);
 }
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
+.or-bed-selected .or-bed-num { color: #fff !important; }
 
 /* ── Form inputs ── */
 .dept-input {

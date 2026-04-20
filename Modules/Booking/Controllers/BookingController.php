@@ -17,6 +17,7 @@ use Modules\Booking\Models\Booking;
 use Modules\Booking\Repositories\Contracts\BookingRepositoryInterface;
 use Modules\Booking\Services\BookingService;
 use Modules\Doctor\Models\Doctor;
+use Modules\Surgery\Models\OrRoom;
 
 class BookingController extends Controller
 {
@@ -34,6 +35,11 @@ class BookingController extends Controller
         $bookings = $this->bookingService->list($filter);
         $formResources = $this->bookingService->getFormResources();
 
+        $orRooms = OrRoom::with(['beds' => function ($q) {
+            $q->orderBy('bed_number')
+                ->with(['surgery' => fn ($sq) => $sq->whereIn('status', ['scheduled', 'prep', 'in_progress'])]);
+        }])->orderBy('name')->get();
+
         return Inertia::render('booking/Index', [
             'bookings' => $bookings,
             'filters' => request()->only(['date', 'date_from', 'date_to', 'dept', 'status', 'pay_status', 'search']),
@@ -41,6 +47,7 @@ class BookingController extends Controller
             'services' => $formResources['services'],
             'insuranceCompanies' => $formResources['insuranceCompanies'],
             'doctors' => Doctor::select('id', 'name')->where('is_active', true)->orderBy('name')->get(),
+            'orRooms' => $orRooms,
         ]);
     }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 interface Service {
     id: string;
@@ -21,10 +21,24 @@ interface InsuranceCompany {
     name: string;
 }
 
+interface OrBed {
+    id: number;
+    bed_number: number;
+    status: string;
+    surgery?: { id: string; status: string } | null;
+}
+
+interface OrRoom {
+    id: number;
+    name: string;
+    beds: OrBed[];
+}
+
 interface Props {
     services: Service[];
     doctors: Doctor[];
     insuranceCompanies: InsuranceCompany[];
+    orRooms?: OrRoom[];
     booking?: Record<string, unknown>;
     submitUrl: string;
     submitMethod?: 'post' | 'put';
@@ -33,6 +47,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     booking: undefined,
     submitMethod: 'post',
+    orRooms: () => [],
 });
 
 const emit = defineEmits<{
@@ -125,6 +140,31 @@ const analysisOptions = [
 const filteredServices = computed(() =>
     props.services.filter((s) => s.dept === form.dept),
 );
+
+const bedPickerColor = computed(() =>
+    form.dept === 'lasik' ? '#7B2FA6' : '#27AE60',
+);
+
+const selectedBedId = ref<number | null>(
+    props.booking?.bed_no
+        ? (props.orRooms.flatMap((r) => r.beds).find((b) => String(b.bed_number) === String(props.booking!.bed_no))?.id ?? null)
+        : null,
+);
+
+function isBedOccupied(bed: OrBed): boolean {
+    return bed.status !== 'available' || (!!bed.surgery && bed.surgery !== null);
+}
+
+function selectBed(bed: OrBed) {
+    if (isBedOccupied(bed)) return;
+    if (selectedBedId.value === bed.id) {
+        selectedBedId.value = null;
+        form.bed_no = '';
+    } else {
+        selectedBedId.value = bed.id;
+        form.bed_no = String(bed.bed_number);
+    }
+}
 
 const isInsurance = computed(() => form.pay_method === 'insurance');
 
@@ -359,7 +399,7 @@ function submit() {
                     <span class="bk-title bk-title-green">{{ deptExtraTitle }}</span>
                     <div class="bk-grid-2">
                         <!-- Eye side -->
-                        <div :class="showBeds ? '' : 'col-span-2'">
+                        <div :class="(showBeds && props.orRooms.length) ? 'col-span-2' : (showBeds ? '' : 'col-span-2')">
                             <label class="bk-label">جهة العين</label>
                             <div class="eye-side-row">
                                 <button
@@ -372,9 +412,44 @@ function submit() {
                             </div>
                         </div>
                         <!-- Bed number — surgery / lasik only -->
-                        <div v-if="showBeds">
+                        <div v-if="showBeds" :class="props.orRooms.length ? 'col-span-2' : ''">
                             <label class="bk-label">رقم السرير</label>
+                            <div v-if="props.orRooms.length" class="bed-picker-panel">
+                                <!-- Legend -->
+                                <div class="bed-picker-legend">
+                                    <span class="legend-dot" :style="{ background: bedPickerColor }" /> فارغ
+                                    <span class="legend-dot legend-dot-busy" /> مشغول
+                                    <span class="legend-dot legend-dot-selected" :style="{ background: bedPickerColor, opacity: '1' }" /> محدد
+                                </div>
+                                <!-- Rooms -->
+                                <div v-for="room in props.orRooms" :key="room.id" class="bed-room">
+                                    <p class="bed-room-label">{{ room.name }}</p>
+                                    <div class="bed-room-row">
+                                        <button
+                                            v-for="bed in room.beds"
+                                            :key="bed.id"
+                                            type="button"
+                                            :class="[
+                                                'bk-bed',
+                                                isBedOccupied(bed) ? 'bk-bed-busy' : 'bk-bed-free',
+                                                selectedBedId === bed.id ? 'bk-bed-selected' : '',
+                                            ]"
+                                            :style="selectedBedId === bed.id ? { background: bedPickerColor, borderColor: bedPickerColor } : {}"
+                                            :title="isBedOccupied(bed) ? `${room.name} - سرير ${bed.bed_number} مشغول` : `${room.name} - سرير ${bed.bed_number}`"
+                                            @click="selectBed(bed)"
+                                        >
+                                            <span class="bk-bed-num">{{ bed.bed_number }}</span>
+                                            <span v-if="isBedOccupied(bed)" class="bk-bed-busy-dot" />
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Selection label -->
+                                <p v-if="form.bed_no" class="bed-picker-selected" :style="{ color: bedPickerColor }">
+                                    ✓ سرير {{ form.bed_no }} محدد
+                                </p>
+                            </div>
                             <input
+                                v-else
                                 v-model="form.bed_no"
                                 type="number"
                                 min="1"
@@ -682,4 +757,122 @@ function submit() {
     color: #0D1F3C;
 }
 .inv-line:last-child { border-bottom: none; }
+
+/* ── Bed picker ── */
+.bed-picker-panel {
+    background: #F3F6FA;
+    border: 1.5px solid #DDE4EF;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bed-picker-legend {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+    color: #4A5878;
+    font-weight: 600;
+    border-bottom: 1px solid #DDE4EF;
+    padding-bottom: 7px;
+}
+.legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    opacity: 0.35;
+}
+.legend-dot-busy {
+    background: #E74C3C;
+    opacity: 1;
+}
+.legend-dot-selected {
+    opacity: 1;
+}
+
+.bed-room {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.bed-room-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #4A5878;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.bed-room-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.bk-bed {
+    width: 44px;
+    height: 38px;
+    border-radius: 7px;
+    border: 1.5px solid #DDE4EF;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    padding: 0;
+    position: relative;
+    gap: 2px;
+}
+.bk-bed-num {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0D1F3C;
+    line-height: 1;
+}
+.bk-bed-free:hover {
+    border-color: currentColor;
+    background: #F0F7FF;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+.bk-bed-free:hover .bk-bed-num {
+    color: inherit;
+}
+.bk-bed-busy {
+    background: #FFF0EE;
+    border-color: #E74C3C;
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+.bk-bed-busy .bk-bed-num {
+    color: #E74C3C;
+}
+.bk-bed-busy-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #E74C3C;
+}
+.bk-bed-selected {
+    color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.bk-bed-selected .bk-bed-num {
+    color: #fff !important;
+}
+
+.bed-picker-selected {
+    font-size: 11px;
+    font-weight: 700;
+    margin: 0;
+    padding-top: 6px;
+    border-top: 1px solid #DDE4EF;
+}
 </style>

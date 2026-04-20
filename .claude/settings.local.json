@@ -64,7 +64,9 @@
       "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)",
       "Bash(\"/c/Users/Royal/AppData/Roaming/Herd/bin/php84/php\" artisan *)",
       "Bash(\"C:/Users/Royal/.config/herd/bin/php.bat\" artisan *)",
-      "Bash(\"C:/Users/Royal/.config/herd/bin/php.bat\" vendor/bin/pint --dirty --format agent)"
+      "Bash(\"C:/Users/Royal/.config/herd/bin/php.bat\" vendor/bin/pint --dirty --format agent)",
+      "Bash(vendor/bin/pint --dirty --format agent Modules/Booking/Controllers/BookingController.php)",
+      "Bash(./vendor/bin/pint --dirty Modules/Booking/Controllers/BookingController.php)"
     ]
   },
   "enableAllProjectMcpServers": true,

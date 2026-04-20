@@ -53,6 +53,7 @@ interface Props {
     services?: { id: string; name: string; dept: string; price: number; ins_price: number }[];
     doctors?: { id: string; name: string; is_active: boolean }[];
     insuranceCompanies?: { id: string; name: string }[];
+    orRooms?: { id: number; name: string; beds: { id: number; bed_number: number }[] }[];
 }
 
 const props = defineProps<Props>();
@@ -396,6 +397,7 @@ const isCloseModalOpen = computed({
             :services="(services as any) ?? []"
             :doctors="(doctors as any) ?? []"
             :insurance-companies="(insuranceCompanies as any) ?? []"
+            :or-rooms="(orRooms as any) ?? []"
             submit-url="/booking"
             submit-method="post"
             @success="showCreateModal = false"
@@ -430,6 +432,7 @@ const isCloseModalOpen = computed({
             :services="(services as any) ?? []"
             :doctors="(doctors as any) ?? []"
             :insurance-companies="(insuranceCompanies as any) ?? []"
+            :or-rooms="(orRooms as any) ?? []"
             :booking="editBooking as Record<string, unknown>"
             :submit-url="`/booking/${editBooking.id}`"
             submit-method="put"
