@@ -6,18 +6,10 @@ use App\Services\ActivityLogService;
 use Illuminate\Validation\ValidationException;
 use Modules\Booking\Models\Booking;
 use Modules\Booking\Repositories\Contracts\BookingRepositoryInterface;
+use Spatie\ModelStates\Exceptions\CouldNotPerformTransition;
 
 class UpdateBookingStatusAction
 {
-    /** Valid transitions: from → allowed next statuses */
-    private const TRANSITIONS = [
-        'waiting'     => ['confirmed', 'cancelled'],
-        'confirmed'   => ['in_progress', 'cancelled'],
-        'in_progress' => ['completed', 'cancelled'],
-        'completed'   => [],
-        'cancelled'   => [],
-    ];
-
     public function __construct(
         private readonly BookingRepositoryInterface $bookingRepository,
         private readonly ActivityLogService $activityLog,
@@ -26,31 +18,27 @@ class UpdateBookingStatusAction
     public function execute(string $id, string $newStatus, ?string $cancelReason = null): Booking
     {
         $booking = $this->bookingRepository->findOrFail($id);
-        $currentStatus = $booking->status;
+        $oldStatus = (string) $booking->status;
 
-        $allowed = self::TRANSITIONS[$currentStatus] ?? [];
-
-        if (! in_array($newStatus, $allowed, true)) {
+        try {
+            $booking->status->transitionTo($newStatus);
+        } catch (CouldNotPerformTransition $e) {
             throw ValidationException::withMessages([
-                'status' => "لا يمكن الانتقال من حالة \"{$currentStatus}\" إلى \"{$newStatus}\".",
+                'status' => "لا يمكن الانتقال من حالة \"{$oldStatus}\" إلى \"{$newStatus}\".",
             ]);
         }
 
-        if ($newStatus === 'cancelled' && empty($cancelReason)) {
-            throw ValidationException::withMessages([
-                'cancel_reason' => 'يجب تحديد سبب الإلغاء.',
-            ]);
+        if ($newStatus === 'cancelled') {
+            $booking->update(['cancel_reason' => $cancelReason]);
         }
-
-        $updated = $this->bookingRepository->updateStatus($id, $newStatus, $cancelReason);
 
         $this->activityLog->log(
-            action:      'status_changed',
-            module:      'booking',
-            recordId:    $booking->id,
-            description: "تغيير حالة الحجز {$booking->file_no}: {$currentStatus} → {$newStatus}",
+            action: 'status_changed',
+            module: 'booking',
+            recordId: $booking->id,
+            description: "تغيير حالة الحجز {$booking->file_no}: {$oldStatus} → {$newStatus}",
         );
 
-        return $updated;
+        return $booking->fresh();
     }
 }

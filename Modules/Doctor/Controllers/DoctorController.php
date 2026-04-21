@@ -4,16 +4,24 @@ namespace Modules\Doctor\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\Doctor\Actions\CreateDoctorAction;
+use Modules\Doctor\Actions\UpdateDoctorAction;
+use Modules\Doctor\Http\Requests\StoreDoctorRequest;
+use Modules\Doctor\Http\Requests\UpdateDoctorRequest;
 use Modules\Doctor\Models\Doctor;
 
 class DoctorController extends Controller
 {
+    public function __construct(
+        private readonly CreateDoctorAction $createAction,
+        private readonly UpdateDoctorAction $updateAction,
+    ) {}
+
     public function index(): Response
     {
-        $search  = request('search');
+        $search = request('search');
         $doctors = Doctor::query()
             ->when($search, fn ($q) => $q->where('name', 'like', "%{$search}%"))
             ->orderBy('name')
@@ -25,36 +33,17 @@ class DoctorController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreDoctorRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'name'      => ['required', 'string', 'max:150'],
-            'specialty' => ['nullable', 'string', 'max:100'],
-            'phone'     => ['nullable', 'string', 'max:30'],
-            'fee_type'  => ['required', 'in:percentage,fixed,insurance'],
-            'fee_value' => ['nullable', 'numeric', 'min:0'],
-            'is_active' => ['boolean'],
-        ]);
-
-        Doctor::create($data);
+        $this->createAction->execute($request->validated());
 
         return back()->with('success', 'تم إضافة الطبيب بنجاح.');
     }
 
-    public function update(Request $request, string $id): RedirectResponse
+    public function update(UpdateDoctorRequest $request, string $id): RedirectResponse
     {
         $doctor = Doctor::findOrFail($id);
-
-        $data = $request->validate([
-            'name'      => ['required', 'string', 'max:150'],
-            'specialty' => ['nullable', 'string', 'max:100'],
-            'phone'     => ['nullable', 'string', 'max:30'],
-            'fee_type'  => ['required', 'in:percentage,fixed,insurance'],
-            'fee_value' => ['nullable', 'numeric', 'min:0'],
-            'is_active' => ['boolean'],
-        ]);
-
-        $doctor->update($data);
+        $this->updateAction->execute($doctor, $request->validated());
 
         return back()->with('success', 'تم تعديل بيانات الطبيب بنجاح.');
     }

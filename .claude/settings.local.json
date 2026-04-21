@@ -73,7 +73,8 @@
       "Bash(vendor/bin/pint Modules/Booking/Actions/CreateBookingAction.php --format agent)",
       "Bash(php vendor/bin/pint Modules/Booking/Actions/CreateBookingAction.php --format agent)",
       "Bash(\"D:/Projects/neil hospital/v3/vendor/bin/pint.bat\" Modules/Booking/Actions/CreateBookingAction.php --format agent)",
-      "Bash(vendor/bin/pint.bat Modules/Insurance/Controllers/PriceListController.php --format agent)"
+      "Bash(vendor/bin/pint.bat Modules/Insurance/Controllers/PriceListController.php --format agent)",
+      "mcp__laravel-boost__search-docs"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -37,7 +37,10 @@ function removeRow(idx: number) {
 
 function onServiceSelect(idx: number) {
     const svc = props.services.find((s) => s.id === form.items[idx].service_id)
-    if (svc) { form.items[idx].price = svc.ins_price || svc.price }
+
+    if (svc) {
+ form.items[idx].price = svc.ins_price || svc.price 
+}
 }
 
 function close() {
@@ -48,7 +51,9 @@ function close() {
 
 function submit() {
     form.post('/insurance/price-lists', {
-        onSuccess: () => { close(); emit('success') },
+        onSuccess: () => {
+ close(); emit('success') 
+},
     })
 }
 </script>

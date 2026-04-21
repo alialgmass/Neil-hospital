@@ -106,6 +106,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->middleware('can:services.write')
             ->name('destroy');
 
+        Route::patch('/{id}/status', [ServiceController::class, 'toggleStatus'])
+            ->middleware('can:services.write')
+            ->name('toggleStatus');
+
         Route::post('/import', [ServiceController::class, 'import'])
             ->middleware('can:services.write')
             ->name('import');

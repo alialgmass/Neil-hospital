@@ -34,7 +34,9 @@ function close() {
 
 function submit() {
     form.post('/insurance/claims', {
-        onSuccess: () => { close(); emit('success') },
+        onSuccess: () => {
+ close(); emit('success') 
+},
     })
 }
 </script>

@@ -4,29 +4,25 @@ namespace Modules\Insurance\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Modules\Insurance\Actions\DeleteInsuranceClaimAction;
+use Modules\Insurance\Actions\UpdateInsuranceClaimAction;
+use Modules\Insurance\Http\Requests\StoreInsuranceClaimRequest;
+use Modules\Insurance\Http\Requests\UpdateInsuranceClaimRequest;
 use Modules\Insurance\Models\InsuranceClaim;
+use Modules\Insurance\States\DraftState;
 
 class InsuranceClaimController extends Controller
 {
-    public function store(Request $request): RedirectResponse
-    {
-        $data = $request->validate([
-            'insurance_company_id' => ['required', 'exists:insurance_companies,id'],
-            'booking_id' => ['nullable', 'exists:bookings,id'],
-            'service_id' => ['nullable', 'exists:services,id'],
-            'patient_name' => ['required', 'string', 'max:150'],
-            'file_no' => ['nullable', 'string', 'max:50'],
-            'service_name' => ['required', 'string', 'max:200'],
-            'invoice_amount' => ['required', 'numeric', 'min:0'],
-            'discount' => ['nullable', 'numeric', 'min:0'],
-            'patient_share' => ['nullable', 'numeric', 'min:0'],
-            'insurance_share' => ['nullable', 'numeric', 'min:0'],
-            'service_date' => ['required', 'date'],
-            'notes' => ['nullable', 'string'],
-        ]);
+    public function __construct(
+        private readonly UpdateInsuranceClaimAction $updateAction,
+        private readonly DeleteInsuranceClaimAction $deleteAction,
+    ) {}
 
-        $data['status'] = 'draft';
+    public function store(StoreInsuranceClaimRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+
+        $data['status'] = DraftState::$name;
         $data['claim_date'] = now()->toDateString();
         $data['created_by'] = $request->user()->id;
         $data['discount'] = $data['discount'] ?? 0;
@@ -38,27 +34,10 @@ class InsuranceClaimController extends Controller
         return back()->with('success', 'تم إنشاء المطالبة بنجاح.');
     }
 
-    public function update(Request $request, string $id): RedirectResponse
+    public function update(UpdateInsuranceClaimRequest $request, string $id): RedirectResponse
     {
         $claim = InsuranceClaim::findOrFail($id);
-
-        $data = $request->validate([
-            'status' => ['required', 'in:draft,submitted,approved,rejected,paid'],
-            'approved_amount' => ['nullable', 'numeric', 'min:0'],
-            'paid_amount' => ['nullable', 'numeric', 'min:0'],
-            'rejection_reason' => ['nullable', 'string'],
-            'submission_date' => ['nullable', 'date'],
-            'approval_date' => ['nullable', 'date'],
-            'payment_date' => ['nullable', 'date'],
-            'notes' => ['nullable', 'string'],
-        ]);
-
-        $oldStatus = $claim->status;
-        $claim->update($data);
-
-        if ($data['status'] === 'paid' && $claim->booking_id && $oldStatus !== 'paid') {
-            $claim->booking->update(['pay_status' => 'paid']);
-        }
+        $this->updateAction->execute($claim, $request->validated());
 
         return back()->with('success', 'تم تحديث المطالبة بنجاح.');
     }
@@ -66,12 +45,7 @@ class InsuranceClaimController extends Controller
     public function destroy(string $id): RedirectResponse
     {
         $claim = InsuranceClaim::findOrFail($id);
-
-        if ($claim->status !== 'draft') {
-            return back()->with('error', 'لا يمكن حذف مطالبة بعد إرسالها.');
-        }
-
-        $claim->delete();
+        $this->deleteAction->execute($claim);
 
         return back()->with('success', 'تم حذف المطالبة.');
     }

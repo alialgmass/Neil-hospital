@@ -27,14 +27,20 @@ const activeTab = ref<'companies' | 'pricelists' | 'contracts' | 'claims'>('comp
 const showCompanyModal = ref(false)
 const editingCompany = ref<Company | null>(null)
 
-function openCreate() { editingCompany.value = null; showCompanyModal.value = true }
-function openEdit(company: Company) { editingCompany.value = company; showCompanyModal.value = true }
+function openCreate() {
+ editingCompany.value = null; showCompanyModal.value = true 
+}
+function openEdit(company: Company) {
+ editingCompany.value = company; showCompanyModal.value = true 
+}
 
 // Delete modal
 const showDeleteModal = ref(false)
 const deletingCompanyId = ref<string | null>(null)
 
-function confirmDelete(id: string) { deletingCompanyId.value = id; showDeleteModal.value = true }
+function confirmDelete(id: string) {
+ deletingCompanyId.value = id; showDeleteModal.value = true 
+}
 
 // Claim modal
 const showClaimModal = ref(false)
@@ -43,10 +49,15 @@ const showClaimModal = ref(false)
 const showStatusModal = ref(false)
 const editingClaim = ref<Claim | null>(null)
 
-function openStatusModal(claim: Claim) { editingClaim.value = claim; showStatusModal.value = true }
+function openStatusModal(claim: Claim) {
+ editingClaim.value = claim; showStatusModal.value = true 
+}
 
 function deleteClaim(id: number) {
-    if (!confirm('هل تريد حذف هذه المطالبة؟')) { return }
+    if (!confirm('هل تريد حذف هذه المطالبة؟')) {
+ return 
+}
+
     router.delete(`/insurance/claims/${id}`)
 }
 
@@ -64,7 +75,9 @@ function filterClaims() {
 
 const activeCount = computed(() => props.companies.data.filter((c) => c.status === 'active').length)
 
-function companyInitials(name: string) { return name.trim().charAt(0) }
+function companyInitials(name: string) {
+ return name.trim().charAt(0) 
+}
 
 const tabs = [
     { key: 'companies', label: 'شركات التأمين', icon: Building2, count: computed(() => props.companies.data.length) },

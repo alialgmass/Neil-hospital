@@ -27,7 +27,10 @@ const form = useForm({
 })
 
 watch(() => props.claim, (claim) => {
-    if (!claim) { return }
+    if (!claim) {
+ return 
+}
+
     form.status = claim.status
     form.approved_amount = claim.approved_amount
     form.paid_amount = claim.paid_amount
@@ -43,9 +46,14 @@ function close() {
 }
 
 function submit() {
-    if (!props.claim) { return }
+    if (!props.claim) {
+ return 
+}
+
     form.put(`/insurance/claims/${props.claim.id}`, {
-        onSuccess: () => { close(); emit('success') },
+        onSuccess: () => {
+ close(); emit('success') 
+},
     })
 }
 </script>

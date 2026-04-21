@@ -2,10 +2,13 @@
 
 namespace Modules\Doctor\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Booking\Models\Booking;
+use Modules\Doctor\Enums\FeeType;
 
 class Doctor extends Model
 {
@@ -25,16 +28,17 @@ class Doctor extends Model
     protected $casts = [
         'fee_value' => 'decimal:2',
         'is_active' => 'boolean',
+        'fee_type' => FeeType::class,
     ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function bookings(): HasMany
     {
-        return $this->hasMany(\Modules\Booking\Models\Booking::class);
+        return $this->hasMany(Booking::class);
     }
 
     public function shifts(): HasMany

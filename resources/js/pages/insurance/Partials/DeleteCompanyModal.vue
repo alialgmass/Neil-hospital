@@ -18,10 +18,14 @@ function close() {
 }
 
 function confirm() {
-    if (!props.companyId) { return }
+    if (!props.companyId) {
+ return 
+}
 
     router.delete(`/insurance/${props.companyId}`, {
-        onSuccess: () => { close(); emit('success') },
+        onSuccess: () => {
+ close(); emit('success') 
+},
     })
 }
 </script>

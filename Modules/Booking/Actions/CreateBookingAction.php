@@ -4,9 +4,11 @@ namespace Modules\Booking\Actions;
 
 use App\Services\ActivityLogService;
 use Modules\Booking\DTOs\BookingData;
+use Modules\Booking\Enums\PayMethod;
 use Modules\Booking\Models\Booking;
 use Modules\Booking\Services\BookingService;
 use Modules\Insurance\Models\InsuranceClaim;
+use Modules\Insurance\States\DraftState;
 use Modules\Surgery\DTOs\SurgeryData;
 use Modules\Surgery\Services\SurgeryService;
 
@@ -22,7 +24,7 @@ class CreateBookingAction
     {
         $booking = $this->bookingService->create($data, $createdBy);
 
-        if ($data->payMethod === 'insurance' && $data->insCompanyId) {
+        if ($data->payMethod === PayMethod::Insurance->value && $data->insCompanyId) {
             $patientShare = max(0, $data->price - $data->discount - $data->insAmount);
 
             InsuranceClaim::create([
@@ -38,7 +40,7 @@ class CreateBookingAction
                 'patient_share' => $patientShare,
                 'approved_amount' => 0,
                 'paid_amount' => 0,
-                'status' => 'draft',
+                'status' => DraftState::$name,
                 'service_date' => $data->visitDate,
                 'claim_date' => today()->toDateString(),
                 'created_by' => $createdBy,
@@ -46,13 +48,12 @@ class CreateBookingAction
         }
 
         if (in_array($data->dept, ['surgery', 'lasik'])) {
-            $aa = $this->surgeryService->schedule(new SurgeryData(
+            $this->surgeryService->schedule(new SurgeryData(
                 bookingId: $booking->id,
                 dept: $data->dept,
                 orBedId: $data->bedId,
                 surgeonId: $data->doctorId,
             ));
-
         }
 
         $this->activityLog->log(

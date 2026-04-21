@@ -77,6 +77,19 @@ class ServiceController extends Controller
         return back()->with('success', 'تم حذف الخدمة.');
     }
 
+    public function toggleStatus(Request $request, string $id): RedirectResponse
+    {
+        $service = Service::findOrFail($id);
+
+        $data = $request->validate([
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        $service->update(['status' => $data['status']]);
+
+        return back();
+    }
+
     /** @param array<string, mixed> $data */
     private function appendShares(array $data): array
     {

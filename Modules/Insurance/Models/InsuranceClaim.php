@@ -5,10 +5,14 @@ namespace Modules\Insurance\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Booking\Models\Booking;
+use Modules\Insurance\States\ClaimStatus;
 use Modules\Inventory\Models\Service;
+use Spatie\ModelStates\HasStates;
 
 class InsuranceClaim extends Model
 {
+    use HasStates;
+
     protected $table = 'insurance_claims';
 
     protected $fillable = [
@@ -50,6 +54,7 @@ class InsuranceClaim extends Model
             'submission_date' => 'date',
             'approval_date' => 'date',
             'payment_date' => 'date',
+            'status' => ClaimStatus::class,
         ];
     }
 

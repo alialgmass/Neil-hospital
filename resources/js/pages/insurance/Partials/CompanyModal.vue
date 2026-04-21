@@ -43,6 +43,7 @@ watch(() => props.editingCompany, (company) => {
     } else {
         form.reset()
     }
+
     form.clearErrors()
 }, { immediate: true })
 
@@ -53,7 +54,10 @@ function close() {
 }
 
 function submit() {
-    const opts = { onSuccess: () => { close(); emit('success') } }
+    const opts = { onSuccess: () => {
+ close(); emit('success') 
+} }
+
     if (props.editingCompany) {
         form.put(`/insurance/${props.editingCompany.id}`, opts)
     } else {

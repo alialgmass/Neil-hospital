@@ -4,10 +4,10 @@ namespace Modules\Insurance\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Insurance\Actions\ManagePriceListAction;
+use Modules\Insurance\Http\Requests\StorePriceListRequest;
 use Modules\Insurance\Services\InsuranceService;
 use Modules\Inventory\Models\Service;
 
@@ -29,20 +29,9 @@ class PriceListController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StorePriceListRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:150',
-            'type' => 'required|in:cash,insurance,vip,special',
-            'ins_company_id' => 'nullable|string|exists:insurance_companies,id',
-            'ins_coverage' => 'nullable|numeric|min:0|max:100',
-            'discount_pct' => 'nullable|numeric|min:0|max:100',
-            'notes' => 'nullable|string',
-            'items' => 'nullable|array',
-            'items.*.service_id' => 'required|string|exists:services,id',
-            'items.*.price' => 'required|numeric|min:0',
-        ]);
-
+        $data = $request->validated();
         $items = $data['items'] ?? [];
         unset($data['items']);
 
