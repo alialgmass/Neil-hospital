@@ -25,6 +25,7 @@ interface Props {
     };
     insuranceCompanies: InsuranceCompany[];
     priceLists: PriceList[];
+    priceListId: string;
     isInsurance: boolean;
     netAmount: number;
 }
@@ -50,8 +51,10 @@ const payStatusOptions = [
 ];
 
 const filteredPriceLists = computed(() =>
-    props.priceLists.filter(
-        (pl) => !props.modelValue.ins_company_id || pl.ins_company_id === props.modelValue.ins_company_id,
+    (props.priceLists ?? []).filter(
+        (pl) =>
+            !props.modelValue.ins_company_id ||
+            pl.ins_company_id === props.modelValue.ins_company_id,
     ),
 );
 
@@ -72,9 +75,18 @@ function handleInsCompanyChange(value: string) {
             <select
                 :value="modelValue.pay_method"
                 class="bk-input"
-                @change="update('pay_method', ($event.target as HTMLSelectElement).value)"
+                @change="
+                    update(
+                        'pay_method',
+                        ($event.target as HTMLSelectElement).value,
+                    )
+                "
             >
-                <option v-for="opt in payMethodOptions" :key="opt.value" :value="opt.value">
+                <option
+                    v-for="opt in payMethodOptions"
+                    :key="opt.value"
+                    :value="opt.value"
+                >
                     {{ opt.label }}
                 </option>
             </select>
@@ -88,7 +100,12 @@ function handleInsCompanyChange(value: string) {
                 step="0.01"
                 min="0"
                 class="bk-input"
-                @input="update('paid_amount', ($event.target as HTMLInputElement).value)"
+                @input="
+                    update(
+                        'paid_amount',
+                        ($event.target as HTMLInputElement).value,
+                    )
+                "
             />
         </div>
 
@@ -98,19 +115,35 @@ function handleInsCompanyChange(value: string) {
                 <select
                     :value="modelValue.ins_company_id"
                     class="bk-input"
-                    @change="handleInsCompanyChange(($event.target as HTMLSelectElement).value)"
+                    @change="
+                        handleInsCompanyChange(
+                            ($event.target as HTMLSelectElement).value,
+                        )
+                    "
                 >
                     <option value="">— اختر الشركة —</option>
-                    <option v-for="ins in insuranceCompanies" :key="ins.id" :value="ins.id">
+                    <option
+                        v-for="ins in insuranceCompanies"
+                        :key="ins.id"
+                        :value="ins.id"
+                    >
                         {{ ins.name }}
                     </option>
                 </select>
             </div>
             <div>
                 <label class="bk-label">قائمة الأسعار</label>
-                <select class="bk-input">
+                <select
+                    :value="priceListId"
+                    class="bk-input"
+                    @change="emit('update:priceListId', ($event.target as HTMLSelectElement).value)"
+                >
                     <option value="">— اختر القائمة —</option>
-                    <option v-for="pl in filteredPriceLists" :key="pl.id" :value="pl.id">
+                    <option
+                        v-for="pl in filteredPriceLists"
+                        :key="pl.id"
+                        :value="pl.id"
+                    >
                         {{ pl.name }} ({{ pl.ins_coverage }}%)
                     </option>
                 </select>
@@ -125,7 +158,9 @@ function handleInsCompanyChange(value: string) {
                 step="0.01"
                 min="0"
                 class="bk-input"
-                @input="update('price', ($event.target as HTMLInputElement).value)"
+                @input="
+                    update('price', ($event.target as HTMLInputElement).value)
+                "
             />
         </div>
 
@@ -137,7 +172,12 @@ function handleInsCompanyChange(value: string) {
                 step="0.01"
                 min="0"
                 class="bk-input"
-                @input="update('discount', ($event.target as HTMLInputElement).value)"
+                @input="
+                    update(
+                        'discount',
+                        ($event.target as HTMLInputElement).value,
+                    )
+                "
             />
         </div>
 
@@ -159,7 +199,7 @@ function handleInsCompanyChange(value: string) {
                 :value="netAmount"
                 type="number"
                 class="bk-input bk-input-readonly"
-                style="font-weight: 700; color: #0a4fa6; font-size: 14px;"
+                style="font-weight: 700; color: #0a4fa6; font-size: 14px"
                 readonly
             />
         </div>
@@ -169,9 +209,18 @@ function handleInsCompanyChange(value: string) {
             <select
                 :value="modelValue.pay_status"
                 class="bk-input"
-                @change="update('pay_status', ($event.target as HTMLSelectElement).value)"
+                @change="
+                    update(
+                        'pay_status',
+                        ($event.target as HTMLSelectElement).value,
+                    )
+                "
             >
-                <option v-for="opt in payStatusOptions" :key="opt.value" :value="opt.value">
+                <option
+                    v-for="opt in payStatusOptions"
+                    :key="opt.value"
+                    :value="opt.value"
+                >
                     {{ opt.label }}
                 </option>
             </select>

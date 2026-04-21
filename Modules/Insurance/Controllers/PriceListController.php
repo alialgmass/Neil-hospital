@@ -21,7 +21,9 @@ class PriceListController extends Controller
     public function index(): Response
     {
         return Inertia::render('insurance/PriceLists', [
-            'priceLists' => $this->insuranceService->allPriceLists(),
+            'priceLists' => $this->insuranceService->allPriceLists()->through(
+                fn ($pl) => tap($pl, fn ($p) => $p->load('items.service:id,name,dept'))
+            ),
             'companies' => $this->insuranceService->allActive(),
             'services' => Service::active()->orderBy('dept')->orderBy('name')->get(['id', 'name', 'dept', 'price', 'ins_price']),
         ]);

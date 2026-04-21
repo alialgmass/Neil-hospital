@@ -219,7 +219,9 @@ function submitStatus() {
     }
 
     statusForm.put(`/insurance/claims/${editingClaim.value.id}`, {
-        onSuccess: () => { showStatusModal.value = false },
+        onSuccess: () => {
+ showStatusModal.value = false 
+},
     })
 }
 
@@ -541,57 +543,92 @@ const tabs = [
         <!-- Create / Edit Company Modal -->
         <Modal v-model="showModal" :title="editingCompany ? 'تعديل شركة التأمين' : 'إضافة شركة تأمين'" @close="closeModal">
             <form class="space-y-4" @submit.prevent="submit">
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="col-span-2">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">اسم الشركة <span class="text-hospital-danger">*</span></label>
-                        <input v-model="form.name" :class="['input-field', form.errors.name && 'border-hospital-danger ring-1 ring-hospital-danger/30']" type="text" required />
-                        <p v-if="form.errors.name" class="mt-1 text-xs text-hospital-danger">{{ form.errors.name }}</p>
+                <!-- Basic Info section -->
+                <div class="form-section">
+                    <p class="form-section-title text-hospital-primary">
+                        <Building2 class="h-3.5 w-3.5" />
+                        بيانات الشركة
+                    </p>
+                    <div class="fg col-span-2">
+                        <label>اسم الشركة <span class="text-hospital-danger">*</span></label>
+                        <input
+                            v-model="form.name"
+                            :class="['fi', form.errors.name && 'fi-err']"
+                            type="text"
+                            placeholder="اسم شركة التأمين"
+                            required
+                        />
+                        <p v-if="form.errors.name" class="form-err-msg">{{ form.errors.name }}</p>
                     </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">الكود</label>
-                        <input v-model="form.code" :class="['input-field', form.errors.code && 'border-hospital-danger ring-1 ring-hospital-danger/30']" type="text" />
-                        <p v-if="form.errors.code" class="mt-1 text-xs text-hospital-danger">{{ form.errors.code }}</p>
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">رقم العقد</label>
-                        <input v-model="form.contract_no" class="input-field" type="text" />
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">الهاتف</label>
-                        <input v-model="form.phone" class="input-field" type="text" />
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">المسؤول</label>
-                        <input v-model="form.contact_person" class="input-field" type="text" />
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">نسبة التغطية %</label>
-                        <input v-model.number="form.coverage_pct" class="input-field" type="number" min="0" max="100" step="0.01" />
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">نسبة الخصم %</label>
-                        <input v-model.number="form.disc_pct" class="input-field" type="number" min="0" max="100" step="0.01" />
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">الحالة</label>
-                        <select v-model="form.status" class="input-field">
-                            <option value="active">نشط</option>
-                            <option value="inactive">غير نشط</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">البريد الإلكتروني</label>
-                        <input v-model="form.email" :class="['input-field', form.errors.email && 'border-hospital-danger ring-1 ring-hospital-danger/30']" type="email" />
-                        <p v-if="form.errors.email" class="mt-1 text-xs text-hospital-danger">{{ form.errors.email }}</p>
-                    </div>
-                    <div class="col-span-2">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">ملاحظات</label>
-                        <textarea v-model="form.notes" class="input-field resize-none" rows="2" />
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="fg">
+                            <label>الكود</label>
+                            <input v-model="form.code" :class="['fi font-mono', form.errors.code && 'fi-err']" type="text" placeholder="INS-001" />
+                            <p v-if="form.errors.code" class="form-err-msg">{{ form.errors.code }}</p>
+                        </div>
+                        <div class="fg">
+                            <label>رقم العقد</label>
+                            <input v-model="form.contract_no" class="fi" type="text" placeholder="CON-2024-001" />
+                        </div>
                     </div>
                 </div>
-                <div class="flex justify-end gap-2 border-t border-hospital-border pt-4">
-                    <button type="button" class="btn-secondary" @click="closeModal">إلغاء</button>
-                    <button type="submit" class="btn-primary" :disabled="form.processing">
+
+                <!-- Contact section -->
+                <div class="form-section">
+                    <p class="form-section-title">بيانات التواصل</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="fg">
+                            <label>الهاتف</label>
+                            <input v-model="form.phone" class="fi" type="text" placeholder="05xxxxxxxx" />
+                        </div>
+                        <div class="fg">
+                            <label>المسؤول</label>
+                            <input v-model="form.contact_person" class="fi" type="text" placeholder="اسم المسؤول" />
+                        </div>
+                        <div class="fg col-span-2">
+                            <label>البريد الإلكتروني</label>
+                            <input v-model="form.email" :class="['fi', form.errors.email && 'fi-err']" type="email" placeholder="info@insurance.sa" />
+                            <p v-if="form.errors.email" class="form-err-msg">{{ form.errors.email }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial section -->
+                <div class="form-section">
+                    <p class="form-section-title">الشروط المالية</p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="fg">
+                            <label>التغطية %</label>
+                            <div class="relative">
+                                <input v-model.number="form.coverage_pct" class="fi pl-7" type="number" min="0" max="100" step="0.01" />
+                                <span class="pct-badge text-hospital-primary">%</span>
+                            </div>
+                        </div>
+                        <div class="fg">
+                            <label>الخصم %</label>
+                            <div class="relative">
+                                <input v-model.number="form.disc_pct" class="fi pl-7" type="number" min="0" max="100" step="0.01" />
+                                <span class="pct-badge text-hospital-text-3">%</span>
+                            </div>
+                        </div>
+                        <div class="fg">
+                            <label>الحالة</label>
+                            <select v-model="form.status" class="fi">
+                                <option value="active">نشط</option>
+                                <option value="inactive">غير نشط</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fg">
+                    <label>ملاحظات</label>
+                    <textarea v-model="form.notes" class="fi resize-none" rows="2" placeholder="أي ملاحظات إضافية..." />
+                </div>
+
+                <div class="form-footer">
+                    <button type="button" class="fbtn-secondary" @click="closeModal">إلغاء</button>
+                    <button type="submit" class="fbtn-primary" :disabled="form.processing">
                         {{ form.processing ? 'جارٍ الحفظ...' : editingCompany ? 'حفظ التعديلات' : 'إضافة الشركة' }}
                     </button>
                 </div>
@@ -609,9 +646,9 @@ const tabs = [
                     <p class="mt-1 text-sm text-hospital-text-3">هل أنت متأكد؟ سيتم حذف جميع البيانات المرتبطة بها ولا يمكن التراجع.</p>
                 </div>
             </div>
-            <div class="mt-5 flex justify-end gap-2 border-t border-hospital-border pt-4">
-                <button class="btn-secondary" @click="showDeleteModal = false">إلغاء</button>
-                <button class="flex items-center gap-2 rounded-lg bg-hospital-danger px-4 py-2 text-sm font-medium text-white hover:bg-hospital-danger/90" @click="deleteCompany">
+            <div class="form-footer mt-5">
+                <button class="fbtn-secondary" @click="showDeleteModal = false">إلغاء</button>
+                <button class="fbtn-danger" @click="deleteCompany">
                     <Trash2 class="h-4 w-4" />
                     تأكيد الحذف
                 </button>
@@ -621,66 +658,80 @@ const tabs = [
         <!-- New Claim Modal -->
         <Modal v-model="showClaimModal" title="إنشاء مطالبة جديدة" size="lg" @close="closeClaimModal">
             <form class="space-y-4" @submit.prevent="submitClaim">
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="col-span-2">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">شركة التأمين <span class="text-hospital-danger">*</span></label>
-                        <select v-model="claimForm.insurance_company_id" :class="['input-field', claimForm.errors.insurance_company_id && 'border-hospital-danger ring-1 ring-hospital-danger/30']" required>
-                            <option value="">— اختر الشركة —</option>
-                            <option v-for="c in companies.data" :key="c.id" :value="c.id">{{ c.name }}</option>
-                        </select>
-                        <p v-if="claimForm.errors.insurance_company_id" class="mt-1 text-xs text-hospital-danger">{{ claimForm.errors.insurance_company_id }}</p>
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">اسم المريض <span class="text-hospital-danger">*</span></label>
-                        <input v-model="claimForm.patient_name" :class="['input-field', claimForm.errors.patient_name && 'border-hospital-danger ring-1 ring-hospital-danger/30']" type="text" required />
-                        <p v-if="claimForm.errors.patient_name" class="mt-1 text-xs text-hospital-danger">{{ claimForm.errors.patient_name }}</p>
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">رقم الملف</label>
-                        <input v-model="claimForm.file_no" class="input-field" type="text" />
-                    </div>
-                    <div class="col-span-2">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">الخدمة <span class="text-hospital-danger">*</span></label>
-                        <input v-model="claimForm.service_name" :class="['input-field', claimForm.errors.service_name && 'border-hospital-danger ring-1 ring-hospital-danger/30']" type="text" required />
-                        <p v-if="claimForm.errors.service_name" class="mt-1 text-xs text-hospital-danger">{{ claimForm.errors.service_name }}</p>
-                    </div>
+                <!-- Company -->
+                <div class="fg">
+                    <label>شركة التأمين <span class="text-hospital-danger">*</span></label>
+                    <select v-model="claimForm.insurance_company_id" :class="['fi', claimForm.errors.insurance_company_id && 'fi-err']" required>
+                        <option value="">— اختر الشركة —</option>
+                        <option v-for="c in companies.data" :key="c.id" :value="c.id">{{ c.name }}</option>
+                    </select>
+                    <p v-if="claimForm.errors.insurance_company_id" class="form-err-msg">{{ claimForm.errors.insurance_company_id }}</p>
+                </div>
 
-                    <!-- Amount fields with dividing line -->
-                    <div class="col-span-2 mt-1 border-t border-hospital-border pt-3">
-                        <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-hospital-text-3">المبالغ المالية</p>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="mb-1 block text-xs text-hospital-text-3">إجمالي الفاتورة (ج) <span class="text-hospital-danger">*</span></label>
-                                <input v-model.number="claimForm.invoice_amount" :class="['input-field', claimForm.errors.invoice_amount && 'border-hospital-danger ring-1 ring-hospital-danger/30']" type="number" min="0" step="0.01" required />
-                                <p v-if="claimForm.errors.invoice_amount" class="mt-1 text-xs text-hospital-danger">{{ claimForm.errors.invoice_amount }}</p>
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs text-hospital-text-3">الخصم (ج)</label>
-                                <input v-model.number="claimForm.discount" class="input-field" type="number" min="0" step="0.01" />
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs text-hospital-text-3">حصة التأمين (ج)</label>
-                                <input v-model.number="claimForm.insurance_share" class="input-field" type="number" min="0" step="0.01" />
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs text-hospital-text-3">حصة المريض (ج)</label>
-                                <input v-model.number="claimForm.patient_share" class="input-field" type="number" min="0" step="0.01" />
-                            </div>
+                <!-- Patient -->
+                <div class="form-section">
+                    <p class="form-section-title">بيانات المريض</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="fg">
+                            <label>اسم المريض <span class="text-hospital-danger">*</span></label>
+                            <input v-model="claimForm.patient_name" :class="['fi', claimForm.errors.patient_name && 'fi-err']" type="text" placeholder="الاسم الكامل" required />
+                            <p v-if="claimForm.errors.patient_name" class="form-err-msg">{{ claimForm.errors.patient_name }}</p>
+                        </div>
+                        <div class="fg">
+                            <label>رقم الملف</label>
+                            <input v-model="claimForm.file_no" class="fi font-mono" type="text" placeholder="PT-0001" />
                         </div>
                     </div>
+                </div>
 
-                    <div>
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">تاريخ الخدمة <span class="text-hospital-danger">*</span></label>
-                        <input v-model="claimForm.service_date" class="input-field" type="date" required />
-                    </div>
-                    <div class="col-span-2">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">ملاحظات</label>
-                        <textarea v-model="claimForm.notes" class="input-field resize-none" rows="2" />
+                <!-- Service -->
+                <div class="form-section">
+                    <p class="form-section-title">بيانات الخدمة</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="fg col-span-2">
+                            <label>الخدمة <span class="text-hospital-danger">*</span></label>
+                            <input v-model="claimForm.service_name" :class="['fi', claimForm.errors.service_name && 'fi-err']" type="text" placeholder="اسم الخدمة المقدمة" required />
+                            <p v-if="claimForm.errors.service_name" class="form-err-msg">{{ claimForm.errors.service_name }}</p>
+                        </div>
+                        <div class="fg">
+                            <label>تاريخ الخدمة <span class="text-hospital-danger">*</span></label>
+                            <input v-model="claimForm.service_date" class="fi" type="date" required />
+                        </div>
                     </div>
                 </div>
-                <div class="flex justify-end gap-2 border-t border-hospital-border pt-4">
-                    <button type="button" class="btn-secondary" @click="closeClaimModal">إلغاء</button>
-                    <button type="submit" class="btn-primary" :disabled="claimForm.processing">
+
+                <!-- Financial breakdown -->
+                <div class="rounded-xl border border-hospital-border bg-hospital-surface-2 p-4">
+                    <p class="mb-3 form-section-title">المبالغ المالية</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="fg">
+                            <label>إجمالي الفاتورة (ج) <span class="text-hospital-danger">*</span></label>
+                            <input v-model.number="claimForm.invoice_amount" :class="['fi', claimForm.errors.invoice_amount && 'fi-err']" type="number" min="0" step="0.01" required />
+                            <p v-if="claimForm.errors.invoice_amount" class="form-err-msg">{{ claimForm.errors.invoice_amount }}</p>
+                        </div>
+                        <div class="fg">
+                            <label>الخصم (ج)</label>
+                            <input v-model.number="claimForm.discount" class="fi" type="number" min="0" step="0.01" />
+                        </div>
+                        <div class="fg">
+                            <label class="text-hospital-primary">حصة التأمين (ج)</label>
+                            <input v-model.number="claimForm.insurance_share" class="fi border-hospital-primary/30 bg-hospital-primary-pale/30 focus:border-hospital-primary" type="number" min="0" step="0.01" />
+                        </div>
+                        <div class="fg">
+                            <label class="text-hospital-warning">حصة المريض (ج)</label>
+                            <input v-model.number="claimForm.patient_share" class="fi border-hospital-warning/30 bg-hospital-warning-pale/30 focus:border-hospital-warning" type="number" min="0" step="0.01" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fg">
+                    <label>ملاحظات</label>
+                    <textarea v-model="claimForm.notes" class="fi resize-none" rows="2" placeholder="ملاحظات إضافية..." />
+                </div>
+
+                <div class="form-footer">
+                    <button type="button" class="fbtn-secondary" @click="closeClaimModal">إلغاء</button>
+                    <button type="submit" class="fbtn-primary" :disabled="claimForm.processing">
                         {{ claimForm.processing ? 'جارٍ الحفظ...' : 'إنشاء المطالبة' }}
                     </button>
                 </div>
@@ -690,18 +741,18 @@ const tabs = [
         <!-- Claim Status Modal -->
         <Modal v-model="showStatusModal" title="تحديث حالة المطالبة" @close="showStatusModal = false">
             <form class="space-y-4" @submit.prevent="submitStatus">
-                <!-- Status selector with visual indicators -->
+                <!-- Status pill selector -->
                 <div>
-                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">الحالة الجديدة</label>
+                    <label class="mb-2 block text-[11px] font-bold uppercase tracking-widest text-hospital-text-3">الحالة الجديدة</label>
                     <div class="grid grid-cols-5 gap-2">
                         <button
                             v-for="(label, key) in claimStatusLabels"
                             :key="key"
                             type="button"
-                            class="rounded-lg border px-2 py-2 text-center text-xs font-medium transition-all"
+                            class="rounded-lg border px-2 py-2.5 text-center text-xs font-semibold transition-all"
                             :class="statusForm.status === key
                                 ? 'border-hospital-primary bg-hospital-primary text-white shadow-sm'
-                                : 'border-hospital-border bg-white text-hospital-text-3 hover:border-hospital-primary/50 hover:text-hospital-primary'"
+                                : 'border-hospital-border bg-white text-hospital-text-3 hover:border-hospital-primary/40 hover:text-hospital-primary'"
                             @click="statusForm.status = key as Claim['status']"
                         >
                             {{ label }}
@@ -709,40 +760,45 @@ const tabs = [
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div v-if="statusForm.status === 'submitted'">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">تاريخ الإرسال</label>
-                        <input v-model="statusForm.submission_date" class="input-field" type="date" />
-                    </div>
-                    <div v-if="statusForm.status === 'approved' || statusForm.status === 'paid'">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">المبلغ المعتمد (ج)</label>
-                        <input v-model.number="statusForm.approved_amount" class="input-field" type="number" min="0" step="0.01" />
-                    </div>
-                    <div v-if="statusForm.status === 'approved'">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">تاريخ الاعتماد</label>
-                        <input v-model="statusForm.approval_date" class="input-field" type="date" />
-                    </div>
-                    <div v-if="statusForm.status === 'paid'">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">المبلغ المسدد (ج)</label>
-                        <input v-model.number="statusForm.paid_amount" class="input-field" type="number" min="0" step="0.01" />
-                    </div>
-                    <div v-if="statusForm.status === 'paid'">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">تاريخ السداد</label>
-                        <input v-model="statusForm.payment_date" class="input-field" type="date" />
-                    </div>
-                    <div v-if="statusForm.status === 'rejected'" class="col-span-2">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">سبب الرفض</label>
-                        <textarea v-model="statusForm.rejection_reason" class="input-field resize-none" rows="2" />
-                    </div>
-                    <div class="col-span-2">
-                        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-hospital-text-3">ملاحظات</label>
-                        <textarea v-model="statusForm.notes" class="input-field resize-none" rows="2" />
+                <!-- Conditional status fields -->
+                <div v-if="statusForm.status !== 'draft'" class="form-section">
+                    <p class="form-section-title">تفاصيل الحالة</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div v-if="statusForm.status === 'submitted'" class="fg">
+                            <label>تاريخ الإرسال</label>
+                            <input v-model="statusForm.submission_date" class="fi" type="date" />
+                        </div>
+                        <div v-if="statusForm.status === 'approved' || statusForm.status === 'paid'" class="fg">
+                            <label>المبلغ المعتمد (ج)</label>
+                            <input v-model.number="statusForm.approved_amount" class="fi" type="number" min="0" step="0.01" />
+                        </div>
+                        <div v-if="statusForm.status === 'approved'" class="fg">
+                            <label>تاريخ الاعتماد</label>
+                            <input v-model="statusForm.approval_date" class="fi" type="date" />
+                        </div>
+                        <div v-if="statusForm.status === 'paid'" class="fg">
+                            <label>المبلغ المسدد (ج)</label>
+                            <input v-model.number="statusForm.paid_amount" class="fi" type="number" min="0" step="0.01" />
+                        </div>
+                        <div v-if="statusForm.status === 'paid'" class="fg">
+                            <label>تاريخ السداد</label>
+                            <input v-model="statusForm.payment_date" class="fi" type="date" />
+                        </div>
+                        <div v-if="statusForm.status === 'rejected'" class="fg col-span-2">
+                            <label>سبب الرفض</label>
+                            <textarea v-model="statusForm.rejection_reason" class="fi resize-none" rows="2" placeholder="اذكر سبب الرفض..." />
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-2 border-t border-hospital-border pt-4">
-                    <button type="button" class="btn-secondary" @click="showStatusModal = false">إلغاء</button>
-                    <button type="submit" class="btn-primary" :disabled="statusForm.processing">
+                <div class="fg">
+                    <label>ملاحظات</label>
+                    <textarea v-model="statusForm.notes" class="fi resize-none" rows="2" placeholder="ملاحظات إضافية..." />
+                </div>
+
+                <div class="form-footer">
+                    <button type="button" class="fbtn-secondary" @click="showStatusModal = false">إلغاء</button>
+                    <button type="submit" class="fbtn-primary" :disabled="statusForm.processing">
                         {{ statusForm.processing ? 'جارٍ الحفظ...' : 'حفظ التغييرات' }}
                     </button>
                 </div>
@@ -750,3 +806,144 @@ const tabs = [
         </Modal>
     </div>
 </template>
+
+<style scoped>
+/* Form field */
+.fi {
+    width: 100%;
+    padding: 8px 11px;
+    border: 1.5px solid var(--color-hospital-border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--color-hospital-text);
+    background: #fff;
+    direction: rtl;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.fi:focus {
+    outline: none;
+    border-color: var(--color-hospital-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-hospital-primary) 15%, transparent);
+}
+.fi-err {
+    border-color: var(--color-hospital-danger);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-hospital-danger) 15%, transparent);
+}
+
+/* Field group */
+.fg {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.fg label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-hospital-text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Form section card */
+.form-section {
+    border: 1.5px solid var(--color-hospital-border);
+    border-radius: 10px;
+    padding: 14px;
+    background: var(--color-hospital-surface-2);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.form-section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-hospital-text-3);
+    margin-bottom: 2px;
+}
+
+/* Error message */
+.form-err-msg {
+    font-size: 11px;
+    color: var(--color-hospital-danger);
+    margin-top: 2px;
+}
+
+/* % badge inside input */
+.pct-badge {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    font-weight: 800;
+    pointer-events: none;
+}
+
+/* Footer row */
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1.5px solid var(--color-hospital-border);
+}
+
+/* Buttons */
+.fbtn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    background: var(--color-hospital-primary);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+}
+.fbtn-primary:hover { background: var(--color-hospital-primary-light); }
+.fbtn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.fbtn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    background: #fff;
+    color: var(--color-hospital-text-2);
+    border: 1.5px solid var(--color-hospital-border);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.fbtn-secondary:hover { background: var(--color-hospital-bg); }
+
+.fbtn-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    background: var(--color-hospital-danger);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.fbtn-danger:hover { background: #b73030; }
+</style>

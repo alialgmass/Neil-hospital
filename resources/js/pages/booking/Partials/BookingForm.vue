@@ -62,7 +62,7 @@ interface Props {
     services: Service[];
     doctors: Doctor[];
     insuranceCompanies: InsuranceCompany[];
-    priceLists: PriceList[];
+    priceLists?: PriceList[];
     orRooms?: OrRoom[];
     booking?: Record<string, unknown>;
     submitUrl: string;
@@ -73,6 +73,7 @@ const props = withDefaults(defineProps<Props>(), {
     booking: undefined,
     submitMethod: 'post',
     orRooms: () => [],
+    priceLists: () => [],
 });
 
 const emit = defineEmits<{
@@ -157,7 +158,7 @@ const isInsurance = computed(() => form.pay_method === 'insurance');
 const priceListId = ref('');
 
 const filteredPriceLists = computed(() =>
-    props.priceLists.filter(
+    (props.priceLists ?? []).filter(
         (pl) => !form.ins_company_id || pl.ins_company_id === form.ins_company_id,
     ),
 );
@@ -277,6 +278,7 @@ function submit() {
                         }"
                         :insurance-companies="insuranceCompanies"
                         :price-lists="filteredPriceLists"
+                        :price-list-id="priceListId"
                         :is-insurance="isInsurance"
                         :net-amount="netAmount"
                         @update:model-value="(v) => Object.assign(form, v)"

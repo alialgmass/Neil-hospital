@@ -68,7 +68,12 @@
       "Bash(vendor/bin/pint --dirty --format agent Modules/Booking/Controllers/BookingController.php)",
       "Bash(./vendor/bin/pint --dirty Modules/Booking/Controllers/BookingController.php)",
       "mcp__laravel-boost__last-error",
-      "mcp__laravel-boost__database-schema"
+      "mcp__laravel-boost__database-schema",
+      "Bash(xargs -I{} bash -c 'grep -l \"btn-primary\\\\|input-field\" \"D:/Projects/neil hospital/v3/public/build/assets/{}\" 2>/dev/null')",
+      "Bash(vendor/bin/pint Modules/Booking/Actions/CreateBookingAction.php --format agent)",
+      "Bash(php vendor/bin/pint Modules/Booking/Actions/CreateBookingAction.php --format agent)",
+      "Bash(\"D:/Projects/neil hospital/v3/vendor/bin/pint.bat\" Modules/Booking/Actions/CreateBookingAction.php --format agent)",
+      "Bash(vendor/bin/pint.bat Modules/Insurance/Controllers/PriceListController.php --format agent)"
     ]
   },
   "enableAllProjectMcpServers": true,

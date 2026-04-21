@@ -52,6 +52,7 @@ interface Props {
     todayStats: Record<string, number>;
     services?: { id: string; name: string; dept: string; price: number; ins_price: number }[];
     doctors?: { id: string; name: string; is_active: boolean }[];
+    priceLists?: { id: string; name: string; ins_company_id: string; ins_coverage: number; items: { service_id: string; price: number }[] }[];
     insuranceCompanies?: { id: string; name: string }[];
     orRooms?: { id: number; name: string; beds: { id: number; bed_number: number }[] }[];
 }
@@ -410,6 +411,7 @@ const isCloseModalOpen = computed({
             :services="(services as any) ?? []"
             :doctors="(doctors as any) ?? []"
             :insurance-companies="(insuranceCompanies as any) ?? []"
+            :price-lists="(priceLists as any) ?? []"
             :or-rooms="(orRooms as any) ?? []"
             submit-url="/booking"
             submit-method="post"
@@ -445,6 +447,7 @@ const isCloseModalOpen = computed({
             :services="(services as any) ?? []"
             :doctors="(doctors as any) ?? []"
             :insurance-companies="(insuranceCompanies as any) ?? []"
+            :price-lists="(priceLists as any) ?? []"
             :or-rooms="(orRooms as any) ?? []"
             :booking="editBooking as Record<string, unknown>"
             :submit-url="`/booking/${editBooking.id}`"
