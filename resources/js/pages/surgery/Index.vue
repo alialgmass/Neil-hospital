@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { CalendarPlus, ClipboardList, List, Package } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
@@ -71,6 +72,18 @@ const columns = [
 const viewMode = ref<'grid' | 'table'>('grid');
 
 const statusFilter = ref(props.filters.status ?? '');
+
+let filterTimeout: ReturnType<typeof setTimeout> | null = null;
+watch(statusFilter, () => {
+    if (filterTimeout) {
+clearTimeout(filterTimeout);
+}
+
+    filterTimeout = setTimeout(() => {
+        applyFilters();
+    }, 300);
+});
+
 function applyFilters() {
     router.get(
         '/surgery',
@@ -193,6 +206,7 @@ function submitSchedule() {
         onSuccess: () => {
             showSchedule.value = false;
             scheduleForm.reset();
+            toast.success('تم جدولة العملية بنجاح');
         },
     });
 }
@@ -226,6 +240,7 @@ function submitReport() {
     reportForm.post(`/surgery/${reportTarget.value}/report`, {
         onSuccess: () => {
             showReport.value = false;
+            toast.success('تم حفظ التقرير بنجاح');
         },
     });
 }
@@ -284,6 +299,7 @@ function submitSupplies() {
         {
             onSuccess: () => {
                 showSupplies.value = false;
+                toast.success('تم حفظ المستلزمات بنجاح');
             },
         },
     );

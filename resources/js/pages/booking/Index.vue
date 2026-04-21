@@ -8,7 +8,8 @@ import {
     X,
     CreditCard,
 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
 import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import DateFilter from '@/components/shared/DateFilter.vue';
@@ -106,15 +107,28 @@ function submitPay() {
 return;
 }
 
-    payForm.patch(`/booking/${payTarget.value.id}/pay`, {
+payForm.patch(`/booking/${payTarget.value.id}/pay`, {
         onSuccess: () => {
- payTarget.value = null; payForm.reset(); 
-},
+            payTarget.value = null;
+            payForm.reset();
+            toast.success('تم تسجيل الدفع بنجاح');
+        },
     });
 }
 const search = ref(props.filters.search ?? '');
 const selectedDept = ref(props.filters.dept ?? '');
 const selectedStatus = ref(props.filters.status ?? '');
+
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
+watch([search, selectedDept, selectedStatus], () => {
+    if (searchTimeout) {
+clearTimeout(searchTimeout);
+}
+
+    searchTimeout = setTimeout(() => {
+        applySearch();
+    }, 300);
+});
 
 const deptLabels: Record<string, string> = {
     clinic: 'العيادة',
@@ -211,6 +225,7 @@ return;
         data: { cancel_reason: cancelReason.value },
         onSuccess: () => {
             cancelTarget.value = null;
+            toast.success('تم إلغاء الحجز بنجاح');
         },
     });
 }
@@ -415,7 +430,7 @@ const isCloseModalOpen = computed({
             :or-rooms="(orRooms as any) ?? []"
             submit-url="/booking"
             submit-method="post"
-            @success="showCreateModal = false"
+            @success="showCreateModal = false; toast.success('تم إنشاء الحجز بنجاح')"
             @cancel="showCreateModal = false"
         />
     </Modal>
@@ -452,7 +467,7 @@ const isCloseModalOpen = computed({
             :booking="editBooking as Record<string, unknown>"
             :submit-url="`/booking/${editBooking.id}`"
             submit-method="put"
-            @success="editBooking = null"
+            @success="editBooking = null; toast.success('تم تحديث الحجز بنجاح')"
             @cancel="editBooking = null"
         />
     </Modal>
