@@ -7,6 +7,14 @@ import Badge from '@/components/shared/Badge.vue';
 import DataTable from '@/components/shared/DataTable.vue';
 import Modal from '@/components/shared/Modal.vue';
 
+interface SupplyUsedItem {
+    inventory_item_id: string;
+    name: string;
+    qty: number;
+    unit_cost: number;
+    total: number;
+}
+
 interface Surgery {
     id: string;
     booking: { file_no: string; patient_name: string };
@@ -19,6 +27,10 @@ interface Surgery {
     scheduled_at: string | null;
     supply_total: number;
     anaesthesia: string | null;
+    supplies_used: SupplyUsedItem[] | null;
+    op_report: string | null;
+    post_op_notes: string | null;
+    complications: string | null;
 }
 
 interface Paginator {
@@ -55,6 +67,7 @@ const props = defineProps<{
     bookings: { id: string; file_no: string; patient_name: string }[];
     dept: string;
     filters: { status?: string };
+    revenue: number;
 }>();
 
 const columns = [
@@ -311,6 +324,41 @@ const procedures = [
     'Femto-LASIK',
     'Trans PRK',
 ];
+
+/* ── Status update ── */
+const nextStatuses = computed(() => {
+    const c = activeCase.value?.status;
+    const map: Record<string, { value: string; label: string; color: string }[]> = {
+        scheduled: [
+            { value: 'prep', label: 'بدء التحضير', color: '#2980B9' },
+            { value: 'cancelled', label: 'إلغاء', color: '#95A5A6' },
+        ],
+        prep: [
+            { value: 'in_progress', label: 'بدء الجلسة', color: '#E74C3C' },
+            { value: 'cancelled', label: 'إلغاء', color: '#95A5A6' },
+        ],
+        in_progress: [
+            { value: 'completed', label: 'اكتمال الجلسة ✓', color: '#1A8C5B' },
+            { value: 'cancelled', label: 'إلغاء', color: '#95A5A6' },
+        ],
+    };
+    return c ? (map[c] ?? []) : [];
+});
+
+function updateStatus(newStatus: string) {
+    router.patch(
+        `/lasik/${activeCase.value!.id}/status`,
+        { status: newStatus },
+        {
+            onSuccess: () => {
+                if (activeCase.value) {
+                    activeCase.value.status = newStatus as Surgery['status'];
+                }
+                toast.success('تم تحديث حالة الجلسة');
+            },
+        },
+    );
+}
 </script>
 
 <template>
@@ -327,8 +375,8 @@ const procedures = [
             <p class="stat-val">{{ completedToday }}</p>
         </div>
         <div class="stat-card border-r-hospital-primary">
-            <p class="stat-lbl">إيراد الليزك</p>
-            <p class="stat-val">—</p>
+            <p class="stat-lbl">إيراد الليزك اليوم</p>
+            <p class="stat-val text-sm">{{ revenue.toLocaleString('ar-EG') }}</p>
             <p class="stat-sub">جنيه</p>
         </div>
         <div class="stat-card border-r-hospital-accent">
@@ -379,7 +427,7 @@ const procedures = [
         </button>
     </div>
 
-    <div class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+    <div class="mb-4 grid grid-cols-5 gap-2 sm:grid-cols-7 lg:grid-cols-10">
         <div
             v-for="(item, idx) in bedMap"
             :key="idx"
@@ -669,6 +717,21 @@ const procedures = [
                         >
                             <ClipboardList class="h-3.5 w-3.5" /> تقرير
                         </button>
+                    </div>
+                    <!-- Status update buttons -->
+                    <div v-if="nextStatuses.length" class="mt-3">
+                        <p class="mb-2 text-[10px] font-semibold text-hospital-text-2">تحديث الحالة:</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button
+                                v-for="s in nextStatuses"
+                                :key="s.value"
+                                class="rounded px-3 py-1.5 text-[10px] font-bold text-white transition-opacity hover:opacity-85"
+                                :style="{ background: s.color }"
+                                @click="updateStatus(s.value)"
+                            >
+                                {{ s.label }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

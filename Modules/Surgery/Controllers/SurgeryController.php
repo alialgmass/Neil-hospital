@@ -12,6 +12,7 @@ use Modules\Inventory\Models\InventoryItem;
 use Modules\Surgery\Actions\RecordSuppliesUsedAction;
 use Modules\Surgery\Actions\RecordSurgeryReportAction;
 use Modules\Surgery\Actions\ScheduleSurgeryAction;
+use Modules\Surgery\Actions\UpdateSurgeryStatusAction;
 use Modules\Surgery\DTOs\SuppliesUsedData;
 use Modules\Surgery\DTOs\SurgeryData;
 use Modules\Surgery\Http\Requests\RecordSuppliesRequest;
@@ -27,6 +28,7 @@ class SurgeryController extends Controller
         private readonly ScheduleSurgeryAction $scheduleAction,
         private readonly RecordSurgeryReportAction $reportAction,
         private readonly RecordSuppliesUsedAction $suppliesAction,
+        private readonly UpdateSurgeryStatusAction $statusAction,
     ) {}
 
     public function index(): Response
@@ -65,6 +67,10 @@ class SurgeryController extends Controller
             ->orderBy('name')
             ->get();
 
+        $revenue = Booking::where('dept', $dept)
+            ->whereDate('visit_date', today())
+            ->sum('paid_amount');
+
         return Inertia::render($page, [
             'surgeries' => $surgeries,
             'orRooms' => $orRooms,
@@ -73,6 +79,7 @@ class SurgeryController extends Controller
             'bookings' => $bookings,
             'dept' => $dept,
             'filters' => ['status' => $status],
+            'revenue' => (float) $revenue,
         ]);
     }
 
@@ -97,5 +104,16 @@ class SurgeryController extends Controller
         $this->suppliesAction->execute($data);
 
         return back()->with('success', 'تم تسجيل المستلزمات المستخدمة.');
+    }
+
+    public function updateStatus(string $id): RedirectResponse
+    {
+        request()->validate([
+            'status' => 'required|in:scheduled,prep,in_progress,completed,cancelled',
+        ]);
+
+        $this->statusAction->execute($id, request('status'));
+
+        return back()->with('success', 'تم تحديث حالة الإجراء.');
     }
 }
