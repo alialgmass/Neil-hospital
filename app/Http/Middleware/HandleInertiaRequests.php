@@ -54,28 +54,11 @@ class HandleInertiaRequests extends Middleware
                 'hospital_name'      => config('app.name', 'مستشفى النور'),
                 'hospital_specialty' => 'طب وجراحة العيون',
             ],
-            // Low-stock alert count for notification bell
-            'low_stock_count' => $user ? $this->getLowStockCount() : 0,
+            // Alerts for notification bell
+            'alerts' => $user ? (new \App\Services\AlertService())->getAlerts() : [],
+            'alert_count' => $user ? (new \App\Services\AlertService())->getAlertCount() : 0,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
-    }
-
-    /**
-     * Return the flat permission name list for the given user.
-     * Admins receive ['*'] so the frontend can skip per-permission checks.
-     *
-     * @param  \App\Models\User  $user
-     * @return array<string>
-     */
-    private function getLowStockCount(): int
-    {
-        try {
-            return (int) DB::table('inventory')
-                ->whereRaw('quantity <= min_quantity AND min_quantity > 0')
-                ->count();
-        } catch (\Throwable) {
-            return 0;
-        }
     }
 
     private function resolvePermissions($user): array

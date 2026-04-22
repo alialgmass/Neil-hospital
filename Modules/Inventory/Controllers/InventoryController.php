@@ -22,10 +22,12 @@ class InventoryController extends Controller
         $filters = request()->only(['search', 'category', 'low_stock']);
 
         return Inertia::render('inventory/Index', [
-            'items'         => $this->inventoryService->list($filters, 30),
-            'categories'    => $this->inventoryService->categories(),
-            'lowStockCount' => $this->inventoryService->lowStockCount(),
-            'filters'       => $filters,
+            'items'           => $this->inventoryService->list($filters, 30),
+            'categories'      => $this->inventoryService->categories(),
+            'lowStockCount'   => $this->inventoryService->lowStockCount(),
+            'totalValue'      => $this->inventoryService->totalValue(),
+            'openOrdersCount' => $this->inventoryService->openOrdersCount(),
+            'filters'         => $filters,
         ]);
     }
 

@@ -123,9 +123,9 @@ return currentPath.value === '/dashboard';
 </script>
 
 <template>
-    <nav class="flex flex-col gap-1 px-3 py-4 overflow-y-auto h-full">
+    <nav class="flex flex-col gap-0.5 px-0 py-2 overflow-y-auto h-full nav">
         <template v-for="group in visibleGroups" :key="group.label">
-            <p class="px-2 pt-4 pb-1 text-xs font-semibold uppercase tracking-wider text-white/50 first:pt-0">
+            <p class="px-4 pt-4 pb-1 text-[9px] font-bold uppercase tracking-[0.8px] text-white/30 nav-lbl">
                 {{ group.label }}
             </p>
             <Link
@@ -133,15 +133,31 @@ return currentPath.value === '/dashboard';
                 :key="item.href"
                 :href="item.href"
                 :class="[
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'nav-item group relative flex items-center gap-2.5 px-4 py-2 text-[12.5px] transition-all duration-150',
                     isActive(item.href)
-                        ? 'bg-white/20 text-white'
-                        : 'text-white/80 hover:bg-white/10 hover:text-white',
+                        ? 'active bg-white/12 font-semibold text-white'
+                        : 'text-white/60 hover:bg-white/7 hover:text-white',
                 ]"
             >
-                <component :is="item.icon" class="h-4 w-4 shrink-0" />
+                <!-- Active Indicator -->
+                <div 
+                    v-if="isActive(item.href)" 
+                    class="absolute inset-y-1.5 right-0 w-[3px] rounded-l-sm bg-hospital-accent"
+                ></div>
+
+                <component :is="item.icon" class="nav-icon h-4 w-4 shrink-0 opacity-80" />
                 <span>{{ item.title }}</span>
             </Link>
         </template>
     </nav>
 </template>
+
+<style scoped>
+.nav::-webkit-scrollbar {
+    width: 2px;
+}
+.nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+}
+</style>

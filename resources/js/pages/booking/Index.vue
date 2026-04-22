@@ -255,23 +255,29 @@ const isCloseModalOpen = computed({
     <Head title="الحجوزات" />
 
     <!-- Stats row -->
-    <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+    <div class="stats-row grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 mb-4">
         <StatCard
             v-for="stat in statCards"
             :key="stat.label"
             :label="stat.label"
             :value="stat.value"
             :color="stat.color"
-        />
+        >
+            <template #icon>
+                <div class="opacity-20">
+                    <component :is="stat.icon" class="h-4 w-4" />
+                </div>
+            </template>
+        </StatCard>
     </div>
 
-    <!-- Dept Tabs -->
-    <div class="mb-4 flex gap-1 border-b border-hospital-border">
+    <!-- Dept Tabs (Standardized to the reference HTML tabs look) -->
+    <div class="tabs flex gap-1 border-b-[2px] border-hospital-border mb-4">
         <button
-            class="px-4 py-2 text-sm font-medium transition-colors"
+            class="tab px-4 py-2 text-[12px] font-bold transition-all duration-150 mb-[-2px] border-b-[2px]"
             :class="selectedDept === ''
-                ? 'border-b-2 border-hospital-primary text-hospital-primary'
-                : 'text-hospital-muted hover:text-hospital-text'"
+                ? 'active border-hospital-primary text-hospital-primary'
+                : 'text-hospital-text-3 hover:text-hospital-primary border-transparent'"
             @click="selectedDept = ''; applySearch()"
         >
             كل الحجوزات
@@ -279,10 +285,10 @@ const isCloseModalOpen = computed({
         <button
             v-for="(label, key) in deptLabels"
             :key="key"
-            class="px-4 py-2 text-sm font-medium transition-colors"
+            class="tab px-4 py-2 text-[12px] font-bold transition-all duration-150 mb-[-2px] border-b-[2px]"
             :class="selectedDept === key
-                ? 'border-b-2 border-hospital-primary text-hospital-primary'
-                : 'text-hospital-muted hover:text-hospital-text'"
+                ? 'active border-hospital-primary text-hospital-primary'
+                : 'text-hospital-text-3 hover:text-hospital-primary border-transparent'"
             @click="selectedDept = key; applySearch()"
         >
             {{ label }}
@@ -290,51 +296,60 @@ const isCloseModalOpen = computed({
     </div>
 
     <!-- Toolbar: filters on left, action on right -->
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div class="flex flex-wrap items-center gap-2">
-            <select
-                v-model="selectedStatus"
-                class="rounded-lg border border-hospital-border bg-hospital-surface px-3 py-2 text-sm text-hospital-text focus:border-hospital-primary focus:outline-none"
-                @change="applySearch"
-            >
-                <option value="">كل الحالات</option>
-                <option value="waiting">انتظار</option>
-                <option value="confirmed">مؤكد</option>
-                <option value="in_progress">جارٍ</option>
-                <option value="completed">مكتمل</option>
-                <option value="cancelled">ملغي</option>
-            </select>
+            <!-- Status Filter -->
+            <div class="flex items-center gap-2 rounded-[7px] border border-hospital-border bg-white px-2 py-1">
+                <span class="text-[10px] font-bold text-hospital-text-3 uppercase">الحالة:</span>
+                <select
+                    v-model="selectedStatus"
+                    class="bg-transparent text-[12px] font-bold text-hospital-text focus:outline-none"
+                    @change="applySearch"
+                >
+                    <option value="">كل الحالات</option>
+                    <option value="waiting">انتظار</option>
+                    <option value="confirmed">مؤكد</option>
+                    <option value="in_progress">جارٍ</option>
+                    <option value="completed">مكتمل</option>
+                    <option value="cancelled">ملغي</option>
+                </select>
+            </div>
 
             <DateFilter
                 @apply="applyFilter"
                 @clear="() => router.get('/booking')"
             />
 
-            <SearchBar
-                v-model="search"
-                placeholder="بحث باسم المريض أو رقم الملف..."
-                class="min-w-[200px]"
-                @keyup.enter="applySearch"
-            />
+            <!-- Search Bar -->
+            <div class="search-bar flex items-center gap-[7px] rounded-[7px] border border-hospital-border bg-white px-[11px] min-w-[240px]">
+                <Search class="h-[14px] w-[14px] text-hospital-text-3" />
+                <input
+                    v-model="search"
+                    type="text"
+                    placeholder="بحث باسم المريض أو رقم الملف..."
+                    class="flex-1 bg-transparent py-[7px] px-1 text-[12px] text-hospital-text placeholder-hospital-text-3 focus:outline-none"
+                    @keyup.enter="applySearch"
+                />
+            </div>
         </div>
 
         <button
             type="button"
-            class="flex items-center gap-2 rounded-lg bg-hospital-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-hospital-primary-light"
+            class="btn btn-p flex items-center gap-1.5 rounded-[7px] bg-hospital-primary px-[13px] py-[7px] text-[12px] font-bold text-white transition-all hover:bg-hospital-primary-light active:scale-95 shadow-sm"
             @click="showCreateModal = true"
         >
-            <CalendarPlus class="h-4 w-4" />
-            حجز جديد
+            <CalendarPlus class="h-3.5 w-3.5" />
+            <span>حجز جديد</span>
         </button>
     </div>
 
-    <!-- Table card -->
-    <div class="booking-table-card overflow-hidden rounded-xl border border-hospital-border shadow-sm">
-        <!-- Card header -->
-        <div class="flex items-center justify-between border-b border-hospital-border bg-hospital-bg px-4 py-3">
+    <!-- Table Card -->
+    <div class="card rounded-[var(--rl)] border border-hospital-border bg-white [box-shadow:var(--sh)] overflow-hidden">
+        <!-- Card Header -->
+        <div class="card-hd flex items-center justify-between border-b border-hospital-border bg-hospital-surface-2 px-4 py-3">
             <div>
-                <p class="text-sm font-bold text-hospital-text">{{ currentDeptLabel }}</p>
-                <p class="text-xs text-hospital-text-3">{{ bookings.total }} سجل</p>
+                <p class="card-title text-[13px] font-bold text-hospital-text">{{ currentDeptLabel }}</p>
+                <p class="card-sub text-[10px] text-hospital-text-3">إجمالي الحجوزات: {{ bookings.total }}</p>
             </div>
             <ExportBar @print="() => window.print()" />
         </div>

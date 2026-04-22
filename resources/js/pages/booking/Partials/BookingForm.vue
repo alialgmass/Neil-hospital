@@ -397,22 +397,24 @@ function submit() {
 
 <style scoped>
 .bk-section {
-    background: var(--color-hospital-bg, #f3f6fa);
-    border: 1.5px solid var(--color-hospital-border, #dde4ef);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
+    background: var(--color-hospital-surface, #ffffff);
+    border: 1px solid var(--color-hospital-border, #dde4ef);
+    border-radius: var(--hospital-rl, 14px);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--hospital-sh, 0 2px 12px rgba(10,79,166,.08));
 }
 
 .bk-title {
     display: inline-block;
     border-radius: 6px;
-    padding: 4px 14px;
+    padding: 3px 12px;
     font-size: 11px;
     font-weight: 700;
     color: #fff;
-    margin-bottom: 12px;
-    letter-spacing: 0.3px;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .bk-title-blue { background: #0a4fa6; }
@@ -424,35 +426,33 @@ function submit() {
 .bk-grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 12px 16px;
 }
 
 .bk-label {
     display: block;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     color: #4a5878;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
 }
 
 .bk-input {
     width: 100%;
-    padding: 7px 10px;
+    padding: 9px 12px;
     border: 1.5px solid #dde4ef;
-    border-radius: 7px;
-    font-size: 12px;
+    border-radius: 8px;
+    font-size: 13px;
     font-family: inherit;
     color: #0d1f3c;
     background: #fff;
     direction: rtl;
-    transition: border-color 0.15s;
+    transition: all 0.15s ease;
 }
 
 .bk-input:focus {
     outline: none;
     border-color: #0a4fa6;
-    box-shadow: 0 0 0 3px rgba(10, 79, 166, 0.1);
+    box-shadow: 0 0 0 3px rgba(10, 79, 166, 0.08);
 }
 </style>

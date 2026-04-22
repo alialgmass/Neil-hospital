@@ -5,6 +5,7 @@ namespace Modules\Inventory\Services;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as SupportCollection;
 use Modules\Inventory\Models\InventoryItem;
+use Modules\Inventory\Models\PurchaseInvoice;
 
 class InventoryService
 {
@@ -43,6 +44,16 @@ class InventoryService
         $item->increment('quantity', $delta);
 
         return $item->refresh();
+    }
+
+    public function totalValue(): float
+    {
+        return (float) InventoryItem::selectRaw('SUM(quantity * unit_cost) as total')->value('total');
+    }
+
+    public function openOrdersCount(): int
+    {
+        return PurchaseInvoice::whereIn('status', ['pending', 'partial'])->count();
     }
 
     public function categories(): SupportCollection

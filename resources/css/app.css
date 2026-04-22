@@ -7,17 +7,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-    --font-sans:
-        'Cairo', 'Tajawal', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
-
-    /* Hospital brand palette — Al-Nour Eye Hospital */
+    /* Hospital brand palette — Al-Nour Eye Hospital (v20 FINAL) */
     --color-hospital-primary:          #0A4FA6;
     --color-hospital-primary-light:    #1A6ED8;
-    --color-hospital-primary-dark:     #072E63;
     --color-hospital-primary-pale:     #E8F1FB;
+    --color-hospital-primary-dark:     #072E63;
 
     --color-hospital-accent:           #00B5A4;
     --color-hospital-accent-pale:      #E0F7F5;
@@ -39,81 +33,40 @@
     --color-hospital-text:             #0D1F3C;
     --color-hospital-text-2:           #4A5878;
     --color-hospital-text-3:           #8A96AE;
-    --color-hospital-muted:            #8A96AE;
 
-    --radius-lg: var(--radius);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
+    /* Extended tokens from v20 */
+    --hospital-sh: 0 2px 12px rgba(10, 79, 166, .08);
+    --hospital-shl: 0 8px 32px rgba(10, 79, 166, .14);
+    --hospital-rl: 14px;
+    --hospital-r: 10px;
 
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
+    --radius-lg: 14px;
+    --radius-md: 10px;
+    --radius-sm: 6px;
 
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
+    --color-background: var(--hospital-bg);
+    --color-foreground: var(--hospital-text);
 
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
+    --color-card: var(--hospital-surface);
+    --color-card-foreground: var(--hospital-text);
 
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--hospital-primary);
+    --color-primary-foreground: #FFFFFF;
 
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-
-    --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
-
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-
-    --color-chart-1: var(--chart-1);
-    --color-chart-2: var(--chart-2);
-    --color-chart-3: var(--chart-3);
-    --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
-
-    --color-sidebar: var(--sidebar-background);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar: var(--hospital-primary-dark);
+    --color-sidebar-foreground: rgba(255, 255, 255, .6);
+    --color-sidebar-primary: #FFFFFF;
+    --color-sidebar-accent: rgba(255, 255, 255, .12);
+    --color-sidebar-border: rgba(255, 255, 255, .08);
 }
 
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
-    *,
-    ::after,
-    ::before,
-    ::backdrop,
-    ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+    * {
+        @apply border-hospital-border outline-hospital-primary/50;
     }
-}
-
-@layer utilities {
-    body,
-    html {
-        --font-sans:
-            'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-            'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-            'Noto Color Emoji';
+    body {
+        @apply bg-hospital-bg text-hospital-text font-sans antialiased;
+        direction: rtl;
     }
 }
 
@@ -122,14 +75,8 @@
     --foreground: #0D1F3C;
     --card: #FFFFFF;
     --card-foreground: #0D1F3C;
-    --popover: #FFFFFF;
-    --popover-foreground: #0D1F3C;
     --primary: #0A4FA6;
     --primary-foreground: #FFFFFF;
-    --secondary: #E8F1FB;
-    --secondary-foreground: #072E63;
-    --muted: #F3F6FA;
-    --muted-foreground: #4A5878;
     --accent: #00B5A4;
     --accent-foreground: #FFFFFF;
     --destructive: #D63B3B;
@@ -137,22 +84,21 @@
     --border: #DDE4EF;
     --input: #DDE4EF;
     --ring: #1A6ED8;
-    --chart-1: #0A4FA6;
-    --chart-2: #00B5A4;
-    --chart-3: #1A8C5B;
-    --chart-4: #E07C10;
-    --chart-5: #D63B3B;
-    --radius: 0.5rem;
-    --sidebar-background: #0A4FA6;
-    --sidebar-foreground: #FFFFFF;
-    --sidebar-primary: #FFFFFF;
-    --sidebar-primary-foreground: #0A4FA6;
-    --sidebar-accent: #1A6ED8;
-    --sidebar-accent-foreground: #FFFFFF;
-    --sidebar-border: #072E63;
-    --sidebar-ring: #E8F1FB;
-    --sidebar: #0A4FA6;
+    --radius: 0.75rem;
+
+    /* Legacy reference from HTML */
+    --p: #0A4FA6; --pl: #1A6ED8; --pp: #E8F1FB; --pd: #072E63;
+    --a: #00B5A4; --ap: #E0F7F5;
+    --d: #D63B3B; --dp: #FDEAEA;
+    --w: #E07C10; --wp: #FEF0E0;
+    --s: #1A8C5B; --sp: #E2F5EC;
+    --bg: #F3F6FA; --sf: #FFF; --sf2: #F8FAFD;
+    --br: #DDE4EF; --t: #0D1F3C; --t2: #4A5878; --t3: #8A96AE;
+    --r: 10px; --rl: 14px;
+    --sh: 0 2px 12px rgba(10, 79, 166, .08);
+    --shl: 0 8px 32px rgba(10, 79, 166, .14);
 }
+
 
 .dark {
     --background: hsl(0 0% 3.9%);
