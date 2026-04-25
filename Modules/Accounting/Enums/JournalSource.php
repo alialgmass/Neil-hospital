@@ -6,6 +6,7 @@ enum JournalSource: string
 {
     case MANUAL = 'manual';
     case BOOKING = 'booking';
+    case AUTO_BOOKING = 'auto_booking';
     case PURCHASE = 'purchase';
     case EXPENSE = 'expense';
     case SALARY = 'salary';
@@ -16,6 +17,7 @@ enum JournalSource: string
         return match ($this) {
             self::MANUAL => 'يدوي',
             self::BOOKING => 'حجز',
+            self::AUTO_BOOKING => 'حجز تلقائي',
             self::PURCHASE => 'مشتريات',
             self::EXPENSE => 'مصروفات',
             self::SALARY => 'رواتب',

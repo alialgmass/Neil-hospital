@@ -98,10 +98,15 @@ class SurgeryService
 
     public function recordSupplies(SuppliesUsedData $data): Surgery
     {
-        $total = $data->total();
+        $surgery = Surgery::findOrFail($data->surgeryId);
+        $existing = $surgery->supplies_used ?? [];
+        $newItems = $data->items;
+
+        $merged = array_merge($existing, $newItems);
+        $total = array_sum(array_map(fn ($item) => (float) ($item['total'] ?? 0), $merged));
 
         return $this->surgeryRepository->update($data->surgeryId, [
-            'supplies_used' => $data->items,
+            'supplies_used' => $merged,
             'supply_total' => $total,
         ]);
     }

@@ -138,6 +138,54 @@ function openSupplies(id: string) {
     showSupplies.value = true;
 }
 
+function submitSupplies(items: any[]) {
+    if (!activeCase.value) return;
+
+    const validItems = items.filter(item => item.name && item.qty > 0);
+    if (validItems.length === 0) {
+        toast.error('يرجى إضافة صنف واحد على الأقل');
+        return;
+    }
+
+    const newTotal = validItems.reduce((sum, item) => sum + (item.qty * item.unit_cost), 0);
+    const prevSupplies = activeCase.value.supplies_used ?? [];
+    const optimisticSupplies = [...prevSupplies, ...validItems];
+
+    router.post(
+        `/lasik/${activeCase.value.id}/supplies`,
+        { supplies: validItems },
+        {
+            onSuccess: (page) => {
+                if (page.props.flash?.surgery) {
+                    activeCase.value!.supplies_used = page.props.flash.surgery.supplies_used;
+                    activeCase.value!.supply_total = page.props.flash.surgery.supply_total;
+                } else {
+                    activeCase.value!.supplies_used = optimisticSupplies;
+                    activeCase.value!.supply_total = (parseFloat(String(activeCase.value.supply_total)) + newTotal).toFixed(2);
+                }
+                toast.success('تم حفظ المستلزمات بنجاح');
+            },
+            onError: () => {
+                activeCase.value!.supplies_used = prevSupplies;
+                toast.error('فشل في حفظ المستلزمات. حاول مرة أخرى.');
+            },
+        },
+    );
+}
+
+function submitReport(data: { op_report: string; post_op_notes: string; complications: string }) {
+    if (!activeCase.value) return;
+    router.patch(
+        `/lasik/${activeCase.value.id}/report`,
+        data,
+        {
+            onSuccess: () => {
+                toast.success('تم حفظ التقرير بنجاح');
+            },
+        },
+    );
+}
+
 /* ── Table ── */
 const columns = [
     { key: 'scheduled_at', label: 'الموعد', sortable: true },
@@ -266,10 +314,13 @@ const eyeLabel: Record<string, string> = { OD: 'يمنى', OS: 'يسرى', OU: '
     <CasePanel
         v-if="activeCase"
         :surgery="activeCase"
+        :inventory-items="inventoryItems"
         @close="closeCase"
         @open-report="openReport"
         @open-supplies="openSupplies"
         @update-status="updateStatus"
+        @submit-supplies="submitSupplies"
+        @submit-report="submitReport"
     />
 
     <!-- Schedule Modal -->

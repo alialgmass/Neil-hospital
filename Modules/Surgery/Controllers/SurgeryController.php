@@ -65,10 +65,13 @@ class SurgeryController extends Controller
         return back()->with('success', 'تم تسجيل تقرير العملية.');
     }
 
-    public function supplies(RecordSuppliesRequest $request): RedirectResponse
+    public function supplies(RecordSuppliesRequest $request)
     {
         $data = SuppliesUsedData::fromArray($request->validated());
-        $this->suppliesAction->execute($data);
+        $surgery = $this->suppliesAction->execute($data);
+
+        session()->flash('surgery.supplies_used', $surgery->supplies_used);
+        session()->flash('surgery.supply_total', $surgery->supply_total);
 
         return back()->with('success', 'تم تسجيل المستلزمات المستخدمة.');
     }

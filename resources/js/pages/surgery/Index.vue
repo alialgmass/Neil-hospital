@@ -201,13 +201,32 @@ function submitOverlaySupplies() {
         .filter((i) => i.inventory_item_id !== '')
         .map((i) => ({ ...i, total: i.qty * i.unit_cost }));
 
+    if (adding.length === 0) {
+        toast.error('يرجى إضافة صنف واحد على الأقل');
+        return;
+    }
+
+    const newTotal = adding.reduce((sum, item) => sum + (item.total ?? item.qty * item.unit_cost), 0);
+    const optimisticSupplies = [...existing, ...adding];
+
     router.post(
         `/surgery/${selectedCase.value!.id}/supplies`,
         { surgery_id: selectedCase.value!.id, items: [...existing, ...adding] as any },
         {
-            onSuccess: () => {
+            onSuccess: (page) => {
+                if (page.props.flash?.surgery) {
+                    selectedCase.value!.supplies_used = page.props.flash.surgery.supplies_used;
+                    selectedCase.value!.supply_total = page.props.flash.surgery.supply_total;
+                } else {
+                    selectedCase.value!.supplies_used = optimisticSupplies;
+                    selectedCase.value!.supply_total = (parseFloat(String(selectedCase.value!.supply_total)) + newTotal).toFixed(2);
+                }
                 newSupplyItems.value = [{ inventory_item_id: '', name: '', qty: 1, unit_cost: 0 }];
                 toast.success('تم تسجيل المستلزمات بنجاح');
+            },
+            onError: () => {
+                selectedCase.value!.supplies_used = existing;
+                toast.error('فشل في حفظ المستلزمات. حاول مرة أخرى.');
             },
         },
     );
