@@ -43,33 +43,36 @@ const form = useForm({
 
 const procedures = ['LASIK', 'SMILE', 'PRK', 'LASEK', 'Femto-LASIK', 'Trans PRK'];
 
-const occupiedBedIds = computed(() => {
-    const ids: number[] = [];
+interface FlatBed {
+    id: number;
+    displayNumber: number;
+    surgery?: { status: string } | null;
+}
+
+const flatBeds = computed<FlatBed[]>(() => {
+    const result: FlatBed[] = [];
+    let seq = 1;
     props.orRooms.forEach((room) => {
         room.beds.forEach((bed) => {
-            if (
-                bed.status !== 'available' &&
-                bed.surgery &&
-                ['scheduled', 'prep', 'in_progress'].includes(bed.surgery.status)
-            ) {
-                ids.push(bed.id);
-            }
+            result.push({ id: bed.id, displayNumber: seq++, surgery: bed.surgery });
         });
     });
-    return ids;
+    return result;
 });
+
+const occupiedBedIds = computed(() =>
+    flatBeds.value
+        .filter((b) => b.surgery && ['scheduled', 'prep', 'in_progress'].includes(b.surgery.status))
+        .map((b) => b.id),
+);
+
+const selectedDisplayNumber = computed(() =>
+    flatBeds.value.find((b) => b.id === form.or_bed_id)?.displayNumber ?? null,
+);
 
 function selectBed(bedId: number) {
     if (occupiedBedIds.value.includes(bedId)) return;
     form.or_bed_id = form.or_bed_id === bedId ? null : bedId;
-}
-
-function getBedLabel(bedId: number): string {
-    for (const room of props.orRooms) {
-        const bed = room.beds.find((b) => b.id === bedId);
-        if (bed) return `${room.name} - سرير ${bed.bed_number}`;
-    }
-    return '';
 }
 
 function submit() {
@@ -163,33 +166,26 @@ function close() {
                     <span class="beds-legend-item">
                         <span class="beds-dot beds-dot-selected" /> محدد
                     </span>
-                    <span v-if="form.or_bed_id" class="beds-selected-label ms-auto">
-                        ✓ {{ getBedLabel(form.or_bed_id) }}
+                    <span v-if="selectedDisplayNumber" class="beds-selected-label ms-auto">
+                        ✓ سرير {{ selectedDisplayNumber }}
                     </span>
                 </div>
-                <div v-for="room in orRooms" :key="room.id" class="beds-room">
-                    <p class="beds-room-name">{{ room.name }}</p>
-                    <div class="beds-row">
-                        <button
-                            v-for="bed in room.beds"
-                            :key="bed.id"
-                            type="button"
-                            :class="[
-                                'bed-btn',
-                                occupiedBedIds.includes(bed.id) ? 'bed-btn-busy' : 'bed-btn-free',
-                                form.or_bed_id === bed.id ? 'bed-btn-selected' : '',
-                            ]"
-                            :title="
-                                occupiedBedIds.includes(bed.id)
-                                    ? `${room.name} - سرير ${bed.bed_number} مشغول`
-                                    : `${room.name} - سرير ${bed.bed_number}`
-                            "
-                            @click="selectBed(bed.id)"
-                        >
-                            <span class="bed-btn-num">{{ bed.bed_number }}</span>
-                            <span v-if="occupiedBedIds.includes(bed.id)" class="bed-busy-dot" />
-                        </button>
-                    </div>
+                <div class="beds-row">
+                    <button
+                        v-for="bed in flatBeds"
+                        :key="bed.id"
+                        type="button"
+                        :class="[
+                            'bed-btn',
+                            occupiedBedIds.includes(bed.id) ? 'bed-btn-busy' : 'bed-btn-free',
+                            form.or_bed_id === bed.id ? 'bed-btn-selected' : '',
+                        ]"
+                        :title="occupiedBedIds.includes(bed.id) ? `سرير ${bed.displayNumber} مشغول` : `سرير ${bed.displayNumber}`"
+                        @click="selectBed(bed.id)"
+                    >
+                        <span class="bed-btn-num">{{ bed.displayNumber }}</span>
+                        <span v-if="occupiedBedIds.includes(bed.id)" class="bed-busy-dot" />
+                    </button>
                 </div>
             </div>
 
@@ -280,11 +276,6 @@ function close() {
     font-size: 10px; font-weight: 700;
     background: #7b2fa6; color: #fff;
     border-radius: 12px; padding: 2px 10px;
-}
-.beds-room { display: flex; flex-direction: column; gap: 6px; }
-.beds-room-name {
-    font-size: 10px; font-weight: 700;
-    color: #4a5878; text-transform: uppercase; letter-spacing: 0.4px;
 }
 .beds-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .bed-btn {

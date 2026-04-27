@@ -230,6 +230,7 @@ const eyeLabel: Record<string, string> = { OD: 'يمنى', OS: 'يسرى', OU: '
     <BedsGrid
         :or-rooms="orRooms"
         :surgeries="surgeries.data"
+        :dept="dept"
         @open-case="openCase"
         @schedule-new="showSchedule = true"
         @open-report="openReport"

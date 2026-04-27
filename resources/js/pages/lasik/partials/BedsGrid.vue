@@ -4,11 +4,13 @@ import { computed } from 'vue';
 
 interface Surgery {
     id: string;
+    dept: string;
     booking: { file_no: string; patient_name: string };
     procedure: string;
     eye: 'OD' | 'OS' | 'OU' | null;
     surgeon: { id: string; name: string } | null;
     or_bed_id: number | null;
+    scheduled_at: string | null;
     status: 'scheduled' | 'prep' | 'in_progress' | 'completed' | 'cancelled';
 }
 
@@ -28,6 +30,7 @@ interface OrRoom {
 const props = defineProps<{
     orRooms: OrRoom[];
     surgeries: Surgery[];
+    dept: string;
 }>();
 
 const emit = defineEmits<{
@@ -60,17 +63,21 @@ const eyeLabel: Record<string, string> = {
 };
 
 const bedMap = computed(() => {
-    const map: { room: OrRoom; bed: OrBed; surgery: Surgery | null }[] = [];
+    const list: { bed: OrBed; surgery: Surgery | null; displayNumber: number }[] = [];
+    let seq = 1;
     props.orRooms.forEach((room) => {
         room.beds.forEach((bed) => {
-            const surgery = props.surgeries.find((s) => s.or_bed_id === bed.id) ?? null;
-            map.push({ room, bed, surgery });
+            list.push({ bed, surgery: bed.surgery ?? null, displayNumber: seq++ });
         });
     });
-    return map;
+    return list;
 });
 
 const totalBeds = computed(() => bedMap.value.length);
+
+function isOwnDept(surgery: Surgery): boolean {
+    return surgery.dept === props.dept;
+}
 </script>
 
 <template>
@@ -88,6 +95,7 @@ const totalBeds = computed(() => bedMap.value.length);
                     <span class="legend-item"><span class="legend-dot" style="background:#E74C3C" />جارية</span>
                     <span class="legend-item"><span class="legend-dot" style="background:#1A8C5B" />مكتملة</span>
                     <span class="legend-item"><span class="legend-dot" style="background:#BDC3C7" />فارغة</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#E67E22" />قسم آخر</span>
                 </div>
             </div>
             <button class="schedule-btn" @click="emit('scheduleNew')">
@@ -98,36 +106,40 @@ const totalBeds = computed(() => bedMap.value.length);
 
         <div class="beds-grid">
             <div
-                v-for="(item, idx) in bedMap"
-                :key="idx"
+                v-for="item in bedMap"
+                :key="item.bed.id"
                 class="bed-card"
                 :style="
                     item.surgery
-                        ? { background: statusColor[item.surgery.status] ?? '#7B2FA6' }
+                        ? { background: isOwnDept(item.surgery) ? (statusColor[item.surgery.status] ?? '#7B2FA6') : '#E67E22' }
                         : { background: '#BDC3C7', opacity: '0.75' }
                 "
-                @click="item.surgery ? emit('openCase', item.surgery) : emit('scheduleNew')"
+                @click="item.surgery && isOwnDept(item.surgery) ? emit('openCase', item.surgery) : emit('scheduleNew')"
             >
-                <div class="bed-header">
-                    <span class="bed-room-label">{{ item.room.name }}</span>
-                    <span class="bed-num">{{ item.bed.bed_number }}</span>
+                <div class="bed-card-hd">
+                    <span class="text-[13px] font-black">سرير {{ item.displayNumber }}</span>
                     <span v-if="item.surgery" class="bed-status-badge">
-                        {{ statusAr[item.surgery.status] }}
+                        {{ isOwnDept(item.surgery) ? statusAr[item.surgery.status] : 'قسم آخر' }}
                     </span>
                 </div>
 
-                <div v-if="item.surgery" class="bed-body">
-                    <p class="bed-patient">{{ item.surgery.booking?.patient_name ?? '—' }}</p>
-                    <p class="bed-detail"><span>الإجراء:</span><strong>{{ item.surgery.procedure }}</strong></p>
-                    <p class="bed-detail">
+                <div v-if="item.surgery && isOwnDept(item.surgery)" class="bed-card-body">
+                    <p class="mb-1 text-[14px] font-extrabold leading-tight">
+                        {{ item.surgery.booking?.patient_name ?? '—' }}
+                    </p>
+                    <p class="bed-info-row"><span>الإجراء:</span><strong>{{ item.surgery.procedure || '—' }}</strong></p>
+                    <p class="bed-info-row">
                         <span>الطبيب:</span><strong>{{ item.surgery.surgeon?.name ?? '—' }}</strong>
                     </p>
-                    <p v-if="item.surgery.eye" class="bed-detail">
+                    <p v-if="item.surgery.eye" class="bed-info-row">
                         <span>العين:</span><strong>{{ eyeLabel[item.surgery.eye] ?? item.surgery.eye }}</strong>
                     </p>
-                    <div class="bed-actions" @click.stop>
+                    <p v-if="item.surgery.scheduled_at" class="bed-info-row">
+                        <span>الموعد:</span><strong>{{ item.surgery.scheduled_at.slice(0, 16).replace('T', ' ') }}</strong>
+                    </p>
+                    <div class="mt-2 flex gap-1.5" @click.stop>
                         <button class="bed-action-btn" @click="emit('openReport', item.surgery!.id)">
-                            ▶ تقرير
+                            📋 تقرير
                         </button>
                         <button class="bed-action-btn" @click="emit('openSupplies', item.surgery!.id)">
                             💊 مستلزمات
@@ -135,10 +147,15 @@ const totalBeds = computed(() => bedMap.value.length);
                     </div>
                 </div>
 
-                <div v-else class="bed-empty">
-                    <div class="bed-empty-icon">🛏️</div>
-                    <p class="bed-empty-label">سرير فارغ</p>
-                    <div class="bed-empty-action">+ جدولة ليزك</div>
+                <div v-else-if="item.surgery && !isOwnDept(item.surgery)" class="bed-card-empty">
+                    <div class="text-2xl">🔒</div>
+                    <p class="mt-1 text-[11px] opacity-90 font-semibold">مشغول بقسم آخر</p>
+                </div>
+
+                <div v-else class="bed-card-empty">
+                    <div class="text-2xl">🛏️</div>
+                    <p class="mt-1 text-[11px] opacity-80">سرير فارغ</p>
+                    <div class="mt-2 rounded bg-white/30 px-2 py-1 text-[10px]">+ جدولة ليزك</div>
                 </div>
             </div>
         </div>
@@ -221,11 +238,11 @@ const totalBeds = computed(() => bedMap.value.length);
 .beds-grid {
     padding: 14px;
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 12px;
 }
-@media (max-width: 1024px) { .beds-grid { grid-template-columns: repeat(7, 1fr); } }
-@media (max-width: 640px)  { .beds-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (min-width: 640px)  { .beds-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .beds-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .bed-card {
     border-radius: 10px;
@@ -234,85 +251,47 @@ const totalBeds = computed(() => bedMap.value.length);
     color: #fff;
     box-shadow: 0 3px 12px rgba(0,0,0,0.18);
     transition: transform 0.18s, box-shadow 0.18s;
-    min-height: 110px;
 }
 .bed-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.28);
 }
-.bed-header {
+.bed-card-hd {
     background: rgba(0,0,0,0.18);
-    padding: 6px 8px;
+    padding: 8px 12px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
-}
-.bed-room-label {
-    font-size: 9px;
-    opacity: 0.8;
-    font-weight: 600;
-    flex-basis: 100%;
-    line-height: 1;
-}
-.bed-num {
-    font-size: 15px;
-    font-weight: 900;
-    line-height: 1;
 }
 .bed-status-badge {
-    font-size: 8px;
+    font-size: 9px;
     background: rgba(255,255,255,0.25);
-    padding: 1px 6px;
-    border-radius: 10px;
-    margin-right: auto;
+    padding: 2px 8px;
+    border-radius: 12px;
 }
-.bed-body {
-    padding: 7px 8px;
-    font-size: 10px;
-    line-height: 1.8;
-}
-.bed-patient {
+.bed-card-body {
+    padding: 10px 12px;
     font-size: 11px;
-    font-weight: 800;
-    margin-bottom: 2px;
-    line-height: 1.3;
+    line-height: 1.85;
 }
-.bed-detail {
-    display: flex;
-    gap: 3px;
-    font-size: 10px;
-}
-.bed-detail span { opacity: 0.75; }
-.bed-actions {
-    display: flex;
-    gap: 4px;
-    margin-top: 6px;
-}
+.bed-info-row { display: flex; gap: 4px; }
+.bed-info-row span { opacity: 0.75; }
 .bed-action-btn {
     flex: 1;
-    padding: 3px 4px;
+    padding: 5px 4px;
     background: rgba(255,255,255,0.22);
     color: #fff;
     border: 1px solid rgba(255,255,255,0.45);
     border-radius: 5px;
     cursor: pointer;
-    font-size: 9px;
+    font-size: 10px;
     font-family: inherit;
     transition: background 0.15s;
+    white-space: nowrap;
 }
 .bed-action-btn:hover { background: rgba(255,255,255,0.35); }
-.bed-empty {
-    padding: 14px 8px;
+.bed-card-empty {
+    padding: 20px 12px;
     text-align: center;
-}
-.bed-empty-icon { font-size: 20px; }
-.bed-empty-label { font-size: 10px; opacity: 0.8; margin: 3px 0; }
-.bed-empty-action {
-    font-size: 9px;
-    background: rgba(255,255,255,0.3);
-    border-radius: 4px;
-    padding: 2px 6px;
-    display: inline-block;
 }
 </style>

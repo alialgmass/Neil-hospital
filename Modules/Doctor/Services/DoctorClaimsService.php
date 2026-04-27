@@ -59,7 +59,8 @@ class DoctorClaimsService
 
         // Per-department fee override takes priority
         $deptFee = $doctor->dept_fees[$dept] ?? null;
-        if ($deptFee) {
+
+        if ($deptFee && ! in_array($dept, ['surgery', 'lasik']) ) {
             return $this->computeFromFeeEntry($deptFee, $paid);
         }
 
@@ -75,7 +76,7 @@ class DoctorClaimsService
         };
     }
 
-    private function computeFromFeeEntry(array $deptFee, float $paid): float
+    private function computeFromFeeEntry(array$deptFee, float $paid): float
     {
         $feeValue = (float) ($deptFee['fee_value'] ?? 0);
 

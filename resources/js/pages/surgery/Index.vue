@@ -38,7 +38,7 @@ interface OrBed {
     id: number;
     bed_number: number;
     status: string;
-    surgery?: Surgery | null;
+    surgery?: (Surgery & { dept: string }) | null;
 }
 
 interface OrRoom {
@@ -114,6 +114,23 @@ const bedMap = computed(() => {
     });
 
     return map;
+});
+
+interface FlatOrBed {
+    id: number;
+    displayNumber: number;
+    surgery?: Surgery | null;
+}
+
+const flatOrBeds = computed<FlatOrBed[]>(() => {
+    const result: FlatOrBed[] = [];
+    let seq = 1;
+    props.orRooms.forEach((room) => {
+        room.beds.forEach((bed) => {
+            result.push({ id: bed.id, displayNumber: seq++, surgery: bed.surgery ?? null });
+        });
+    });
+    return result;
 });
 
 const totalBeds = computed(() => Object.keys(bedMap.value).length);
@@ -298,15 +315,8 @@ return;
 }
 
 function getBedLabel(bedId: number): string {
-    for (const room of props.orRooms) {
-        const bed = room.beds.find((b) => b.id === bedId);
-
-        if (bed) {
-return `${room.name} - سرير ${bed.bed_number}`;
-}
-    }
-
-    return '';
+    const found = flatOrBeds.value.find((b) => b.id === bedId);
+    return found ? `سرير ${found.displayNumber}` : '';
 }
 
 function submitSchedule() {
@@ -412,14 +422,20 @@ function submitSchedule() {
             v-for="(item, idx) in bedMap"
             :key="idx"
             class="bed-card group cursor-pointer"
-            :style="item.surgery ? { background: bedBg[item.surgery.status] ?? '#27AE60' } : { background: '#BDC3C7', opacity: '0.75' }"
-            @click="item.surgery ? openCase(item.surgery) : (showSchedule = true)"
+            :style="
+                item.surgery
+                    ? { background: item.surgery.dept === dept ? (bedBg[item.surgery.status] ?? '#27AE60') : '#E67E22' }
+                    : { background: '#BDC3C7', opacity: '0.75' }
+            "
+            @click="item.surgery && item.surgery.dept === dept ? openCase(item.surgery) : (showSchedule = true)"
         >
             <div class="bed-card-hd">
-                <span class="text-[13px] font-black">{{ item.room.name }} — سرير {{ item.bed.bed_number }}</span>
-                <span v-if="item.surgery" class="bed-status-badge">{{ statusAr[item.surgery.status] }}</span>
+                <span class="text-[13px] font-black">سرير {{ idx }}</span>
+                <span v-if="item.surgery" class="bed-status-badge">
+                    {{ item.surgery.dept === dept ? statusAr[item.surgery.status] : 'قسم آخر' }}
+                </span>
             </div>
-            <div v-if="item.surgery" class="bed-card-body">
+            <div v-if="item.surgery && item.surgery.dept === dept" class="bed-card-body">
                 <p class="mb-1 text-[14px] font-extrabold leading-tight">
                     {{ item.surgery.booking?.patient_name ?? '—' }}
                 </p>
@@ -443,6 +459,11 @@ function submitSchedule() {
                     </button>
                 </div>
             </div>
+            <div v-else-if="item.surgery && item.surgery.dept !== dept" class="bed-card-empty">
+                <div class="text-2xl">🔒</div>
+                <p class="mt-1 text-[11px] opacity-90 font-semibold">مشغول بقسم آخر</p>
+            </div>
+
             <div v-else class="bed-card-empty">
                 <div class="text-2xl">🛏️</div>
                 <p class="mt-1 text-[11px] opacity-80">غرفة فارغة</p>
@@ -841,21 +862,18 @@ function submitSchedule() {
                         ✓ {{ getBedLabel(scheduleForm.or_bed_id) }}
                     </span>
                 </div>
-                <div v-for="room in orRooms" :key="room.id" class="beds-room">
-                    <p class="beds-room-label">{{ room.name }}</p>
-                    <div class="beds-row">
-                        <button
-                            v-for="bed in room.beds"
-                            :key="bed.id"
-                            type="button"
-                            :class="['or-bed', occupiedBedIds.includes(bed.id) ? 'or-bed-busy' : 'or-bed-free', scheduleForm.or_bed_id === bed.id ? 'or-bed-selected' : '']"
-                            :title="occupiedBedIds.includes(bed.id) ? `${room.name} - سرير ${bed.bed_number} مشغول` : `${room.name} - سرير ${bed.bed_number}`"
-                            @click="selectOrBed(bed.id)"
-                        >
-                            <span class="or-bed-num">{{ bed.bed_number }}</span>
-                            <span v-if="occupiedBedIds.includes(bed.id)" class="or-bed-busy-dot" />
-                        </button>
-                    </div>
+                <div class="beds-row">
+                    <button
+                        v-for="bed in flatOrBeds"
+                        :key="bed.id"
+                        type="button"
+                        :class="['or-bed', occupiedBedIds.includes(bed.id) ? 'or-bed-busy' : 'or-bed-free', scheduleForm.or_bed_id === bed.id ? 'or-bed-selected' : '']"
+                        :title="occupiedBedIds.includes(bed.id) ? `سرير ${bed.displayNumber} مشغول` : `سرير ${bed.displayNumber}`"
+                        @click="selectOrBed(bed.id)"
+                    >
+                        <span class="or-bed-num">{{ bed.displayNumber }}</span>
+                        <span v-if="occupiedBedIds.includes(bed.id)" class="or-bed-busy-dot" />
+                    </button>
                 </div>
             </div>
 
@@ -1099,8 +1117,6 @@ function submitSchedule() {
 .beds-legend-busy { background: #fff0ee; border-color: #e74c3c; }
 .beds-legend-selected { background: #27ae60; border-color: #27ae60; }
 .beds-panel-selected { font-size: 10px; font-weight: 700; background: #27ae60; color: #fff; border-radius: 12px; padding: 2px 10px; }
-.beds-room { display: flex; flex-direction: column; gap: 6px; }
-.beds-room-label { font-size: 10px; font-weight: 700; color: #4a5878; text-transform: uppercase; letter-spacing: 0.4px; }
 .beds-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .or-bed {
     width: 48px;

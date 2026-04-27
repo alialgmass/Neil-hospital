@@ -32,14 +32,37 @@ const bedPickerColor = computed(() =>
 
 const hasRooms = computed(() => props.orRooms.length > 0);
 
-function isBedOccupied(bed: OrBed): boolean {
+interface FlatBed {
+    id: number;
+    displayNumber: number;
+    status: string;
+    surgery?: { id: string; status: string } | null;
+}
+
+const flatBeds = computed<FlatBed[]>(() => {
+    const result: FlatBed[] = [];
+    let seq = 1;
+    props.orRooms.forEach((room) => {
+        room.beds.forEach((bed) => {
+            result.push({ ...bed, displayNumber: seq++ });
+        });
+    });
+    return result;
+});
+
+const selectedDisplayNumber = computed(() => {
+    const found = flatBeds.value.find((b) => String(b.id) === props.modelValue);
+    return found?.displayNumber ?? null;
+});
+
+function isBedOccupied(bed: FlatBed): boolean {
     return !!bed.surgery && bed.surgery !== null;
 }
 
-function selectBed(bed: OrBed) {
+function selectBed(bed: FlatBed) {
     if (isBedOccupied(bed)) {
-return;
-}
+        return;
+    }
 
     const newValue = props.modelValue === String(bed.id) ? '' : String(bed.id);
     emit('update:modelValue', newValue);
@@ -58,29 +81,26 @@ return;
                 <span class="legend-dot legend-dot-selected" :style="{ background: bedPickerColor, opacity: '1' }" />
                 محدد
             </div>
-            <div v-for="room in orRooms" :key="room.id" class="bed-room">
-                <p class="bed-room-label">{{ room.name }}</p>
-                <div class="bed-room-row">
-                    <button
-                        v-for="bed in room.beds"
-                        :key="bed.id"
-                        type="button"
-                        :class="[
-                            'bk-bed',
-                            isBedOccupied(bed) ? 'bk-bed-busy' : 'bk-bed-free',
-                            modelValue === String(bed.id) ? 'bk-bed-selected' : '',
-                        ]"
-                        :style="modelValue === String(bed.id) ? { background: bedPickerColor, borderColor: bedPickerColor } : {}"
-                        :title="isBedOccupied(bed) ? `${room.name} - سرير ${bed.bed_number} مشغول` : `${room.name} - سرير ${bed.bed_number}`"
-                        @click="selectBed(bed)"
-                    >
-                        <span class="bk-bed-num">{{ bed.bed_number }}</span>
-                        <span v-if="isBedOccupied(bed)" class="bk-bed-busy-dot" />
-                    </button>
-                </div>
+            <div class="bed-room-row">
+                <button
+                    v-for="bed in flatBeds"
+                    :key="bed.id"
+                    type="button"
+                    :class="[
+                        'bk-bed',
+                        isBedOccupied(bed) ? 'bk-bed-busy' : 'bk-bed-free',
+                        modelValue === String(bed.id) ? 'bk-bed-selected' : '',
+                    ]"
+                    :style="modelValue === String(bed.id) ? { background: bedPickerColor, borderColor: bedPickerColor } : {}"
+                    :title="isBedOccupied(bed) ? `سرير ${bed.displayNumber} مشغول` : `سرير ${bed.displayNumber}`"
+                    @click="selectBed(bed)"
+                >
+                    <span class="bk-bed-num">{{ bed.displayNumber }}</span>
+                    <span v-if="isBedOccupied(bed)" class="bk-bed-busy-dot" />
+                </button>
             </div>
-            <p v-if="modelValue" class="bed-picker-selected" :style="{ color: bedPickerColor }">
-                ✓ سرير {{ modelValue }} محدد
+            <p v-if="selectedDisplayNumber" class="bed-picker-selected" :style="{ color: bedPickerColor }">
+                ✓ سرير {{ selectedDisplayNumber }} محدد
             </p>
         </div>
         <input
@@ -162,20 +182,6 @@ return;
 
 .legend-dot-selected {
     opacity: 1;
-}
-
-.bed-room {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.bed-room-label {
-    font-size: 10px;
-    font-weight: 700;
-    color: #4a5878;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
 }
 
 .bed-room-row {

@@ -126,36 +126,25 @@ class SurgeryService
             ->get();
     }
 
-    /** OR rooms with each bed's current active/scheduled surgery for a given date and dept. */
+    /** OR rooms with each bed's active surgery (any dept) so cross-dept occupancy is visible. */
     public function getOrRoomsWithBedStatus(string $dept, string $date): Collection
     {
-        return OrRoom::with(['beds' => function ($q) use ($dept, $date) {
+        return OrRoom::with(['beds' => function ($q) use ($date) {
             $q->orderBy('bed_number')
-                ->with(['surgery' => function ($sq) use ($dept, $date) {
-                    $sq->where('dept', $dept)
-//                        ->where(function ($iq) use ($date) {
-//                            $iq->whereIn('status', [PrepState::$name, InProgressState::$name])
-//                                ->orWhere(function ($iiq) use ($date) {
-//                                    $iiq->where('status', ScheduledState::$name)
-//                                        ->whereDate('scheduled_at', $date);
-//                                });
-//                        })
+                ->with(['surgery' => function ($sq) use ($date) {
+                    $sq->whereIn('status', [ScheduledState::$name, PrepState::$name, InProgressState::$name])
                         ->with(['booking', 'surgeon']);
                 }]);
         }])->orderBy('name')->get();
     }
 
-    /** OR rooms for a given date, without dept filter (used for booking form bed picker). */
+    /** OR rooms for a given date — shows any active surgery regardless of dept (for booking bed picker). */
     public function getOrRoomsForDate(string $date): Collection
     {
         return OrRoom::with(['beds' => function ($q) use ($date) {
             $q->orderBy('bed_number')
                 ->with(['surgery' => function ($sq) use ($date) {
-//                    $sq->whereIn('status', [PrepState::$name, InProgressState::$name])
-//                        ->orWhere(function ($iq) use ($date) {
-//                            $iq->where('status', ScheduledState::$name)
-//                                ->whereDate('scheduled_at', $date);
-//                        });
+                    $sq->whereIn('status', [ScheduledState::$name, PrepState::$name, InProgressState::$name]);
                 }]);
         }])->orderBy('name')->get();
     }
