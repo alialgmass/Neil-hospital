@@ -122,6 +122,7 @@ const form = useForm({
 });
 
 const isCreating = computed(() => props.submitMethod === 'post');
+const isPaid = computed(() => props.booking?.pay_status === 'paid');
 
 const showBeds = computed(
     () => form.dept === 'surgery' || form.dept === 'lasik',
@@ -241,6 +242,12 @@ function submit() {
 
 <template>
     <form @submit.prevent="submit">
+        <div v-if="isPaid" class="paid-banner">
+            <div class="paid-badge">تم الدفع</div>
+            <span>هذا الحجز مكتمل الدفع — لا يمكن تعديل بياناته</span>
+        </div>
+
+        <fieldset :disabled="isPaid" class="contents-fieldset">
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <div>
                 <PatientFields
@@ -372,8 +379,13 @@ function submit() {
                 </div>
             </div>
         </div>
+        </fieldset>
 
+        <div v-if="isPaid" class="paid-footer">
+            <button type="button" class="paid-close-btn" @click="emit('cancel')">إغلاق</button>
+        </div>
         <FormFooter
+            v-else
             :processing="form.processing"
             :is-edit-mode="!isCreating"
             @cancel="emit('cancel')"
@@ -441,5 +453,76 @@ function submit() {
     outline: none;
     border-color: #0a4fa6;
     box-shadow: 0 0 0 3px rgba(10, 79, 166, 0.08);
+}
+
+/* ── Paid / locked state ── */
+.contents-fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+}
+
+.contents-fieldset :deep(input:disabled),
+.contents-fieldset :deep(select:disabled),
+.contents-fieldset :deep(textarea:disabled),
+.contents-fieldset input:disabled,
+.contents-fieldset select:disabled,
+.contents-fieldset textarea:disabled {
+    background: #f5f7fb;
+    color: #7a8aaa;
+    cursor: not-allowed;
+    border-color: #e4eaf4;
+    opacity: 1;
+}
+
+.paid-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    background: #edfaf5;
+    border: 1px solid #a7e9cc;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #1a6b45;
+    font-weight: 500;
+}
+
+.paid-badge {
+    background: #1a8c5b;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.paid-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 12px;
+    border-top: 1px solid #e4eaf4;
+    margin-top: 4px;
+}
+
+.paid-close-btn {
+    padding: 9px 28px;
+    border-radius: 8px;
+    border: 1.5px solid #dde4ef;
+    background: #fff;
+    color: #4a5878;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.paid-close-btn:hover {
+    background: #f5f7fb;
+    border-color: #b0bcd4;
 }
 </style>
