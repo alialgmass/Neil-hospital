@@ -24,8 +24,9 @@ class DoctorClaimsService
 
         $bookings = DB::table('bookings')
             ->where('doctor_id', $doctorId)
-            ->where('pay_status', 'paid')
-            ->whereBetween('visit_date', [$from, $to])
+            ->whereNotIn('status', ['cancelled'])
+            ->whereDate('visit_date', '>=', $from)
+            ->whereDate('visit_date', '<=', $to)
             ->get();
 
         $rows = [];
@@ -149,7 +150,8 @@ class DoctorClaimsService
     private function buildClaimsResult(Doctor $doctor, string $from, string $to, float $total, array $rows): array
     {
         $paymentRecords = DoctorPayment::where('doctor_id', $doctor->id)
-            ->whereBetween('paid_at', [$from, $to])
+            ->whereDate('paid_at', '>=', $from)
+            ->whereDate('paid_at', '<=', $to)
             ->orderBy('paid_at')
             ->get(['id', 'amount', 'paid_at', 'method', 'notes']);
 
