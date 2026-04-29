@@ -16,7 +16,8 @@ class ClaimCalculator
     {
         $bookings = Booking::where('doctor_id', $doctor->id)
             ->whereBetween('visit_date', [$from->toDateString(), $to->toDateString()])
-            ->whereIn('status', ['confirmed', 'completed']) // Only confirmed/completed bookings count
+            ->whereIn('status', ['confirmed', 'in_progress', 'completed'])
+            ->with('surgery')
             ->get();
 
         $totalRevenue = 0;
@@ -40,13 +41,22 @@ class ClaimCalculator
             $totalRevenue += $revenue;
             $totalClaim += $claim;
 
-            $details[] = [
+            $dept = $booking->dept->value;
+            $row = [
                 'booking_id' => $booking->id,
                 'patient' => $booking->patient_name,
+                'dept' => $dept,
                 'revenue' => $revenue,
                 'claim' => $claim,
                 'date' => $booking->visit_date->toDateString(),
             ];
+
+            if (in_array($dept, ['surgery', 'lasik']) && $booking->surgery) {
+                $row['supplies'] = $booking->surgery->supplies_used ?? [];
+                $row['supply_total'] = (float) $booking->surgery->supply_total;
+            }
+
+            $details[] = $row;
         }
 
         return [

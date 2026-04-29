@@ -27,11 +27,21 @@ class DoctorService
 
     public function getActiveDoctorsWithClaims(string $from, string $to): Collection
     {
-        return Doctor::where('is_active', true)->get()->map(function ($doctor) use ($from, $to) {
+        $paidByDoctor = DoctorPayment::whereDate('paid_at', '>=', $from)
+            ->whereDate('paid_at', '<=', $to)
+            ->selectRaw('doctor_id, SUM(amount) as total_paid')
+            ->groupBy('doctor_id')
+            ->pluck('total_paid', 'doctor_id');
+
+        return Doctor::where('is_active', true)->orderBy('name')->get()->map(function ($doctor) use ($from, $to, $paidByDoctor) {
             $calc = $this->claimCalculator->calculate($doctor, Carbon::parse($from), Carbon::parse($to));
+            $totalClaim = $calc['stats']['total_claim'];
+            $paid = (float) ($paidByDoctor[$doctor->id] ?? 0);
 
             return (object) array_merge($doctor->toArray(), [
-                'claim' => $calc['stats']['total_claim'],
+                'claim' => $totalClaim,
+                'paid_amount' => $paid,
+                'net_due' => max(0, $totalClaim - $paid),
             ]);
         });
     }

@@ -232,6 +232,8 @@ watch(() => form.ins_company_id, recalcPrice);
 function submit() {
     const method = props.submitMethod === 'put' ? form.put : form.post;
     method.call(form, props.submitUrl, {
+        preserveState: true,
+        preserveScroll: true,
         onSuccess: () => emit('success'),
     });
 }

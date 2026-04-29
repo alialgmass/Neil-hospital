@@ -80,7 +80,8 @@
       "Bash(where herd *)",
       "Bash(php.bat vendor/bin/pint --dirty --format agent)",
       "Bash(php.bat artisan *)",
-      "Bash(php.bat vendor/bin/pint Modules/Booking/Controllers/BookingController.php --format agent)"
+      "Bash(php.bat vendor/bin/pint Modules/Booking/Controllers/BookingController.php --format agent)",
+      "Bash(vendor/bin/pint --dirty --format agent Modules/Doctor/Services/ClaimCalculator.php Modules/Doctor/Services/DoctorService.php)"
     ]
   },
   "enableAllProjectMcpServers": true,

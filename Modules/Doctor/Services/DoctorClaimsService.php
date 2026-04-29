@@ -35,7 +35,7 @@ class DoctorClaimsService
             $drShare = $this->computeDrShare($doctor, $booking);
             $totalDrShare += $drShare;
 
-            $rows[] = [
+            $row = [
                 'booking_id' => $booking->id,
                 'file_no' => $booking->file_no,
                 'patient_name' => $booking->patient_name,
@@ -46,6 +46,19 @@ class DoctorClaimsService
                 'ins_amount' => (float) $booking->ins_amount,
                 'dr_share' => $drShare,
             ];
+
+            if (in_array($booking->dept, ['surgery', 'lasik'])) {
+                $surgery = DB::table('surgeries')
+                    ->where('booking_id', $booking->id)
+                    ->first(['supplies_used', 'supply_total']);
+
+                $row['supplies'] = $surgery
+                    ? (json_decode($surgery->supplies_used, true) ?? [])
+                    : [];
+                $row['supply_total'] = $surgery ? (float) $surgery->supply_total : 0.0;
+            }
+
+            $rows[] = $row;
         }
 
         return $this->buildClaimsResult($doctor, $from, $to, $totalDrShare, $rows);
@@ -60,7 +73,7 @@ class DoctorClaimsService
         // Per-department fee override takes priority
         $deptFee = $doctor->dept_fees[$dept] ?? null;
 
-        if ($deptFee && ! in_array($dept, ['surgery', 'lasik']) ) {
+        if ($deptFee && ! in_array($dept, ['surgery', 'lasik'])) {
             return $this->computeFromFeeEntry($deptFee, $paid);
         }
 
@@ -76,7 +89,7 @@ class DoctorClaimsService
         };
     }
 
-    private function computeFromFeeEntry(array$deptFee, float $paid): float
+    private function computeFromFeeEntry(array $deptFee, float $paid): float
     {
         $feeValue = (float) ($deptFee['fee_value'] ?? 0);
 
